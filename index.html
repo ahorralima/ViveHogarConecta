@@ -3,78 +3,84 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EnConjunto</title>
+<title>ViveHogarConecta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEuElEQVR4nO3dy03cUBiG4cGiAjeQCthE7F1GxCotREodSKEEVlHKcANsqCCVTKQgjRCaj7HPnMt/ed8VIGFszsOPxzOGm+PxeCA613T2o0TgoM8CB8nAQTJwkAwcJLs9eOju4fn09uvv70P3JVHWJ8fdw/N7GScoHz5ILbqxfBHsogCmSNLJsWU2MD8y4ti+6vjIhWPveuMjC46ylcZHfBzXrDE+IuO4fnXxERNHrXXFRzQcdVcUH3FwtFhLfETA0W4V8eEbR+v1w4dXHAUrV/BMCj784SiWgY/gOK6cGfgIi6PKbxN8BMRR8TwDH6FwVD8DxUcQHI0em+DDPY6mj1rx4RhHh+sZ+HCJo8+VLnz4w9FNRvHn4mMMjs4yireAj944hsgo3g4++uEYKKN4a/jogWO4jOJt4qMtDiMyireMj1Y4TMko3j4+6uMwKKP4q+CjJg6zMoq/Fj7q/AkG4zKG7Ofy+PX09vrz5ZBzcniR0Wd+LP9NvJfx9u6Hj6SYHI5kdNjn5ZIAjyNkyiOj3fxYNswGj/NjyiOjkY9l86q78zGlklHdx7JzvX35mLLJqOhjKVppRz6mhDKq+FiuWGMvPqacMq70sVy9ui58bHooG1JG8dHN90+1vrTxx7dTchl793auJ8P+/JiSy9i1z3NVGfZ9fIYjiYyNez43kGHch8SRSsbF/Z+bybDsYxp4Z5HBzh7FvF9GwZmmQR/TqHsSzfbhWOZSGQF8TEPuZjbe6Yjm62aGdx/nr3NsP+GIJ+OadVrPaai1HWcv9kHGlhX1Oz/KcSBjuwCnPgpxIGPv2nv0Mf7PW5uq6fnB6s0HOLqeOa6ufICj92OK1Y8PcAx4tLk68QGOMdchVg8+suMYeIVqNe8jNY7h1y5X2z7y4hguw76P2xYb/fvtV8Fnffnz45BMxlvrz5eC+186PP+ScXKYkmF5fqTDYVCGWR+5cJiVYdNHIhzGZRj0kQWHCxnWfKTA4UiGKR/xcbiTYcdHcBxOZRjxERmHaxkWfITFEUDGcB8xcYSRMdZHQBzBZAz0EQ1HSBmjfITCEVjGEB9xcISX0d9HEBxJZHT2UXgjtak73lLJ6HnUESZHhzuLDMYrwUzck2i2vceyd9gEwdHubmbjNT2iJi8w7tn2n4Z4Mopfn5xucuSU0fToUuCILaPdMcbHkUFGoyONj4OKAwfJwEEycJAMHCQDB8nAQTJwUNznVnx1t/9fHA189QyTg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4KDal8/LLgO3aL4fvQdxY3KQDBwkAwfJwEEycJCMF/t07dXSH725GJODduLwBZx6Tw580Ge/VvCRvAsnpPZ9LI9Po3chbJyQkgwcJAMHycBBMnCQDBwkAwfJwEEycJAMHCQDB8nAQTJwkAwcJAMHycBBMnCQDBwkAwfJwEEycFDi2yEb/c/VDDE5SAYOkoGDZOAgGTgoLo48/428f+5x4KPdNyoCDnw0+hYFwYGPFt+cm+PxeAgU10Mr/sxEw0EVi/NrhaoHDpKBg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDZOAgGThIBg46qP4BL9RKDCsMUCoAAAAASUVORK5CYII=">
-<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAFE0lEQVR4nO3dzW3bQBRFYZpwBWogFXhjeM8yAq/SQgDXISAuwasgZUwD3riCVKIsAiiGEUvkXM7M+zlnZQQwRYqfnyhKZG5Op9NEVNtc/ZtEACI1AJEUgEgKQCQFIJICEEndTt66e3w5//z289vQdSFXE+ju8eW9njOmD/9IPbvxcib6qhKm0ZB8TKA1M4Y5NCQHgNbLwFD/rAPaagJDnTMNqE4DhnpmF5DiAEPZAekCMJQX0F77HkMZAe271zGUC1CL/Y2hLIDa7WkMxQfUeh9jKDKgir1b8ckXhmICqtaDIQvNrmcPhlID2uWVC0NJAe143IOhdIB2P2rGUCJAjd5zYSgFoKbv2DEUHFCH8z0YCguoz9lCDMUE1E1P9e9iyC6gznqql4Ahi4CG6KleDoZsARqop3ppGLICaLie6mViaDwgI3qql4yhkYBM6alePobGADKop/pRMNQbkFk91Y+FoX6AjOupfkQM9QDkQk/142Ko7Q2mHOkZtc7L8f78c3l6naI059TTcw4tx/v3es6YPvxj0gnkVE+39V+uKfE+jebMelrPoWXFjPE+h+bMepoaWlbLcG1oTq6nkaFlowm/hmoABdOzu6GlSoNTQ5sBhdSzo6FFcODR0DZAgfXsYmiRBbgztAFQeD2ioWWnfe/L0NrzQEn0VG/v4eF53xXwcn5o1QTKpmfr+h/21uNoDl0HlFDPpq04NNDjyNAVQGn1rNyWQzM9XgxdApRcz9UtOmzXU3FkY9zQPPa6dBf9d7uq9ZRYhuaBd8Zw1IetE2dPCWRoHnVvHnedt3GXV64SxdCn54HWHwBl0KPsxfK5lX2X5vIbiehR9neAOSQBQs/l1vjwbqgeEHr2kuHa0Pg71duvw5FKcWsIQFfqdpxbfBoC0KU6v0sqDg0BaDL1Hrt4MwQgc2doiitDALJ4fq/4MQQgc3p8GQKQRT2ODAHIqB4vhm7bLfr31x91v/jl1/epewb1/K08vVZc59rtM1cmkGk99ucQgKzrMW4oOyAXeiwbSg3IkR6zhvICcqfHpqGkgJzqMWgoIyDXeqwZSgcogB5ThnIBCqPHjqFEgILpMWIoC6CQeiwYSgEosJ7hhuIDCq9nrKHggJLoGWgoMqBUekYZCgsooZ4hhmICSqunv6H627uYvTY+uZ7Oz0PACdThunQXlS7PQ0BAre+M4aiyZevqXsViAmp3bx53lcbb2PCqjCGt/zPKoGfrdR0Vl3OEnUCXy6On9fZmBJRNT9OtTgcop552254OEO0bgEgKQCQFIJICEEkBiKQARFIAIikAkVS0D1Oddrf9v6c18rU+JhBJAYikAERSACIpAJEUgEgKQCQFIJICEEkBiKQARIM+C6v++KZph4fRa5AsJhBJAYikAERSACIpAJEU30g00dvoLxZWxwSiNoD8/k2QlQmEIVJfwjBE6kG0L0PL8Xn0KuSKg2iSAhBJAYikAERSACIpAJEUgEgKQCQFIJICEEkBiKQARFIAIikAkRSASApAJAUgkgIQSQGIpABEUgAiKQCRFIBIKt3NFZbj/ehVCBUTiKQARFIAIikAkRSASApA9K/y9DolB1TxFJDy1EUDhKHOT1pAQBjq+XTdnE6nKW6cd279xxYcELUu5ksYdQtAJAUgkgIQSQGIpABEUgAiKQCRFIBICkAkBSCSAhBJAYikAERSACIpAJEUgEgKQCQFIJICEEkBiKQARFIAIikA0aT0B2h8cyYYCSXoAAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAD1ElEQVR4nO3dvW0bQRRFYZIQoIKcT6ACXAKLUwkugMHkLsjROjMEQVcwd37ffedEgkSIxL5Po+Uuubwex3Eh+qrbl98lAgd9FzhIBg6SgYNk4CAZOEgGDpKBg2Qv+ke5qm/v/74uj/vSx7JL1+SHzz+a+FR53Ovbe2YoqXF8I+NjaX3k3ef4TxmXZ25pVlIcz867pvSREce5Sdd8PtLhaJlxTeYjF4726dZMPhLh6DXXmsZHFhx9J1pz+EiBY8QsawIf/jjGTbG6+zDHMXp+1dqHM445k6u+PmxxzJxZNfXhiWP+tKqjD0Mcq+ZU7Xy44WicUOPZ+erlwwpHFxn4MMTRcc3AhxWO7v9NCj48cAzazyjpfYTHMXQPtOT2ERvHhOcmJbGPwDimPWstWX1ExTH5eEZJ6SMkjiVHuko+H/FwLDwGWpL5CIZj7dHxSzIfkXAsl5HNRxgcm8hI5SMGjq1k5PERAMeGMpL42B3HtjIy+Ngax+Yy7H3siyOEDO+ru2yKI5CM9nvcdvHYEUc4Ga4+tsMRVIalj71whJbh52MjHAYyzHzsgsNGhpOPLXCYybDxsR6HpQwPH4txGMsw8LESh72M6D6W4Ugio72FPtbgyCajxDw5twBHNhlxfczGkVNGUB9TcWSWEdHHPBzICOdjEg5kRPQxAwcygvoYjgMZcX2MxYGM0D4G4kBGdB+jcCDDwMcQHMjw8NEfBzJsfHTGgQwnHz1xIMPMRzccyPDz0QcHMix9dMCBDFcfrTiQYeyjCQcyvH2cx4EMex8ncSAjg48zOJCRxMct1hWiM1em+7gFurY8lbkb8BblUylo/psrbyE+z4aWbMyXCfs1yOheedzDv4YUGaE37FgcyAi9eQfiQMaEhm7k9Zd9om0DB8nAQTJwkAwcJAMHycBBnQ6fR+zPrx+DfvPrz98X61g5SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDZOCgxG+ktn+787hYOUgGDpKBg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDVryGdMKHrdPQWDlIBg6SgYNk4CAZOEgGDpKBgzrhKI/7U7en0LFyUD8cLB5xe3Z2rBzUFQeLR8ROTO3kyoGPWJ2b1/U4jpZ75dTr5rX8GbfiIOPYISUZOEgGDpKBg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDLqq/WY64GnD/h2YAAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAEB0lEQVR4nO3dO24cVxCGUZIQ4AU5n0AL8BK0OC3BC1DQuRekaBwQEAglNvvvvo+q82UEOJzBrYM7PQ92vz6fzxfpbG+nbykBpDSAFAWQogBSFECKAkhRACkKIEUBpKgv2c0rd3z9/vHHx49v8x7Lur36LOw/6XwMo98C6P/S+RhGv3IM9Gk9n/rN8gF00gRD7wF0XsPBEEChg6O9oe6AcgFHb0OtAV01+6Oxob6Arp360dVQU0B3zPtoaagjoPsmffQz1A7Q3TM+mhnqBWjMdI9OhhoBGjnXo42hLoDGT/ToYagFoFmzPBoYqg9o7hSP6oaKA1phfscCj+G+KgO6ZHKXfHfsqGuoLKAL9TDUDtDlew9DjQDd9MzFUAtAtx73MFQc0ICjZobKAhr2mouhgoAGv2JnqBSgKe/3MFQE0MR3Cx8M7Q5o+nvNj/aGNgY0Xc97zQ3tCmgRPe91NrQloKX0NDe0H6AF9XQ2tBmgZfW0NbQToMX19DS0DaAt9DQ0tAegjfR0M7QBoO30tDK0OqBN9fQxtDSgrfU0MbQuoAJ6OhhaFFAZPeUNrQiomJ7ahpYDVFJPYUNrASqsp6qhhQCV11PS0CqAmuipZ2gJQK30FDM0H1BDPZUMTQbUVk8ZQzMBNddTw9A0QPTUMDQHED1lDE0ARE8lQ6MB0VPM0FBA9NQzNA4QPSUNDQJET1VDIwDRU9jQ7YDoqW3oXkD0lDd0IyB6Ohi6CxA9TQzdAoiePoauB0RPK0MXA6Knm6ErAdHT0NBlgOjpaegaQPS0NXQBIHo6G0oB0dPcUASInulNN3QeED2LNNfQSUD0LNVjnqG3ra9Rounr+bbvVZK0wqq+bXqdNt2xtieexd52vFKk1lnh1+fzOezwmZ5hDRvTuH/roWdkw1Z7ECB6xjdmzUcAomdWA1b+dkD0zO3u9Z9/ijttHUCKAkhRACkKIEUBpCiAFPXlpV8///7zvj/+x1//vHTKDqQogBQFkKIAUhRAigJIUQApCiBFAaQogBQFkKIAUhRAigJIUQApCiBFAaQogBQFkKIAUhRAigJIUQApCiBFAaQogBQFkKIAUhRAigJIUR1P79LtDCy3ZgdSFECKAkhRACkKIEUBpCiAFAWQogBSFECKAkhRACkKIEUBpCiAFAWQogBSFECKAkhRAGntL9UfX7/ffReamB1IUQApCiBFAaQogBQFkKIAUhRAGgvo8eNbdo9aus/O1w6kqDOAbEJVe3x+snYgRZ0EZBOq1+PUTM/vQAxV6vQ0X5/PZ3jfvrCxdeFGcAEgdc5BtKIAUhRAigJIUQApCiBFAaQogBQFkKIAUhRAigJIUQApCiBFAaQogBQFkKIAUhRAigJIUQDpJelf+M3WLB8KujAAAAAASUVORK5CYII=">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="EnConjunto">
-<meta name="theme-color" content="#2C58A0">
+<meta name="apple-mobile-web-app-title" content="ViveHogarConecta">
+<meta name="theme-color" content="#C141A1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style id="app-style">
 :root{
-  --bg:#F1F5FA;
+  --bg:#FFFFFF;
   --surface:#FFFFFF;
-  --surface-2:#E6ECF4;
-  --border:#D2DCE8;
-  --ink:#1E2A3A;
-  --ink-soft:#556277;
-  --ink-faint:#8494A8;
-  --paprika:#2C58A0;
+  --surface-2:#F6EEF4;
+  --border:#E8DCE5;
+  --ink:#221420;
+  --ink-soft:#6B5D68;
+  --ink-faint:#998C96;
+  --paprika:#C141A1;
   --paprika-ink:#FFFFFF;
-  --teal:#3E8C31;
+  --teal:#A66A12;
   --teal-ink:#FFFFFF;
   --gold:#9C7220;
-  --gold-fill:#D9A441;
+  --gold-fill:#F8B132;
+  --whatsapp:#25D366;
+  --whatsapp-ink:#FFFFFF;
   --danger:#B23B3B;
   --danger-ink:#FFF9F0;
-  --focus:#2C58A0;
-  --shadow: 0 1px 2px rgba(20,32,52,0.06), 0 4px 14px rgba(20,32,52,0.07);
+  --focus:#C141A1;
+  --shadow: 0 1px 2px rgba(40,15,35,0.06), 0 4px 14px rgba(40,15,35,0.07);
   --font-display:'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
   --font-body:'Public Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0F1620;
-    --surface:#17212E;
-    --surface-2:#212D3D;
-    --border:#2E3C4E;
-    --ink:#E9EFF7;
-    --ink-soft:#AAB9CC;
-    --ink-faint:#7C8CA1;
-    --paprika:#6392DD;
-    --paprika-ink:#0C1826;
-    --teal:#6BC157;
-    --teal-ink:#08210A;
+    --bg:#1A1219;
+    --surface:#241A23;
+    --surface-2:#31242F;
+    --border:#453341;
+    --ink:#F4EAF2;
+    --ink-soft:#CBB9C7;
+    --ink-faint:#9A8696;
+    --paprika:#E56FC3;
+    --paprika-ink:#2A0F22;
+    --teal:#E0A94A;
+    --teal-ink:#2A1B04;
     --gold:#E8B857;
-    --gold-fill:#E8B857;
+    --gold-fill:#F8B132;
+    --whatsapp:#25D366;
+    --whatsapp-ink:#FFFFFF;
     --danger:#E17B7B;
     --danger-ink:#2A0E0E;
-    --focus:#6BC157;
+    --focus:#E56FC3;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0F1620;
-  --surface:#17212E;
-  --surface-2:#212D3D;
-  --border:#2E3C4E;
-  --ink:#E9EFF7;
-  --ink-soft:#AAB9CC;
-  --ink-faint:#7C8CA1;
-  --paprika:#6392DD;
-  --paprika-ink:#0C1826;
-  --teal:#6BC157;
-  --teal-ink:#08210A;
+  --bg:#1A1219;
+  --surface:#241A23;
+  --surface-2:#31242F;
+  --border:#453341;
+  --ink:#F4EAF2;
+  --ink-soft:#CBB9C7;
+  --ink-faint:#9A8696;
+  --paprika:#E56FC3;
+  --paprika-ink:#2A0F22;
+  --teal:#E0A94A;
+  --teal-ink:#2A1B04;
   --gold:#E8B857;
-  --gold-fill:#E8B857;
+  --gold-fill:#F8B132;
+  --whatsapp:#25D366;
+  --whatsapp-ink:#FFFFFF;
   --danger:#E17B7B;
   --danger-ink:#2A0E0E;
-  --focus:#6BC157;
+  --focus:#E56FC3;
   --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
 }
 *{box-sizing:border-box;}
@@ -107,14 +113,16 @@ input,select,textarea{font-family:inherit;font-size:0.95rem;}
   border-bottom:1px solid var(--border);
   padding:14px 16px 10px;
 }
-.header-row{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1040px;margin:0 auto;width:100%;}
-.brand{display:flex;align-items:center;gap:10px;line-height:1.1;}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;max-width:1040px;margin:0 auto;width:100%;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:9px;line-height:1.1;min-width:0;}
 .brand-mark{flex:none;}
-.brand-text{display:flex;flex-direction:column;}
-.brand-name{font-family:var(--font-display);font-weight:800;font-size:1.5rem;letter-spacing:-0.01em;color:var(--paprika);}
-.brand-tag{font-size:0.78rem;font-weight:800;letter-spacing:-0.01em;}
-.brand-tag .b1{color:var(--paprika);}
-.brand-tag .b2{color:var(--teal);}
+.brand-text{display:flex;flex-direction:column;min-width:0;}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:1.1rem;letter-spacing:-0.01em;color:var(--paprika);white-space:nowrap;}
+.brand-tag{font-size:0.68rem;font-weight:600;letter-spacing:0.02em;color:var(--ink-faint);white-space:nowrap;}
+@media (min-width:420px){
+  .brand-name{font-size:1.3rem;}
+  .brand-tag{font-size:0.74rem;}
+}
 .proyecto-switch{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;}
 .proyecto-switch button{
   border:none;background:transparent;color:var(--ink-soft);font-size:0.78rem;font-weight:600;
@@ -245,7 +253,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;
 }
 .wa-btn{
-  display:flex;align-items:center;justify-content:center;gap:10px;background:var(--teal);color:var(--teal-ink);
+  display:flex;align-items:center;justify-content:center;gap:10px;background:var(--whatsapp);color:var(--whatsapp-ink);
   border-radius:10px;padding:15px;font-weight:800;font-size:1rem;text-decoration:none;box-shadow:var(--shadow);margin-bottom:12px;
 }
 .wa-btn svg{flex:none;}
@@ -332,7 +340,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading-screen"><div class="spinner"></div><p>Cargando EnConjunto…</p></div></div>
+<div id="app"><div class="loading-screen"><div class="spinner"></div><p>Cargando ViveHogarConecta…</p></div></div>
 <script>
 (function(){
 'use strict';
@@ -619,18 +627,16 @@ function cardHtml(s){
 }
 
 function houseMarkSvg(){
-  return '<svg class="brand-mark" width="38" height="34" viewBox="0 0 44 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
-    '<path d="M3,14 L14,3 L25,14 L25,29 L3,29 Z" style="fill:none;stroke:var(--paprika);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;"/>'+
-    '<rect x="7" y="17" width="4" height="4" style="fill:#E0568F;"/>'+
-    '<path d="M17,22 L28,11 L39,22 L39,37 L17,37 Z" style="fill:var(--bg);stroke:var(--teal);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;"/>'+
-    '<rect x="30" y="25" width="4" height="4" style="fill:var(--paprika);"/>'+
+  return '<svg class="brand-mark" width="30" height="28" viewBox="0 0 32 30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+    '<path d="M4,15 L16,3 L28,15 L28,27 L4,27 Z" style="fill:none;stroke:var(--paprika);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round;"/>'+
+    '<rect x="13.5" y="17" width="5" height="5" style="fill:var(--gold-fill);"/>'+
   '</svg>';
 }
 
 function renderHeader(){
   return '<div class="header"><div class="header-row">'+
     '<div class="brand">'+houseMarkSvg()+
-      '<div class="brand-text"><span class="brand-name">EnConjunto</span><span class="brand-tag"><span class="b1">vive</span><span class="b2">Hogar</span></span></div>'+
+      '<div class="brand-text"><span class="brand-name">ViveHogarConecta</span><span class="brand-tag">Marketplace vecinal</span></div>'+
     '</div>'+
     '<div class="proyecto-switch">'+
       '<button type="button" data-action="set-proyecto" data-value="all" class="'+(ui.fProyecto==='all'?'active':'')+'">Todos</button>'+
@@ -673,7 +679,7 @@ function etapaPromptHtml(){
 
 function renderHome(){
   var list = visibleServicios();
-  var greeting = identity && identity.nombre ? '¡Hola, '+esc(identity.nombre.split(' ')[0])+'!' : 'Bienvenido a EnConjunto';
+  var greeting = identity && identity.nombre ? '¡Hola, '+esc(identity.nombre.split(' ')[0])+'!' : 'Bienvenido a ViveHogarConecta';
   var html = '<h2 style="margin-bottom:12px;">'+greeting+'</h2>';
 
   if (ui.showEtapaPrompt){
@@ -767,9 +773,9 @@ function renderDetalle(){
   html += '<div class="panel"><h4>Precio</h4><p style="font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;">'+priceTxt+'</p></div>';
 
   if (s.demo){
-    html += '<div class="demo-callout">📌 Este es un servicio de ejemplo para mostrar cómo funciona EnConjunto. No tiene un contacto real — ¡publica el tuyo!</div>';
+    html += '<div class="demo-callout">📌 Este es un servicio de ejemplo para mostrar cómo funciona ViveHogarConecta. No tiene un contacto real — ¡publica el tuyo!</div>';
   } else {
-    var msg = 'Hola, vi tu servicio "'+s.titulo+'" en EnConjunto. ¿Sigue disponible?';
+    var msg = 'Hola, vi tu servicio "'+s.titulo+'" en ViveHogarConecta. ¿Sigue disponible?';
     html += '<a class="wa-btn" href="'+waLink(s.autorTelefono, msg)+'" target="_blank" rel="noopener">'+svgWa()+' Contactar por WhatsApp</a>';
   }
   html += '<a class="maps-btn" href="'+mapsUrl(s)+'" target="_blank" rel="noopener">'+svgPin()+' Cómo llegar hasta ahí</a>';
@@ -959,13 +965,13 @@ function renderPerfil(){
   html += '<button type="button" class="btn btn-ghost btn-block" data-action="logout">Cerrar sesión</button>'+
     '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:8px;text-align:center;">Esto no borra los servicios que ya publicaste — bórralos desde "Mis servicios" si lo necesitas.</p>';
 
-  html += '<p class="footer-note">EnConjunto · Proyecto piloto de Ingenium para Vive Hogar Castilla y Sullana · v0.2</p>';
+  html += '<p class="footer-note">ViveHogarConecta · Proyecto piloto de Ingenium para Vive Hogar Castilla y Sullana · v0.2</p>';
   return html;
 }
 
 function renderApp(){
   if (loading){
-    document.getElementById('app').innerHTML = '<div class="loading-screen"><div class="spinner"></div><p>Cargando EnConjunto…</p></div>';
+    document.getElementById('app').innerHTML = '<div class="loading-screen"><div class="spinner"></div><p>Cargando ViveHogarConecta…</p></div>';
     return;
   }
   var body = '';
