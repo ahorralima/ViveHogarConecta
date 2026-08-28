@@ -1,0 +1,1369 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EnConjunto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEuElEQVR4nO3dy03cUBiG4cGiAjeQCthE7F1GxCotREodSKEEVlHKcANsqCCVTKQgjRCaj7HPnMt/ed8VIGFszsOPxzOGm+PxeCA613T2o0TgoM8CB8nAQTJwkAwcJLs9eOju4fn09uvv70P3JVHWJ8fdw/N7GScoHz5ILbqxfBHsogCmSNLJsWU2MD8y4ti+6vjIhWPveuMjC46ylcZHfBzXrDE+IuO4fnXxERNHrXXFRzQcdVcUH3FwtFhLfETA0W4V8eEbR+v1w4dXHAUrV/BMCj784SiWgY/gOK6cGfgIi6PKbxN8BMRR8TwDH6FwVD8DxUcQHI0em+DDPY6mj1rx4RhHh+sZ+HCJo8+VLnz4w9FNRvHn4mMMjs4yireAj944hsgo3g4++uEYKKN4a/jogWO4jOJt4qMtDiMyireMj1Y4TMko3j4+6uMwKKP4q+CjJg6zMoq/Fj7q/AkG4zKG7Ofy+PX09vrz5ZBzcniR0Wd+LP9NvJfx9u6Hj6SYHI5kdNjn5ZIAjyNkyiOj3fxYNswGj/NjyiOjkY9l86q78zGlklHdx7JzvX35mLLJqOhjKVppRz6mhDKq+FiuWGMvPqacMq70sVy9ui58bHooG1JG8dHN90+1vrTxx7dTchl793auJ8P+/JiSy9i1z3NVGfZ9fIYjiYyNez43kGHch8SRSsbF/Z+bybDsYxp4Z5HBzh7FvF9GwZmmQR/TqHsSzfbhWOZSGQF8TEPuZjbe6Yjm62aGdx/nr3NsP+GIJ+OadVrPaai1HWcv9kHGlhX1Oz/KcSBjuwCnPgpxIGPv2nv0Mf7PW5uq6fnB6s0HOLqeOa6ufICj92OK1Y8PcAx4tLk68QGOMdchVg8+suMYeIVqNe8jNY7h1y5X2z7y4hguw76P2xYb/fvtV8Fnffnz45BMxlvrz5eC+186PP+ScXKYkmF5fqTDYVCGWR+5cJiVYdNHIhzGZRj0kQWHCxnWfKTA4UiGKR/xcbiTYcdHcBxOZRjxERmHaxkWfITFEUDGcB8xcYSRMdZHQBzBZAz0EQ1HSBmjfITCEVjGEB9xcISX0d9HEBxJZHT2UXgjtak73lLJ6HnUESZHhzuLDMYrwUzck2i2vceyd9gEwdHubmbjNT2iJi8w7tn2n4Z4Mopfn5xucuSU0fToUuCILaPdMcbHkUFGoyONj4OKAwfJwEEycJAMHCQDB8nAQTJwUNznVnx1t/9fHA189QyTg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4KDal8/LLgO3aL4fvQdxY3KQDBwkAwfJwEEycJCMF/t07dXSH725GJODduLwBZx6Tw580Ge/VvCRvAsnpPZ9LI9Po3chbJyQkgwcJAMHycBBMnCQDBwkAwfJwEEycJAMHCQDB8nAQTJwkAwcJAMHycBBMnCQDBwkAwfJwEEycFDi2yEb/c/VDDE5SAYOkoGDZOAgGTgoLo48/428f+5x4KPdNyoCDnw0+hYFwYGPFt+cm+PxeAgU10Mr/sxEw0EVi/NrhaoHDpKBg2TgIBk4SAYOkoGDZOAgGThIBg6SgYNk4CAZOEgGDpKBg2TgIBk4SAYOkoGDZOAgGThIBg46qP4BL9RKDCsMUCoAAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAFE0lEQVR4nO3dzW3bQBRFYZpwBWogFXhjeM8yAq/SQgDXISAuwasgZUwD3riCVKIsAiiGEUvkXM7M+zlnZQQwRYqfnyhKZG5Op9NEVNtc/ZtEACI1AJEUgEgKQCQFIJICEEndTt66e3w5//z289vQdSFXE+ju8eW9njOmD/9IPbvxcib6qhKm0ZB8TKA1M4Y5NCQHgNbLwFD/rAPaagJDnTMNqE4DhnpmF5DiAEPZAekCMJQX0F77HkMZAe271zGUC1CL/Y2hLIDa7WkMxQfUeh9jKDKgir1b8ckXhmICqtaDIQvNrmcPhlID2uWVC0NJAe143IOhdIB2P2rGUCJAjd5zYSgFoKbv2DEUHFCH8z0YCguoz9lCDMUE1E1P9e9iyC6gznqql4Ahi4CG6KleDoZsARqop3ppGLICaLie6mViaDwgI3qql4yhkYBM6alePobGADKop/pRMNQbkFk91Y+FoX6AjOupfkQM9QDkQk/142Ko7Q2mHOkZtc7L8f78c3l6naI059TTcw4tx/v3es6YPvxj0gnkVE+39V+uKfE+jebMelrPoWXFjPE+h+bMepoaWlbLcG1oTq6nkaFlowm/hmoABdOzu6GlSoNTQ5sBhdSzo6FFcODR0DZAgfXsYmiRBbgztAFQeD2ioWWnfe/L0NrzQEn0VG/v4eF53xXwcn5o1QTKpmfr+h/21uNoDl0HlFDPpq04NNDjyNAVQGn1rNyWQzM9XgxdApRcz9UtOmzXU3FkY9zQPPa6dBf9d7uq9ZRYhuaBd8Zw1IetE2dPCWRoHnVvHnedt3GXV64SxdCn54HWHwBl0KPsxfK5lX2X5vIbiehR9neAOSQBQs/l1vjwbqgeEHr2kuHa0Pg71duvw5FKcWsIQFfqdpxbfBoC0KU6v0sqDg0BaDL1Hrt4MwQgc2doiitDALJ4fq/4MQQgc3p8GQKQRT2ODAHIqB4vhm7bLfr31x91v/jl1/epewb1/K08vVZc59rtM1cmkGk99ucQgKzrMW4oOyAXeiwbSg3IkR6zhvICcqfHpqGkgJzqMWgoIyDXeqwZSgcogB5ThnIBCqPHjqFEgILpMWIoC6CQeiwYSgEosJ7hhuIDCq9nrKHggJLoGWgoMqBUekYZCgsooZ4hhmICSqunv6H627uYvTY+uZ7Oz0PACdThunQXlS7PQ0BAre+M4aiyZevqXsViAmp3bx53lcbb2PCqjCGt/zPKoGfrdR0Vl3OEnUCXy6On9fZmBJRNT9OtTgcop552254OEO0bgEgKQCQFIJICEEkBiKQARFIAIikAkVS0D1Oddrf9v6c18rU+JhBJAYikAERSACIpAJEUgEgKQCQFIJICEEkBiKQARIM+C6v++KZph4fRa5AsJhBJAYikAERSACIpAJEU30g00dvoLxZWxwSiNoD8/k2QlQmEIVJfwjBE6kG0L0PL8Xn0KuSKg2iSAhBJAYikAERSACIpAJEUgEgKQCQFIJICEEkBiKQARFIAIikAkRSASApAJAUgkgIQSQGIpABEUgAiKQCRFIBIKt3NFZbj/ehVCBUTiKQARFIAIikAkRSASApA9K/y9DolB1TxFJDy1EUDhKHOT1pAQBjq+XTdnE6nKW6cd279xxYcELUu5ksYdQtAJAUgkgIQSQGIpABEUgAiKQCRFIBICkAkBSCSAhBJAYikAERSACIpAJEUgEgKQCQFIJICEEkBiKQARFIAIikA0aT0B2h8cyYYCSXoAAAAAElFTkSuQmCC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EnConjunto">
+<meta name="theme-color" content="#2C58A0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style id="app-style">
+:root{
+  --bg:#F1F5FA;
+  --surface:#FFFFFF;
+  --surface-2:#E6ECF4;
+  --border:#D2DCE8;
+  --ink:#1E2A3A;
+  --ink-soft:#556277;
+  --ink-faint:#8494A8;
+  --paprika:#2C58A0;
+  --paprika-ink:#FFFFFF;
+  --teal:#3E8C31;
+  --teal-ink:#FFFFFF;
+  --gold:#9C7220;
+  --gold-fill:#D9A441;
+  --danger:#B23B3B;
+  --danger-ink:#FFF9F0;
+  --focus:#2C58A0;
+  --shadow: 0 1px 2px rgba(20,32,52,0.06), 0 4px 14px rgba(20,32,52,0.07);
+  --font-display:'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-body:'Public Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1620;
+    --surface:#17212E;
+    --surface-2:#212D3D;
+    --border:#2E3C4E;
+    --ink:#E9EFF7;
+    --ink-soft:#AAB9CC;
+    --ink-faint:#7C8CA1;
+    --paprika:#6392DD;
+    --paprika-ink:#0C1826;
+    --teal:#6BC157;
+    --teal-ink:#08210A;
+    --gold:#E8B857;
+    --gold-fill:#E8B857;
+    --danger:#E17B7B;
+    --danger-ink:#2A0E0E;
+    --focus:#6BC157;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1620;
+  --surface:#17212E;
+  --surface-2:#212D3D;
+  --border:#2E3C4E;
+  --ink:#E9EFF7;
+  --ink-soft:#AAB9CC;
+  --ink-faint:#7C8CA1;
+  --paprika:#6392DD;
+  --paprika-ink:#0C1826;
+  --teal:#6BC157;
+  --teal-ink:#08210A;
+  --gold:#E8B857;
+  --gold-fill:#E8B857;
+  --danger:#E17B7B;
+  --danger-ink:#2A0E0E;
+  --focus:#6BC157;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;margin:0;color:var(--ink);}
+p{margin:0;}
+a{color:var(--teal);}
+button{font-family:inherit;}
+input,select,textarea{font-family:inherit;font-size:0.95rem;}
+::selection{background:var(--paprika);color:var(--paprika-ink);}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}
+}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:2px;}
+
+#app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:76px;}
+
+.header{
+  position:sticky;top:0;z-index:20;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:14px 16px 10px;
+}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1040px;margin:0 auto;width:100%;}
+.brand{display:flex;align-items:center;gap:10px;line-height:1.1;}
+.brand-mark{flex:none;}
+.brand-text{display:flex;flex-direction:column;}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:1.5rem;letter-spacing:-0.01em;color:var(--paprika);}
+.brand-tag{font-size:0.78rem;font-weight:800;letter-spacing:-0.01em;}
+.brand-tag .b1{color:var(--paprika);}
+.brand-tag .b2{color:var(--teal);}
+.proyecto-switch{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;}
+.proyecto-switch button{
+  border:none;background:transparent;color:var(--ink-soft);font-size:0.78rem;font-weight:600;
+  padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+.proyecto-switch button.active{background:var(--paprika);color:var(--paprika-ink);}
+
+.main{flex:1;max-width:1040px;margin:0 auto;padding:16px;width:100%;}
+
+.search-row{display:flex;gap:8px;margin-bottom:12px;}
+.search-input-wrap{
+  flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);
+  border:1px solid var(--border);border-radius:999px;padding:10px 16px;box-shadow:var(--shadow);
+}
+.search-input-wrap svg{flex:none;color:var(--ink-faint);}
+.search-input-wrap input{
+  flex:1;border:none;background:transparent;color:var(--ink);outline:none;font-size:0.95rem;
+}
+.search-input-wrap input::placeholder{color:var(--ink-faint);}
+.filter-toggle{
+  flex:none;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:10px 14px;color:var(--ink-soft);font-size:0.85rem;font-weight:600;cursor:pointer;
+}
+.filter-toggle.active{border-color:var(--teal);color:var(--teal);}
+
+.filters-panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;
+  display:flex;flex-wrap:wrap;gap:12px;box-shadow:var(--shadow);
+}
+.filter-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;}
+.filter-field label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-faint);font-weight:700;}
+select,.text-input,textarea{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--ink);
+  padding:9px 10px;font-size:0.9rem;width:100%;
+}
+select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{
+  border:1px solid var(--border);background:var(--surface-2);color:var(--ink-soft);border-radius:999px;
+  padding:6px 12px;font-size:0.8rem;font-weight:600;cursor:pointer;
+}
+.chip.active{background:var(--teal);border-color:var(--teal);color:var(--teal-ink);}
+
+.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;}
+.cat-pill{
+  flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
+  color:var(--ink-soft);border-radius:999px;padding:7px 13px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;
+}
+.cat-pill.active{background:var(--ink);border-color:var(--ink);color:var(--bg);}
+
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;margin:4px 0 12px;}
+.section-heading h2{font-size:1.15rem;}
+.section-heading .count{font-size:0.8rem;color:var(--ink-faint);font-variant-numeric:tabular-nums;}
+
+.grid{display:grid;grid-template-columns:1fr;gap:14px;}
+@media (min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+@media (min-width:960px){.grid{grid-template-columns:1fr 1fr 1fr;}}
+
+.card{
+  position:relative;background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  box-shadow:var(--shadow);cursor:pointer;overflow:hidden;
+  -webkit-mask-image: radial-gradient(circle 9px at calc(100% - 20px) 0, transparent 98%, #000 100%);
+  mask-image: radial-gradient(circle 9px at calc(100% - 20px) 0, transparent 98%, #000 100%);
+  display:flex;flex-direction:column;
+}
+.card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1;}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);color:var(--ink-soft);
+  border-radius:999px;padding:3px 9px;font-size:0.72rem;font-weight:700;white-space:nowrap;
+}
+.badge-demo{background:var(--surface-2);color:var(--ink-faint);border:1px dashed var(--border);}
+.card h3{font-size:1.02rem;font-weight:700;line-height:1.3;}
+.card .provider{font-size:0.82rem;color:var(--ink-soft);}
+.card .desc{font-size:0.85rem;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px;}
+.rating{display:flex;align-items:center;gap:5px;font-size:0.82rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+.rating .stars{color:var(--gold-fill);letter-spacing:1px;}
+.price{font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);}
+
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--ink-soft);
+}
+.empty-state .icon{font-size:2.2rem;margin-bottom:8px;}
+.empty-state h3{margin-bottom:6px;}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;
+  padding:12px 18px;font-weight:700;font-size:0.92rem;cursor:pointer;font-family:var(--font-body);
+}
+.btn-primary{background:var(--paprika);color:var(--paprika-ink);}
+.btn-primary:hover{filter:brightness(1.05);}
+.btn-secondary{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);}
+.btn-teal{background:var(--teal);color:var(--teal-ink);}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border);}
+.btn-block{width:100%;}
+.btn[disabled]{opacity:0.5;cursor:not-allowed;}
+.btn-sm{padding:8px 12px;font-size:0.82rem;border-radius:6px;}
+
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--ink-soft);
+  font-weight:700;font-size:0.88rem;cursor:pointer;padding:4px 0;
+}
+
+.detail-photo{
+  background:linear-gradient(135deg, var(--surface-2), var(--surface));
+  border:1px solid var(--border);border-radius:10px;height:150px;display:flex;align-items:center;justify-content:center;
+  font-size:3rem;margin-bottom:16px;
+}
+.detail-head{margin-bottom:12px;}
+.detail-head h1{font-size:1.5rem;margin-bottom:8px;}
+.meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px;}
+.panel h4{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-faint);margin-bottom:8px;}
+.provider-row{display:flex;align-items:center;gap:12px;}
+.avatar{
+  flex:none;width:44px;height:44px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--ink-soft);font-family:var(--font-display);
+}
+.provider-name{font-weight:700;}
+.provider-sub{font-size:0.8rem;color:var(--ink-faint);}
+
+.demo-callout{
+  background:var(--surface-2);border:1px dashed var(--border);border-radius:10px;padding:12px 14px;
+  font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;
+}
+.wa-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;background:var(--teal);color:var(--teal-ink);
+  border-radius:10px;padding:15px;font-weight:800;font-size:1rem;text-decoration:none;box-shadow:var(--shadow);margin-bottom:12px;
+}
+.wa-btn svg{flex:none;}
+.maps-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface);color:var(--paprika);
+  border:2px solid var(--paprika);border-radius:10px;padding:13px;font-weight:800;font-size:0.95rem;text-decoration:none;margin-bottom:16px;
+}
+.maps-btn svg{flex:none;}
+
+.review{border-top:1px solid var(--border);padding:12px 0;}
+.review:first-child{border-top:none;padding-top:0;}
+.review-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.review-author{font-weight:700;font-size:0.9rem;}
+.review-date{font-size:0.75rem;color:var(--ink-faint);}
+.review-text{font-size:0.88rem;color:var(--ink-soft);margin-top:2px;}
+
+.star-input{display:flex;gap:4px;}
+.star-input button{
+  background:none;border:none;font-size:1.6rem;line-height:1;cursor:pointer;color:var(--border);padding:2px;
+}
+.star-input button.filled{color:var(--gold-fill);}
+
+.form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.form-field label{font-size:0.82rem;font-weight:700;color:var(--ink);}
+.form-field .hint{font-size:0.75rem;color:var(--ink-faint);}
+.form-field .err{font-size:0.78rem;color:var(--danger);font-weight:600;}
+.form-row{display:flex;gap:12px;}
+.form-row .form-field{flex:1;}
+
+.identity-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--shadow);}
+
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--surface);border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;padding:6px 4px 8px;
+}
+.tab-btn{
+  background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-faint);
+  font-size:0.68rem;font-weight:700;padding:6px 10px;cursor:pointer;border-radius:8px;flex:1;max-width:110px;
+}
+.tab-btn .tab-icon{font-size:1.25rem;}
+.tab-btn.active{color:var(--paprika);}
+@media (min-width:900px){
+  .tabbar{position:static;border-top:none;border-bottom:1px solid var(--border);justify-content:flex-start;
+    gap:6px;padding:0 16px;max-width:1040px;margin:0 auto;background:var(--bg);}
+  #app{padding-bottom:0;}
+  .tab-btn{flex:none;flex-direction:row;font-size:0.85rem;padding:12px 14px;border-radius:0;
+    border-bottom:2px solid transparent;}
+  .tab-btn.active{border-bottom-color:var(--paprika);}
+}
+
+.toast{
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--surface-2);color:var(--ink);
+  border:1px solid var(--border);
+  padding:11px 18px;border-radius:999px;font-size:0.85rem;font-weight:600;z-index:50;box-shadow:var(--shadow);
+  max-width:90vw;text-align:center;
+}
+
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.stat-tile .num{font-family:var(--font-display);font-size:1.4rem;font-weight:800;font-variant-numeric:tabular-nums;}
+.stat-tile .label{font-size:0.68rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;font-weight:700;}
+
+.mysvc-item{display:flex;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;align-items:center;}
+.mysvc-icon{flex:none;width:44px;height:44px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.mysvc-info{flex:1;min-width:0;}
+.mysvc-info h4{font-size:0.92rem;margin-bottom:2px;}
+.mysvc-meta{font-size:0.78rem;color:var(--ink-faint);}
+.mysvc-actions{display:flex;gap:6px;flex:none;}
+
+.onboard-banner{
+  background:var(--surface);border:1px solid var(--teal);border-radius:10px;padding:14px 16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);
+}
+.onboard-banner .txt{flex:1;font-size:0.86rem;color:var(--ink-soft);}
+.onboard-banner strong{color:var(--ink);}
+
+.footer-note{text-align:center;color:var(--ink-faint);font-size:0.72rem;padding:24px 16px;}
+
+.hr{height:1px;background:var(--border);margin:16px 0;border:none;}
+
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:14px;color:var(--ink-soft);}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--paprika);animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading-screen"><div class="spinner"></div><p>Cargando EnConjunto…</p></div></div>
+<script>
+(function(){
+'use strict';
+
+// ============ Supabase ============
+var SUPABASE_URL = 'https://swfoeonrikpzytxbqdye.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_sJ9ORPu0KAmp8XViQRb8Ew__acyucuf';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============ utilities ============
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function uid(prefix){ return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function fmtMoney(n){
+  var v = Number(n)||0;
+  return 'S/ ' + v.toLocaleString('es-PE', {maximumFractionDigits:0});
+}
+function fmtDate(iso){
+  try{
+    var d = new Date(iso);
+    var diffDays = Math.floor((Date.now()-d.getTime())/86400000);
+    if (diffDays <= 0) return 'hoy';
+    if (diffDays === 1) return 'ayer';
+    if (diffDays < 7) return 'hace ' + diffDays + ' días';
+    if (diffDays < 30) return 'hace ' + Math.floor(diffDays/7) + ' sem';
+    if (diffDays < 365) return 'hace ' + Math.floor(diffDays/30) + ' meses';
+    return d.toLocaleDateString('es-PE');
+  }catch(e){ return ''; }
+}
+function avgRating(servicio){
+  if (!servicio.resenas || !servicio.resenas.length) return 0;
+  var sum = servicio.resenas.reduce(function(a,r){ return a + r.puntuacion; }, 0);
+  return sum / servicio.resenas.length;
+}
+function starsRow(rating){
+  var r = Math.round(rating);
+  var out = '';
+  for (var i=1;i<=5;i++) out += (i<=r ? '★' : '☆');
+  return out;
+}
+function digitsOnly(s){ return String(s||'').replace(/\D/g,''); }
+function isValidPeruCel(s){
+  var d = digitsOnly(s);
+  return d.length === 9 && d[0] === '9';
+}
+function waLink(telefono, texto){
+  return 'https://wa.me/51' + digitsOnly(telefono) + '?text=' + encodeURIComponent(texto);
+}
+function isValidEtapa(v){
+  var n = parseInt(v,10);
+  return !isNaN(n) && n >= 1 && n <= 99 && String(n) === String(v).trim();
+}
+function isSessionError(err){ return !!(err && /sesion_invalida/.test(err.message||'')); }
+
+var CATEGORIAS = [
+  {id:1, nombre:'Construcción', icono:'🔨'},
+  {id:2, nombre:'Servicios', icono:'🛠️'},
+  {id:3, nombre:'Comercio', icono:'🏪'},
+  {id:4, nombre:'Educación', icono:'📚'},
+  {id:5, nombre:'Salud', icono:'⚕️'},
+  {id:6, nombre:'Belleza', icono:'💇'},
+  {id:7, nombre:'Otros', icono:'✨'}
+];
+var PROYECTOS = [
+  {id:1, nombre:'Vive Hogar Castilla', ciudad:'Piura'},
+  {id:2, nombre:'Vive Hogar Sullana', ciudad:'Sullana'}
+];
+function catById(id){ for (var i=0;i<CATEGORIAS.length;i++) if (CATEGORIAS[i].id===id) return CATEGORIAS[i]; return CATEGORIAS[6]; }
+function proyById(id){ for (var i=0;i<PROYECTOS.length;i++) if (PROYECTOS[i].id===id) return PROYECTOS[i]; return PROYECTOS[0]; }
+function mapsUrl(s){
+  var proy = proyById(s.proyectoId);
+  var parts = [];
+  if (s.direccion) parts.push(s.direccion);
+  parts.push(proy.nombre + (s.etapa ? ' Etapa ' + s.etapa : ''));
+  parts.push(proy.ciudad + ', Perú');
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(parts.join(', '));
+}
+function fullName(u){ return u.nombre + ' ' + u.apellido; }
+
+// ============ demo seed (shown to everyone, lives only in this file, never in the database) ============
+var DEMO_SERVICIOS = [
+{"id":"s_demo01","autorId":"demo_u1","autorNombre":"Roberto Chunga","autorTelefono":"900000001","proyectoId":1,"etapa":5,"titulo":"Plomería: reparaciones e instalaciones","descripcion":"Arreglo fugas, instalo lavatorios e inodoros y hago mantenimiento de tanques. 12 años de experiencia en Piura.","categoriaId":1,"precioMin":40,"precioMax":150,"activo":true,"demo":true,"createdAt":"2026-08-10T14:00:00.000Z","resenas":[{"id":"r1","autorId":"demo_r1","autorNombre":"Juan Pérez","puntuacion":5,"comentario":"Llegó puntual y dejó todo funcionando perfecto.","fecha":"2026-08-14T10:00:00.000Z"},{"id":"r2","autorId":"demo_r2","autorNombre":"María García","puntuacion":4,"comentario":"Buen trabajo, precio justo.","fecha":"2026-08-16T09:00:00.000Z"}]},
+{"id":"s_demo02","autorId":"demo_u2","autorNombre":"Luis Farfán","autorTelefono":"900000002","proyectoId":1,"etapa":3,"titulo":"Electricista a domicilio","descripcion":"Instalación de tomacorrientes, focos y tableros. Atiendo emergencias el mismo día dentro del proyecto.","categoriaId":1,"precioMin":30,"precioMax":120,"activo":true,"demo":true,"createdAt":"2026-08-08T14:00:00.000Z","resenas":[{"id":"r3","autorId":"demo_r3","autorNombre":"Carmen Ruiz","puntuacion":5,"comentario":"Muy profesional, explica todo antes de cobrar.","fecha":"2026-08-12T09:00:00.000Z"}]},
+{"id":"s_demo03","autorId":"demo_u3","autorNombre":"Segundo Timaná","autorTelefono":"900000003","proyectoId":2,"etapa":1,"titulo":"Carpintería a medida","descripcion":"Fabrico muebles, closets y puertas a medida. Trabajo con madera y melamine, entrego en el plazo acordado.","categoriaId":1,"precioMin":150,"precioMax":800,"activo":true,"demo":true,"createdAt":"2026-08-05T14:00:00.000Z","resenas":[]},
+{"id":"s_demo04","autorId":"demo_u4","autorNombre":"Rosa Elizabeth Neyra","autorTelefono":"900000004","proyectoId":1,"etapa":5,"titulo":"Clases particulares de matemática y comunicación","descripcion":"Profesora de primaria y secundaria. Refuerzo escolar los fines de semana, grupos pequeños o individual.","categoriaId":4,"precioMin":20,"precioMax":50,"activo":true,"demo":true,"createdAt":"2026-08-18T14:00:00.000Z","resenas":[{"id":"r4","autorId":"demo_r4","autorNombre":"Pedro Sánchez","puntuacion":5,"comentario":"Mi hijo subió sus notas en un mes, la recomiendo.","fecha":"2026-08-20T09:00:00.000Z"}]},
+{"id":"s_demo05","autorId":"demo_u5","autorNombre":"Katherine Morán","autorTelefono":"900000005","proyectoId":1,"etapa":7,"titulo":"Cuidado de niños por horas","descripcion":"Cuido niños desde 2 años en tu casa o en la mía, con juegos y apoyo en tareas. Referencias dentro del proyecto.","categoriaId":2,"precioMin":10,"precioMax":15,"activo":true,"demo":true,"createdAt":"2026-08-19T14:00:00.000Z","resenas":[]},
+{"id":"s_demo06","autorId":"demo_u6","autorNombre":"Diana Palacios","autorTelefono":"900000006","proyectoId":2,"etapa":1,"titulo":"Corte de cabello y peinados","descripcion":"Cortes para toda la familia, peinados para fiestas y alisados. Atiendo en mi casa con todos los cuidados.","categoriaId":6,"precioMin":15,"precioMax":60,"activo":true,"demo":true,"createdAt":"2026-08-15T14:00:00.000Z","resenas":[{"id":"r5","autorId":"demo_r5","autorNombre":"Flor Vílchez","puntuacion":5,"comentario":"Excelente, muy detallista con el acabado.","fecha":"2026-08-17T09:00:00.000Z"},{"id":"r6","autorId":"demo_r6","autorNombre":"Jhoana Reyes","puntuacion":4,"comentario":"Buena atención, un poco de espera en fin de semana.","fecha":"2026-08-21T09:00:00.000Z"}]},
+{"id":"s_demo07","autorId":"demo_u7","autorNombre":"Yesenia Cruz","autorTelefono":"900000007","proyectoId":1,"etapa":3,"titulo":"Manicure y pedicure a domicilio","descripcion":"Servicio de uñas con esmaltado semipermanente, decoración y spa de pies. Voy a tu casa dentro de Castilla.","categoriaId":6,"precioMin":20,"precioMax":45,"activo":true,"demo":true,"createdAt":"2026-08-21T14:00:00.000Z","resenas":[]},
+{"id":"s_demo08","autorId":"demo_u8","autorNombre":"Manuel Zapata","autorTelefono":"900000008","proyectoId":1,"etapa":5,"titulo":"Minimarket \"Los Cerezos\" - abarrotes","descripcion":"Vendo abarrotes, útiles escolares y recargas. Abierto todos los días de 7am a 9pm, delivery dentro del proyecto.","categoriaId":3,"precioMin":1,"precioMax":50,"activo":true,"demo":true,"createdAt":"2026-08-02T14:00:00.000Z","resenas":[{"id":"r7","autorId":"demo_r7","autorNombre":"Ana Purizaca","puntuacion":5,"comentario":"Siempre tiene de todo y buenos precios.","fecha":"2026-08-09T09:00:00.000Z"}]},
+{"id":"s_demo09","autorId":"demo_u9","autorNombre":"Silvia Ancajima","autorTelefono":"900000009","proyectoId":2,"etapa":2,"titulo":"Tortas y repostería por encargo","descripcion":"Tortas para cumpleaños, quinceañeros y bautizos. Sabores personalizados, encarga con 3 días de anticipación.","categoriaId":3,"precioMin":40,"precioMax":250,"activo":true,"demo":true,"createdAt":"2026-08-12T14:00:00.000Z","resenas":[{"id":"r8","autorId":"demo_r8","autorNombre":"Kelly Nunura","puntuacion":5,"comentario":"La torta quedó hermosa y deliciosa, súper puntual.","fecha":"2026-08-14T09:00:00.000Z"}]},
+{"id":"s_demo10","autorId":"demo_u10","autorNombre":"Gladys Chero","autorTelefono":"900000010","proyectoId":1,"etapa":9,"titulo":"Confección y arreglo de ropa","descripcion":"Baste pantalones, hago bastas, cierres y arreglos en general. Confecciono cortinas y uniformes escolares.","categoriaId":7,"precioMin":10,"precioMax":80,"activo":true,"demo":true,"createdAt":"2026-08-06T14:00:00.000Z","resenas":[]},
+{"id":"s_demo11","autorId":"demo_u11","autorNombre":"Jorge Livisi","autorTelefono":"900000011","proyectoId":2,"etapa":2,"titulo":"Mecánica de motos y mototaxis","descripcion":"Mantenimiento, cambio de aceite y reparación de motolineales. Servicio a domicilio dentro de Sullana.","categoriaId":2,"precioMin":25,"precioMax":100,"activo":true,"demo":true,"createdAt":"2026-08-17T14:00:00.000Z","resenas":[]},
+{"id":"s_demo12","autorId":"demo_u12","autorNombre":"Verónica Saavedra","autorTelefono":"900000012","proyectoId":1,"etapa":7,"titulo":"Masajes descontracturantes","descripcion":"Terapias de relajación y masajes descontracturantes en tu domicilio. Traigo mi propia camilla.","categoriaId":5,"precioMin":35,"precioMax":70,"activo":true,"demo":true,"createdAt":"2026-08-22T14:00:00.000Z","resenas":[]},
+{"id":"s_demo13","autorId":"demo_u13","autorNombre":"Elena Vega","autorTelefono":"900000013","proyectoId":2,"etapa":1,"titulo":"Taller de costura para principiantes","descripcion":"Aprende a coser desde cero: patronaje básico, uso de máquina recta y overlock. Clases grupales dos veces por semana.","categoriaId":4,"precioMin":30,"precioMax":30,"activo":true,"demo":true,"createdAt":"2026-08-11T14:00:00.000Z","resenas":[{"id":"r9","autorId":"demo_r9","autorNombre":"Nancy Olaya","puntuacion":4,"comentario":"Enseña con paciencia, ideal para empezar desde cero.","fecha":"2026-08-19T09:00:00.000Z"}]},
+{"id":"s_demo14","autorId":"demo_u14","autorNombre":"Fiorella Namuche","autorTelefono":"900000014","proyectoId":1,"etapa":3,"titulo":"Limpieza del hogar","descripcion":"Limpieza profunda de casas: cocina, baños y dormitorios. Llevo mis propios productos de limpieza.","categoriaId":2,"precioMin":40,"precioMax":90,"activo":true,"demo":true,"createdAt":"2026-08-23T14:00:00.000Z","resenas":[]}
+];
+
+// ============ Supabase <-> app-shape mapping ============
+function mapUsuarioRow(row){
+  return { id: row.id, nombre: row.nombre, apellido: row.apellido, telefono: row.telefono,
+    proyectoId: row.proyecto_id, etapa: row.etapa, direccion: row.direccion || '' };
+}
+function mapResenaRow(row){
+  var u = row.usuarios || {};
+  return { id: row.id, autorId: row.autor_id, autorNombre: ((u.nombre||'')+' '+(u.apellido||'')).trim(),
+    puntuacion: row.puntuacion, comentario: row.comentario, fecha: row.created_at };
+}
+function mapServicioRow(row){
+  var u = row.usuarios || {};
+  return {
+    id: row.id, autorId: row.autor_id, autorNombre: ((u.nombre||'')+' '+(u.apellido||'')).trim(), autorTelefono: u.telefono||'',
+    proyectoId: row.proyecto_id, etapa: row.etapa, direccion: row.direccion,
+    titulo: row.titulo, descripcion: row.descripcion, categoriaId: row.categoria_id,
+    precioMin: Number(row.precio_min), precioMax: Number(row.precio_max),
+    activo: row.activo, demo: false, createdAt: row.created_at,
+    resenas: (row.resenas||[]).map(mapResenaRow)
+  };
+}
+
+async function loadUsuario(userId){
+  var res = await sb.from('usuarios').select('id,nombre,apellido,telefono,proyecto_id,etapa,direccion').eq('id', userId).maybeSingle();
+  if (res.error || !res.data) return null;
+  return mapUsuarioRow(res.data);
+}
+async function loadServicios(){
+  var res = await sb.from('servicios')
+    .select('*, usuarios(nombre,apellido,telefono), resenas(id,autor_id,puntuacion,comentario,created_at,usuarios(nombre,apellido))')
+    .eq('activo', true)
+    .order('created_at', {ascending:false});
+  if (res.error){ console.error(res.error); return []; }
+  return res.data.map(mapServicioRow);
+}
+function findServicioById(id){
+  var real = STATE.servicios.find(function(s){ return s.id === id; });
+  if (real) return real;
+  return DEMO_SERVICIOS.find(function(s){ return s.id === id; }) || null;
+}
+
+// ============ app state ============
+var STATE = { servicios: [] };
+var identity = null;
+var sessionToken = null;
+var loading = true;
+
+function saveSession(userId, token){
+  try { localStorage.setItem('ec_session_v2', JSON.stringify({userId:userId, token:token})); } catch(e){}
+}
+function clearSession(){
+  try { localStorage.removeItem('ec_session_v2'); } catch(e){}
+}
+function handleSessionError(err){
+  if (isSessionError(err)){
+    identity = null;
+    sessionToken = null;
+    clearSession();
+    toast('Tu sesión expiró, inicia sesión de nuevo.');
+    return true;
+  }
+  return false;
+}
+
+var localPref = null;
+try { localPref = JSON.parse(localStorage.getItem('ec_local_pref_v1')); } catch(e) { localPref = null; }
+
+var ui = {
+  view: 'home',
+  selectedId: null,
+  editingId: null,
+  showFilters: false,
+  q: '',
+  fCategoria: '',
+  fPrecio: '',
+  fRating: 0,
+  fProyecto: (localPref && localPref.proyectoId) ? String(localPref.proyectoId) : 'all',
+  fEtapa: (localPref && localPref.etapa) ? String(localPref.etapa) : '',
+  showEtapaPrompt: !localPref,
+  etapaPromptErrors: {},
+  formErrors: {},
+  authMode: 'registro',
+  authErrors: {},
+  authBusy: false,
+  perfilErrors: {},
+  passwordErrors: {},
+  showPasswordChange: false
+};
+
+var toastTimer = null;
+
+function saveLocalPref(proyectoId, etapa){
+  localPref = {proyectoId:proyectoId, etapa:etapa};
+  try { localStorage.setItem('ec_local_pref_v1', JSON.stringify(localPref)); } catch(e){}
+}
+function skipLocalPref(){
+  localPref = {skipped:true};
+  try { localStorage.setItem('ec_local_pref_v1', JSON.stringify(localPref)); } catch(e){}
+}
+
+function toast(msg){
+  var el = document.getElementById('ec-toast');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'ec-toast';
+    el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.style.display = 'none'; }, 3200);
+}
+
+async function refreshServicios(){
+  STATE.servicios = await loadServicios();
+}
+
+function visibleServicios(){
+  var list = STATE.servicios.concat(DEMO_SERVICIOS).filter(function(s){ return s.activo !== false; });
+  if (ui.fProyecto !== 'all') list = list.filter(function(s){ return String(s.proyectoId) === ui.fProyecto; });
+  if (ui.fEtapa) list = list.filter(function(s){ return String(s.etapa) === ui.fEtapa; });
+  if (ui.fCategoria) list = list.filter(function(s){ return String(s.categoriaId) === String(ui.fCategoria); });
+  if (ui.fPrecio){
+    var lo=0, hi=Infinity;
+    if (ui.fPrecio==='0-50'){ lo=0; hi=50; }
+    else if (ui.fPrecio==='50-100'){ lo=50; hi=100; }
+    else if (ui.fPrecio==='100-200'){ lo=100; hi=200; }
+    else if (ui.fPrecio==='200+'){ lo=200; hi=Infinity; }
+    list = list.filter(function(s){ return s.precioMin <= hi && s.precioMax >= lo; });
+  }
+  if (ui.fRating){
+    list = list.filter(function(s){ return avgRating(s) >= ui.fRating; });
+  }
+  if (ui.q && ui.q.trim()){
+    var q = ui.q.trim().toLowerCase();
+    list = list.filter(function(s){
+      return (s.titulo+' '+s.descripcion+' '+s.autorNombre).toLowerCase().indexOf(q) !== -1;
+    });
+  }
+  list.sort(function(a,b){
+    if (!!a.demo !== !!b.demo) return a.demo ? 1 : -1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+  return list;
+}
+
+function svgSearch(){
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+}
+function svgWa(){
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4a8.9 8.9 0 0 0-7.7 13.4L3 21l3.7-1.3a8.9 8.9 0 0 0 5.34 1.8h0a8.9 8.9 0 0 0 8.9-8.9 8.86 8.86 0 0 0-3.34-6.28ZM12.05 20a7.4 7.4 0 0 1-3.78-1.04l-.27-.16-2.24.78.75-2.18-.18-.28A7.42 7.42 0 1 1 19.45 12 7.42 7.42 0 0 1 12.05 20Zm4.07-5.56c-.22-.11-1.31-.65-1.51-.72s-.35-.11-.5.11-.58.72-.71.87-.26.16-.48.05a6.08 6.08 0 0 1-1.79-1.1 6.7 6.7 0 0 1-1.24-1.54c-.13-.22 0-.34.1-.45s.22-.26.33-.39a1.5 1.5 0 0 0 .22-.37.4.4 0 0 0 0-.39c-.05-.11-.5-1.2-.68-1.64s-.36-.37-.5-.38h-.43a.83.83 0 0 0-.6.28 2.53 2.53 0 0 0-.79 1.88 4.39 4.39 0 0 0 .92 2.33 10 10 0 0 0 3.85 3.4c.54.23.96.37 1.29.47a3.1 3.1 0 0 0 1.42.09 2.33 2.33 0 0 0 1.53-1.08 1.9 1.9 0 0 0 .13-1.08c-.06-.1-.2-.16-.42-.27Z"/></svg>';
+}
+function svgPin(){
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
+}
+
+function catPillsHtml(active){
+  return CATEGORIAS.map(function(c){
+    return '<button type="button" class="cat-pill'+(String(active)===String(c.id)?' active':'')+'" data-action="set-cat" data-value="'+c.id+'">'+
+      '<span>'+c.icono+'</span><span>'+esc(c.nombre)+'</span></button>';
+  }).join('');
+}
+
+function cardHtml(s){
+  var cat = catById(s.categoriaId);
+  var rating = avgRating(s);
+  var priceTxt = s.precioMin === s.precioMax ? fmtMoney(s.precioMin) : fmtMoney(s.precioMin)+' – '+fmtMoney(s.precioMax);
+  return '<div class="card" data-action="open" data-id="'+s.id+'">'+
+    '<div class="card-body">'+
+      '<div class="card-top">'+
+        '<span class="badge">'+cat.icono+' '+esc(cat.nombre)+'</span>'+
+        (s.demo ? '<span class="badge badge-demo">Ejemplo</span>' : '')+
+      '</div>'+
+      '<h3>'+esc(s.titulo)+'</h3>'+
+      '<div class="provider">por '+esc(s.autorNombre)+' · '+esc(proyById(s.proyectoId).nombre.replace('Vive Hogar ',''))+(s.etapa?', Etapa '+esc(s.etapa):'')+'</div>'+
+      '<div class="desc">'+esc(s.descripcion)+'</div>'+
+      '<div class="card-foot">'+
+        '<span class="rating"><span class="stars">'+starsRow(rating)+'</span> '+(rating? rating.toFixed(1):'—')+' ('+s.resenas.length+')</span>'+
+        '<span class="price">'+priceTxt+'</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function houseMarkSvg(){
+  return '<svg class="brand-mark" width="38" height="34" viewBox="0 0 44 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+    '<path d="M3,14 L14,3 L25,14 L25,29 L3,29 Z" style="fill:none;stroke:var(--paprika);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;"/>'+
+    '<rect x="7" y="17" width="4" height="4" style="fill:#E0568F;"/>'+
+    '<path d="M17,22 L28,11 L39,22 L39,37 L17,37 Z" style="fill:var(--bg);stroke:var(--teal);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;"/>'+
+    '<rect x="30" y="25" width="4" height="4" style="fill:var(--paprika);"/>'+
+  '</svg>';
+}
+
+function renderHeader(){
+  return '<div class="header"><div class="header-row">'+
+    '<div class="brand">'+houseMarkSvg()+
+      '<div class="brand-text"><span class="brand-name">EnConjunto</span><span class="brand-tag"><span class="b1">vive</span><span class="b2">Hogar</span></span></div>'+
+    '</div>'+
+    '<div class="proyecto-switch">'+
+      '<button type="button" data-action="set-proyecto" data-value="all" class="'+(ui.fProyecto==='all'?'active':'')+'">Todos</button>'+
+      '<button type="button" data-action="set-proyecto" data-value="1" class="'+(ui.fProyecto==='1'?'active':'')+'">Castilla</button>'+
+      '<button type="button" data-action="set-proyecto" data-value="2" class="'+(ui.fProyecto==='2'?'active':'')+'">Sullana</button>'+
+    '</div>'+
+  '</div></div>';
+}
+
+function renderTabbar(){
+  var tabs = [
+    {id:'home', icon:'🏠', label:'Inicio'},
+    {id:'publicar', icon:'➕', label:'Publicar'},
+    {id:'mios', icon:'🗂️', label:'Mis servicios'},
+    {id:'perfil', icon:'👤', label:'Perfil'}
+  ];
+  return '<nav class="tabbar">'+tabs.map(function(t){
+    return '<button type="button" class="tab-btn'+(ui.view===t.id?' active':'')+'" data-action="nav" data-value="'+t.id+'">'+
+      '<span class="tab-icon">'+t.icon+'</span><span>'+t.label+'</span></button>';
+  }).join('')+'</nav>';
+}
+
+function etapaPromptHtml(){
+  var e = ui.etapaPromptErrors || {};
+  return '<div class="identity-card" style="margin-bottom:16px;">'+
+    '<h3 style="margin-bottom:4px;">¿En qué etapa vives?</h3>'+
+    '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Así te mostramos primero los servicios de tus vecinos más cercanos. Lo puedes cambiar cuando quieras desde Filtros.</p>'+
+    '<form data-form="etapa-prompt">'+
+      '<div class="form-row">'+
+        '<div class="form-field"><label>Proyecto</label><select name="proyectoId">'+
+          PROYECTOS.map(function(p){ return '<option value="'+p.id+'">'+esc(p.nombre)+'</option>'; }).join('')+
+        '</select></div>'+
+        '<div class="form-field"><label>Etapa</label><input class="text-input" type="number" min="1" max="99" name="etapa" placeholder="Ej. 5" />'+(e.etapa?'<span class="err">'+esc(e.etapa)+'</span>':'')+'</div>'+
+      '</div>'+
+      '<button type="submit" class="btn btn-primary btn-block">Ver servicios de mi etapa</button>'+
+    '</form>'+
+    '<button type="button" class="btn btn-ghost btn-block" style="margin-top:8px;" data-action="skip-etapa-prompt">Ver todo el marketplace</button>'+
+  '</div>';
+}
+
+function renderHome(){
+  var list = visibleServicios();
+  var greeting = identity && identity.nombre ? '¡Hola, '+esc(identity.nombre.split(' ')[0])+'!' : 'Bienvenido a EnConjunto';
+  var html = '<h2 style="margin-bottom:12px;">'+greeting+'</h2>';
+
+  if (ui.showEtapaPrompt){
+    html += etapaPromptHtml();
+  }
+
+  if (!identity && !ui.showEtapaPrompt){
+    html += '<div class="onboard-banner">'+
+      '<div class="txt"><strong>Ofrece o encuentra servicios sin salir del proyecto.</strong> Crea tu cuenta para publicar y dejar reseñas.</div>'+
+      '<button type="button" class="btn btn-teal btn-sm" data-action="nav" data-value="perfil">Empezar</button>'+
+    '</div>';
+  }
+
+  if (!ui.showEtapaPrompt && (ui.fProyecto !== 'all' || ui.fEtapa)){
+    var scopeParts = [];
+    if (ui.fProyecto !== 'all') scopeParts.push(proyById(parseInt(ui.fProyecto,10)).nombre.replace('Vive Hogar ',''));
+    if (ui.fEtapa) scopeParts.push('Etapa '+esc(ui.fEtapa));
+    html += '<div style="font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;">Mostrando: <strong>'+scopeParts.join(', ')+'</strong> · '+
+      '<button type="button" style="background:none;border:none;color:var(--teal);font-weight:700;font-size:0.82rem;cursor:pointer;padding:0;" data-action="toggle-filters">cambiar</button></div>';
+  }
+
+  html += '<div class="search-row">'+
+    '<div class="search-input-wrap">'+svgSearch()+
+      '<input id="ec-search" type="text" placeholder="Busca un servicio, ej. plomería, tutoría..." value="'+esc(ui.q)+'" data-action="search" />'+
+    '</div>'+
+    '<button type="button" class="filter-toggle'+(ui.showFilters?' active':'')+'" data-action="toggle-filters">Filtros</button>'+
+  '</div>';
+
+  html += '<div class="cat-scroll">'+
+    '<button type="button" class="cat-pill'+(!ui.fCategoria?' active':'')+'" data-action="set-cat" data-value="">Todas</button>'+
+    catPillsHtml(ui.fCategoria)+
+  '</div>';
+
+  if (ui.showFilters){
+    html += '<div class="filters-panel">'+
+      '<div class="filter-field"><label>Etapa</label><div style="display:flex;gap:6px;align-items:center;">'+
+        '<input id="ec-etapa-filter" class="text-input" style="max-width:80px;" type="number" min="1" max="99" placeholder="N°" value="'+esc(ui.fEtapa)+'" />'+
+        '<button type="button" class="chip'+(!ui.fEtapa?' active':'')+'" data-action="set-etapa" data-value="">Todas</button>'+
+      '</div></div>'+
+      '<div class="filter-field"><label>Precio</label><div class="chip-row">'+
+        ['', '0-50','50-100','100-200','200+'].map(function(p){
+          var lbl = p===''?'Cualquiera':(p==='200+'?'S/200+':'S/ '+p);
+          return '<button type="button" class="chip'+(ui.fPrecio===p?' active':'')+'" data-action="set-precio" data-value="'+p+'">'+lbl+'</button>';
+        }).join('')+
+      '</div></div>'+
+      '<div class="filter-field"><label>Calificación</label><div class="chip-row">'+
+        [0,3,4].map(function(r){
+          var lbl = r===0?'Cualquiera':r+'★ o más';
+          return '<button type="button" class="chip'+(ui.fRating===r?' active':'')+'" data-action="set-rating" data-value="'+r+'">'+lbl+'</button>';
+        }).join('')+
+      '</div></div>'+
+    '</div>';
+  }
+
+  html += '<div class="section-heading"><h2>Servicios</h2><span class="count">'+list.length+' resultado'+(list.length===1?'':'s')+'</span></div>';
+
+  if (!list.length){
+    html += '<div class="empty-state"><div class="icon">🔍</div><h3>No encontramos servicios</h3><p>Prueba con otra categoría o palabra de búsqueda.</p></div>';
+  } else {
+    html += '<div class="grid">'+list.map(cardHtml).join('')+'</div>';
+  }
+  return html;
+}
+
+function renderDetalle(){
+  var s = findServicioById(ui.selectedId);
+  if (!s){
+    ui.view = 'home';
+    return renderHome();
+  }
+  var cat = catById(s.categoriaId);
+  var rating = avgRating(s);
+  var priceTxt = s.precioMin === s.precioMax ? fmtMoney(s.precioMin) : 'Desde '+fmtMoney(s.precioMin)+' hasta '+fmtMoney(s.precioMax);
+  var isOwner = identity && s.autorId === identity.id;
+  var alreadyReviewed = identity && s.resenas.some(function(r){ return r.autorId === identity.id; });
+
+  var html = '<div class="back-row"><button type="button" class="back-btn" data-action="nav" data-value="home">← Volver</button></div>';
+  html += '<div class="detail-photo">'+cat.icono+'</div>';
+  html += '<div class="detail-head">';
+  html += '<div class="meta-row"><span class="badge">'+cat.icono+' '+esc(cat.nombre)+'</span>'+(s.demo?'<span class="badge badge-demo">Ejemplo</span>':'')+'</div>';
+  html += '<h1>'+esc(s.titulo)+'</h1>';
+  html += '<div class="rating" style="margin-top:6px;"><span class="stars">'+starsRow(rating)+'</span> '+(rating?rating.toFixed(1):'Sin calificar')+' ('+s.resenas.length+' reseña'+(s.resenas.length===1?'':'s')+')</div>';
+  html += '</div>';
+
+  html += '<div class="panel"><h4>Ofrecido por</h4><div class="provider-row">'+
+    '<div class="avatar">'+esc((s.autorNombre||'?').charAt(0).toUpperCase())+'</div>'+
+    '<div><div class="provider-name">'+esc(s.autorNombre)+'</div><div class="provider-sub">'+esc(proyById(s.proyectoId).nombre)+(s.etapa?' · Etapa '+esc(s.etapa):'')+'</div></div>'+
+  '</div></div>';
+
+  html += '<div class="panel"><h4>Descripción</h4><p style="font-size:0.92rem;color:var(--ink-soft);">'+esc(s.descripcion)+'</p></div>';
+  html += '<div class="panel"><h4>Precio</h4><p style="font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;">'+priceTxt+'</p></div>';
+
+  if (s.demo){
+    html += '<div class="demo-callout">📌 Este es un servicio de ejemplo para mostrar cómo funciona EnConjunto. No tiene un contacto real — ¡publica el tuyo!</div>';
+  } else {
+    var msg = 'Hola, vi tu servicio "'+s.titulo+'" en EnConjunto. ¿Sigue disponible?';
+    html += '<a class="wa-btn" href="'+waLink(s.autorTelefono, msg)+'" target="_blank" rel="noopener">'+svgWa()+' Contactar por WhatsApp</a>';
+  }
+  html += '<a class="maps-btn" href="'+mapsUrl(s)+'" target="_blank" rel="noopener">'+svgPin()+' Cómo llegar hasta ahí</a>';
+  if (!s.direccion) html += '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:-10px;margin-bottom:16px;text-align:center;">Ubicación aproximada — este vecino no dejó una referencia exacta.</p>';
+
+  html += '<div class="panel"><h4>Reseñas ('+s.resenas.length+')</h4>';
+  if (!s.resenas.length){
+    html += '<p style="font-size:0.88rem;color:var(--ink-faint);">Todavía no hay reseñas.</p>';
+  } else {
+    html += s.resenas.slice().reverse().map(function(r){
+      return '<div class="review"><div class="review-head"><span class="review-author">'+esc(r.autorNombre)+'</span><span class="review-date">'+fmtDate(r.fecha)+'</span></div>'+
+        '<div class="stars">'+starsRow(r.puntuacion)+'</div>'+
+        '<div class="review-text">'+esc(r.comentario)+'</div>'+
+        (identity && r.autorId===identity.id ? '<button type="button" class="btn btn-danger btn-sm" style="margin-top:6px;" data-action="del-resena" data-id="'+s.id+'" data-rid="'+r.id+'">Borrar mi reseña</button>' : '')+
+      '</div>';
+    }).join('');
+  }
+  html += '</div>';
+
+  if (!s.demo && !isOwner && !alreadyReviewed){
+    html += '<div class="panel"><h4>Deja tu reseña</h4>'+
+      '<form data-form="resena" data-id="'+s.id+'">'+
+      '<div class="star-input" id="resena-stars" data-value="0">'+
+        [1,2,3,4,5].map(function(i){ return '<button type="button" data-star="'+i+'">★</button>'; }).join('')+
+      '</div>'+
+      '<div class="form-field" style="margin-top:10px;"><textarea name="comentario" rows="3" placeholder="Cuéntanos cómo te fue con este servicio..." required minlength="5"></textarea></div>'+
+      (ui.formErrors.resena ? '<div class="err" style="margin-bottom:8px;">'+esc(ui.formErrors.resena)+'</div>' : '')+
+      '<button type="submit" class="btn btn-primary btn-block">Enviar reseña</button>'+
+      '</form></div>';
+  } else if (!s.demo && alreadyReviewed){
+    html += '<p style="font-size:0.82rem;color:var(--ink-faint);text-align:center;">Ya dejaste una reseña para este servicio.</p>';
+  }
+
+  return html;
+}
+
+function authForm(){
+  var mode = ui.authMode;
+  var e = ui.authErrors || {};
+  var busyAttr = ui.authBusy ? ' disabled' : '';
+  var html = '<div class="identity-card">';
+  html += '<div class="proyecto-switch" style="margin-bottom:16px;">'+
+      '<button type="button" data-action="set-authmode" data-value="registro" class="'+(mode==='registro'?'active':'')+'">Crear cuenta</button>'+
+      '<button type="button" data-action="set-authmode" data-value="login" class="'+(mode==='login'?'active':'')+'">Iniciar sesión</button>'+
+    '</div>';
+
+  if (mode === 'login'){
+    html += '<h3 style="margin-bottom:4px;">Inicia sesión</h3>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Usa el WhatsApp y la contraseña con la que creaste tu cuenta.</p>'+
+      '<form data-form="login">'+
+        '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" placeholder="987654321" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
+        '<div class="form-field"><label>Contraseña</label><input class="text-input" type="password" name="password" placeholder="Tu contraseña" />'+(e.password?'<span class="err">'+esc(e.password)+'</span>':'')+'</div>'+
+        '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Entrando…':'Iniciar sesión')+'</button>'+
+      '</form>';
+  } else {
+    html += '<h3 style="margin-bottom:4px;">Crea tu cuenta</h3>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Con nombre, apellido y contraseña, para que otros vecinos sepan quién ofrece o reseña cada servicio, y solo tú puedas editar lo tuyo.</p>'+
+      '<form data-form="registro">'+
+        '<div class="form-row"><div class="form-field"><label>Nombre</label><input class="text-input" type="text" name="nombre" placeholder="María" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
+        '<div class="form-field"><label>Apellido</label><input class="text-input" type="text" name="apellido" placeholder="López" />'+(e.apellido?'<span class="err">'+esc(e.apellido)+'</span>':'')+'</div></div>'+
+        '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" placeholder="987654321" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
+        '<div class="form-row"><div class="form-field"><label>Tu proyecto</label><select name="proyectoId">'+
+          PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+(ui.fProyecto===String(p.id)?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
+        '</select></div>'+
+        '<div class="form-field"><label>Etapa</label><input class="text-input" type="number" min="1" max="99" name="etapa" placeholder="Ej. 5" value="'+esc(ui.fEtapa)+'" />'+(e.etapa?'<span class="err">'+esc(e.etapa)+'</span>':'')+'</div></div>'+
+        '<div class="form-field"><label>Mz./Lote o referencia (opcional)</label><input class="text-input" type="text" name="direccion" placeholder="Ej. Mz. A Lote 5" /><span class="hint">Para que la gente encuentre tus servicios en el mapa.</span></div>'+
+        '<div class="form-row"><div class="form-field"><label>Contraseña</label><input class="text-input" type="password" name="password" placeholder="Mínimo 6 caracteres" />'+(e.password?'<span class="err">'+esc(e.password)+'</span>':'')+'</div>'+
+        '<div class="form-field"><label>Confirmar contraseña</label><input class="text-input" type="password" name="password2" placeholder="Repite tu contraseña" />'+(e.password2?'<span class="err">'+esc(e.password2)+'</span>':'')+'</div></div>'+
+        '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Creando cuenta…':'Crear cuenta')+'</button>'+
+      '</form>';
+  }
+  html += '<p style="font-size:0.72rem;color:var(--ink-faint);margin-top:14px;">🔒 Tu cuenta y contraseña quedan protegidas por Supabase, la misma base de datos que usa Ahorra Lima — no un candado casero.</p>';
+  html += '</div>';
+  return html;
+}
+
+function renderPublicar(){
+  var editing = ui.editingId ? findServicioById(ui.editingId) : null;
+  var html = '<h2 style="margin-bottom:14px;">'+(editing ? 'Editar servicio' : 'Publica tu servicio')+'</h2>';
+
+  if (!identity){
+    return html + authForm();
+  }
+
+  var e = ui.formErrors || {};
+  html += '<form data-form="servicio" data-id="'+(editing?editing.id:'')+'">';
+  html += '<div class="form-field"><label>Título</label>'+
+    '<input class="text-input" type="text" name="titulo" placeholder="Ej. Plomería, reparaciones e instalaciones" value="'+esc(editing?editing.titulo:'')+'" />'+
+    (e.titulo?'<span class="err">'+esc(e.titulo)+'</span>':'<span class="hint">Sé claro y directo, mínimo 8 caracteres.</span>')+
+  '</div>';
+  html += '<div class="form-field"><label>Categoría</label><select name="categoriaId">'+
+    CATEGORIAS.map(function(c){ return '<option value="'+c.id+'" '+((editing?editing.categoriaId:1)===c.id?'selected':'')+'>'+c.icono+' '+esc(c.nombre)+'</option>'; }).join('')+
+  '</select></div>';
+  html += '<div class="form-field"><label>Descripción</label>'+
+    '<textarea name="descripcion" rows="4" placeholder="Describe tu servicio, experiencia y disponibilidad...">'+esc(editing?editing.descripcion:'')+'</textarea>'+
+    (e.descripcion?'<span class="err">'+esc(e.descripcion)+'</span>':'<span class="hint">Mínimo 20 caracteres.</span>')+
+  '</div>';
+  html += '<div class="form-row">'+
+    '<div class="form-field"><label>Precio mínimo (S/)</label><input class="text-input" type="number" min="1" step="1" name="precioMin" value="'+(editing?editing.precioMin:'')+'" />'+(e.precioMin?'<span class="err">'+esc(e.precioMin)+'</span>':'')+'</div>'+
+    '<div class="form-field"><label>Precio máximo (S/)</label><input class="text-input" type="number" min="1" step="1" name="precioMax" value="'+(editing?editing.precioMax:'')+'" />'+(e.precioMax?'<span class="err">'+esc(e.precioMax)+'</span>':'')+'</div>'+
+  '</div>';
+  html += '<div class="form-field"><label>Proyecto</label><select name="proyectoId">'+
+    PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+((editing?editing.proyectoId:identity.proyectoId)===p.id?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
+  '</select><span class="hint">Se publicará como '+esc(fullName(identity))+' · Etapa '+esc(identity.etapa)+' · WhatsApp '+esc(identity.telefono)+' — cambia estos datos desde Perfil si hace falta.</span></div>';
+  html += '<button type="submit" class="btn btn-primary btn-block">'+(editing?'Guardar cambios':'Publicar servicio')+'</button>';
+  if (editing) html += '<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px;" data-action="nav" data-value="mios">Cancelar</button>';
+  html += '</form>';
+  return html;
+}
+
+function renderMios(){
+  var html = '<h2 style="margin-bottom:14px;">Mis servicios</h2>';
+  if (!identity){
+    html += '<div class="empty-state"><div class="icon">🗂️</div><h3>Aún no tienes cuenta</h3><p>Crea tu cuenta en Perfil para empezar a publicar.</p>'+
+      '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="perfil">Ir a Perfil</button></div>';
+    return html;
+  }
+  var mine = STATE.servicios.filter(function(s){ return s.autorId === identity.id; });
+  var activos = mine.filter(function(s){ return s.activo !== false; });
+  var ratings = mine.map(avgRating).filter(function(r){ return r>0; });
+  var avg = ratings.length ? (ratings.reduce(function(a,b){return a+b;},0)/ratings.length) : 0;
+
+  html += '<div class="stat-grid">'+
+    '<div class="stat-tile"><div class="num">'+activos.length+'</div><div class="label">Activos</div></div>'+
+    '<div class="stat-tile"><div class="num">'+mine.reduce(function(a,s){return a+s.resenas.length;},0)+'</div><div class="label">Reseñas</div></div>'+
+    '<div class="stat-tile"><div class="num">'+(avg?avg.toFixed(1):'—')+'</div><div class="label">Rating prom.</div></div>'+
+  '</div>';
+
+  if (!mine.length){
+    html += '<div class="empty-state"><div class="icon">🧰</div><h3>Todavía no publicaste nada</h3><p>Ofrece tu primer servicio a la comunidad.</p>'+
+      '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="publicar">Publicar servicio</button></div>';
+    return html;
+  }
+
+  html += mine.map(function(s){
+    var cat = catById(s.categoriaId);
+    var rating = avgRating(s);
+    return '<div class="mysvc-item">'+
+      '<div class="mysvc-icon">'+cat.icono+'</div>'+
+      '<div class="mysvc-info"><h4>'+esc(s.titulo)+'</h4><div class="mysvc-meta">'+(rating?rating.toFixed(1)+' ★ · ':'')+s.resenas.length+' reseñas · '+fmtMoney(s.precioMin)+(s.precioMin!==s.precioMax?'–'+fmtMoney(s.precioMax):'')+'</div></div>'+
+      '<div class="mysvc-actions">'+
+        '<button type="button" class="btn btn-ghost btn-sm" data-action="edit-svc" data-id="'+s.id+'">Editar</button>'+
+        '<button type="button" class="btn btn-danger btn-sm" data-action="del-svc" data-id="'+s.id+'">Borrar</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  return html;
+}
+
+function renderPerfil(){
+  var html = '<h2 style="margin-bottom:14px;">Perfil</h2>';
+  if (!identity){
+    return html + authForm();
+  }
+  var pe = ui.perfilErrors || {};
+  var pw = ui.passwordErrors || {};
+  html += '<div class="panel"><div class="provider-row">'+
+    '<div class="avatar" style="width:56px;height:56px;font-size:1.3rem;">'+esc(identity.nombre.charAt(0).toUpperCase())+'</div>'+
+    '<div><div class="provider-name" style="font-size:1.1rem;">'+esc(fullName(identity))+'</div>'+
+    '<div class="provider-sub">'+esc(proyById(identity.proyectoId).nombre)+' · Etapa '+esc(identity.etapa)+' · WhatsApp '+esc(identity.telefono)+'</div></div>'+
+  '</div></div>';
+
+  html += '<div class="panel"><h4>Editar datos</h4><form data-form="perfil">'+
+    '<div class="form-row"><div class="form-field"><label>Nombre</label><input class="text-input" type="text" name="nombre" required minlength="2" value="'+esc(identity.nombre)+'" /></div>'+
+    '<div class="form-field"><label>Apellido</label><input class="text-input" type="text" name="apellido" required minlength="2" value="'+esc(identity.apellido)+'" /></div></div>'+
+    '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" required value="'+esc(identity.telefono)+'" />'+(pe.telefono?'<span class="err">'+esc(pe.telefono)+'</span>':'')+'</div>'+
+    '<div class="form-row"><div class="form-field"><label>Tu proyecto</label><select name="proyectoId">'+
+      PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+(identity.proyectoId===p.id?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
+    '</select></div>'+
+    '<div class="form-field"><label>Etapa</label><input class="text-input" type="number" min="1" max="99" name="etapa" value="'+esc(identity.etapa)+'" />'+(pe.etapa?'<span class="err">'+esc(pe.etapa)+'</span>':'')+'</div></div>'+
+    '<div class="form-field"><label>Mz./Lote o referencia (opcional)</label><input class="text-input" type="text" name="direccion" placeholder="Ej. Mz. A Lote 5" value="'+esc(identity.direccion||'')+'" /><span class="hint">Para que la gente encuentre tus servicios en el mapa.</span></div>'+
+    '<button type="submit" class="btn btn-primary btn-block">Guardar cambios</button>'+
+  '</form></div>';
+
+  html += '<div class="panel"><h4>Contraseña</h4>';
+  if (!ui.showPasswordChange){
+    html += '<button type="button" class="btn btn-ghost btn-block" data-action="toggle-password-change">Cambiar mi contraseña</button>';
+  } else {
+    html += '<form data-form="password">'+
+      '<div class="form-row"><div class="form-field"><label>Nueva contraseña</label><input class="text-input" type="password" name="nueva" placeholder="Mínimo 6 caracteres" />'+(pw.nueva?'<span class="err">'+esc(pw.nueva)+'</span>':'')+'</div>'+
+      '<div class="form-field"><label>Confirmar</label><input class="text-input" type="password" name="nueva2" />'+(pw.nueva2?'<span class="err">'+esc(pw.nueva2)+'</span>':'')+'</div></div>'+
+      '<button type="submit" class="btn btn-primary btn-block">Actualizar contraseña</button>'+
+    '</form>';
+  }
+  html += '</div>';
+
+  html += '<button type="button" class="btn btn-ghost btn-block" data-action="logout">Cerrar sesión</button>'+
+    '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:8px;text-align:center;">Esto no borra los servicios que ya publicaste — bórralos desde "Mis servicios" si lo necesitas.</p>';
+
+  html += '<p class="footer-note">EnConjunto · Proyecto piloto de Ingenium para Vive Hogar Castilla y Sullana · v0.2</p>';
+  return html;
+}
+
+function renderApp(){
+  if (loading){
+    document.getElementById('app').innerHTML = '<div class="loading-screen"><div class="spinner"></div><p>Cargando EnConjunto…</p></div>';
+    return;
+  }
+  var body = '';
+  if (ui.view === 'home') body = renderHome();
+  else if (ui.view === 'detalle') body = renderDetalle();
+  else if (ui.view === 'publicar') body = renderPublicar();
+  else if (ui.view === 'mios') body = renderMios();
+  else if (ui.view === 'perfil') body = renderPerfil();
+  else body = renderHome();
+
+  var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
+  var app = document.getElementById('app');
+  app.innerHTML = html;
+
+  if (ui.view === 'home' && lastFocusedInputId){
+    var input = document.getElementById(lastFocusedInputId);
+    if (input){
+      var pos = input.selectionStart;
+      input.focus();
+      try{ input.setSelectionRange(pos,pos); }catch(e){}
+    }
+  }
+  if (ui.view === 'detalle'){
+    var starsWrap = document.getElementById('resena-stars');
+    if (starsWrap) paintStars(starsWrap, parseInt(starsWrap.getAttribute('data-value'),10) || 0);
+  }
+}
+function render(){ renderApp(); }
+
+function paintStars(wrap, val){
+  wrap.setAttribute('data-value', val);
+  var btns = wrap.querySelectorAll('button');
+  btns.forEach(function(b,i){
+    if (i < val) b.classList.add('filled'); else b.classList.remove('filled');
+  });
+}
+
+function validateServicioForm(fd){
+  var errors = {};
+  var titulo = (fd.get('titulo')||'').trim();
+  var descripcion = (fd.get('descripcion')||'').trim();
+  var precioMin = parseFloat(fd.get('precioMin'));
+  var precioMax = parseFloat(fd.get('precioMax'));
+  if (titulo.length < 8) errors.titulo = 'Escribe un título más descriptivo (mínimo 8 caracteres).';
+  if (descripcion.length < 20) errors.descripcion = 'Cuéntanos un poco más (mínimo 20 caracteres).';
+  if (!precioMin || precioMin <= 0) errors.precioMin = 'Ingresa un precio válido.';
+  if (!precioMax || precioMax <= 0) errors.precioMax = 'Ingresa un precio válido.';
+  if (precioMin && precioMax && precioMin > precioMax) errors.precioMax = 'Debe ser mayor o igual al precio mínimo.';
+  return errors;
+}
+
+document.addEventListener('click', async function(ev){
+  var starBtn = ev.target.closest('#resena-stars button');
+  if (starBtn){
+    paintStars(document.getElementById('resena-stars'), parseInt(starBtn.getAttribute('data-star'),10));
+    return;
+  }
+  var t = ev.target.closest('[data-action]');
+  if (!t) return;
+  var action = t.getAttribute('data-action');
+  var value = t.getAttribute('data-value');
+
+  if (action === 'nav'){
+    ui.view = value;
+    ui.formErrors = {};
+    ui.authErrors = {};
+    ui.perfilErrors = {};
+    ui.passwordErrors = {};
+    ui.showPasswordChange = false;
+    if (value !== 'publicar') ui.editingId = null;
+    window.scrollTo(0,0);
+    render();
+  } else if (action === 'set-authmode'){
+    ui.authMode = value;
+    ui.authErrors = {};
+    render();
+  } else if (action === 'toggle-password-change'){
+    ui.showPasswordChange = !ui.showPasswordChange;
+    ui.passwordErrors = {};
+    render();
+  } else if (action === 'open'){
+    ui.selectedId = t.getAttribute('data-id');
+    ui.view = 'detalle';
+    window.scrollTo(0,0);
+    render();
+  } else if (action === 'set-proyecto'){
+    ui.fProyecto = value;
+    render();
+  } else if (action === 'set-cat'){
+    ui.fCategoria = ui.fCategoria === value ? '' : value;
+    render();
+  } else if (action === 'set-precio'){
+    ui.fPrecio = ui.fPrecio === value ? '' : value;
+    render();
+  } else if (action === 'set-rating'){
+    ui.fRating = ui.fRating === Number(value) ? 0 : Number(value);
+    render();
+  } else if (action === 'set-etapa'){
+    ui.fEtapa = value;
+    render();
+  } else if (action === 'skip-etapa-prompt'){
+    skipLocalPref();
+    ui.showEtapaPrompt = false;
+    render();
+  } else if (action === 'toggle-filters'){
+    ui.showFilters = !ui.showFilters;
+    render();
+  } else if (action === 'edit-svc'){
+    ui.editingId = t.getAttribute('data-id');
+    ui.view = 'publicar';
+    ui.formErrors = {};
+    window.scrollTo(0,0);
+    render();
+  } else if (action === 'del-svc'){
+    var idDel = t.getAttribute('data-id');
+    if (confirm('¿Seguro que quieres borrar este servicio? Esta acción no se puede deshacer.')){
+      var del = await sb.rpc('ec_borrar_servicio', { p_token: sessionToken, p_servicio_id: idDel });
+      if (del.error){ if (!handleSessionError(del.error)) toast('No se pudo borrar. Intenta de nuevo.'); }
+      else { toast('Servicio borrado.'); ui.view = 'mios'; }
+      await refreshServicios();
+      render();
+    }
+  } else if (action === 'del-resena'){
+    var sidR = t.getAttribute('data-id'), ridR = t.getAttribute('data-rid');
+    if (confirm('¿Borrar tu reseña?')){
+      var delR = await sb.rpc('ec_borrar_resena', { p_token: sessionToken, p_resena_id: ridR });
+      if (delR.error){ if (!handleSessionError(delR.error)) toast('No se pudo borrar. Intenta de nuevo.'); }
+      else { toast('Reseña borrada.'); ui.view = 'detalle'; ui.selectedId = sidR; }
+      await refreshServicios();
+      render();
+    }
+  } else if (action === 'logout'){
+    if (confirm('¿Cerrar sesión en este dispositivo?')){
+      identity = null;
+      sessionToken = null;
+      clearSession();
+      ui.view = 'home';
+      render();
+      toast('Sesión cerrada.');
+    }
+  }
+});
+
+var lastFocusedInputId = null;
+document.addEventListener('input', function(ev){
+  if (ev.target.id === 'ec-search'){
+    lastFocusedInputId = 'ec-search';
+    ui.q = ev.target.value;
+    render();
+  } else if (ev.target.id === 'ec-etapa-filter'){
+    lastFocusedInputId = 'ec-etapa-filter';
+    ui.fEtapa = ev.target.value.trim();
+    render();
+  }
+});
+
+document.addEventListener('submit', async function(ev){
+  var form = ev.target.closest('form[data-form]');
+  if (!form) return;
+  ev.preventDefault();
+  var kind = form.getAttribute('data-form');
+  var fd = new FormData(form);
+
+  if (kind === 'registro'){
+    var nombre = (fd.get('nombre')||'').trim();
+    var apellido = (fd.get('apellido')||'').trim();
+    var telefono = fd.get('telefono')||'';
+    var proyectoId = parseInt(fd.get('proyectoId'),10) || 1;
+    var etapaVal = fd.get('etapa')||'';
+    var direccion = (fd.get('direccion')||'').trim();
+    var password = fd.get('password')||'';
+    var password2 = fd.get('password2')||'';
+    var telDigits = digitsOnly(telefono);
+    var errs = {};
+    if (nombre.length < 2) errs.nombre = 'Ingresa tu nombre.';
+    if (apellido.length < 2) errs.apellido = 'Ingresa tu apellido.';
+    if (!isValidPeruCel(telefono)) errs.telefono = 'Ingresa 9 dígitos válidos (empieza con 9).';
+    if (!isValidEtapa(etapaVal)) errs.etapa = 'Ingresa el número de tu etapa.';
+    if (password.length < 6) errs.password = 'Mínimo 6 caracteres.';
+    if (password !== password2) errs.password2 = 'Las contraseñas no coinciden.';
+    if (Object.keys(errs).length){ ui.authErrors = errs; render(); return; }
+    var etapaNum = parseInt(etapaVal,10);
+
+    ui.authBusy = true; render();
+    var regRes = await sb.rpc('ec_registrar', {
+      p_nombre: nombre, p_apellido: apellido, p_telefono: telDigits, p_proyecto_id: proyectoId,
+      p_etapa: etapaNum, p_direccion: direccion, p_password: password
+    });
+    ui.authBusy = false;
+    if (regRes.error){
+      var msg = (regRes.error.message || '').toLowerCase();
+      ui.authErrors = /telefono_duplicado/.test(msg) ? {telefono:'Ya existe una cuenta con este WhatsApp. Inicia sesión.'} : {telefono:'No se pudo crear la cuenta. Intenta de nuevo.'};
+      render(); return;
+    }
+    var newRow = regRes.data[0];
+    identity = { id:newRow.id, nombre:nombre, apellido:apellido, telefono:telDigits, proyectoId:proyectoId, etapa:etapaNum, direccion:direccion };
+    sessionToken = newRow.token;
+    saveSession(newRow.id, newRow.token);
+    ui.authErrors = {};
+    ui.fProyecto = String(proyectoId);
+    ui.fEtapa = String(etapaNum);
+    ui.showEtapaPrompt = false;
+    ui.view = (ui.view === 'perfil') ? 'perfil' : 'publicar';
+    toast('¡Cuenta creada! Ya iniciaste sesión.');
+    render();
+    return;
+  }
+
+  if (kind === 'etapa-prompt'){
+    var epProyectoId = parseInt(fd.get('proyectoId'),10) || 1;
+    var epEtapa = fd.get('etapa')||'';
+    if (!isValidEtapa(epEtapa)){ ui.etapaPromptErrors = {etapa:'Ingresa el número de tu etapa.'}; render(); return; }
+    ui.etapaPromptErrors = {};
+    var epEtapaNum = parseInt(epEtapa,10);
+    saveLocalPref(epProyectoId, epEtapaNum);
+    ui.fProyecto = String(epProyectoId);
+    ui.fEtapa = String(epEtapaNum);
+    ui.showEtapaPrompt = false;
+    toast('Listo, te mostramos primero tu etapa.');
+    render();
+    return;
+  }
+
+  if (kind === 'login'){
+    var lTelefono = fd.get('telefono')||'';
+    var lPassword = fd.get('password')||'';
+    var lDigits = digitsOnly(lTelefono);
+    if (!isValidPeruCel(lTelefono)){ ui.authErrors = {telefono:'Ingresa un WhatsApp válido (9 dígitos, empieza con 9).'}; render(); return; }
+    ui.authBusy = true; render();
+    var loginRes = await sb.rpc('ec_login', { p_telefono: lDigits, p_password: lPassword });
+    if (loginRes.error){
+      ui.authBusy = false;
+      ui.authErrors = {password:'Teléfono o contraseña incorrectos.'};
+      render(); return;
+    }
+    var loginRow = loginRes.data[0];
+    var row = await loadUsuario(loginRow.id);
+    ui.authBusy = false;
+    if (!row){
+      ui.authErrors = {telefono:'No se pudo cargar tu perfil. Intenta de nuevo.'};
+      render();
+      return;
+    }
+    identity = row;
+    sessionToken = loginRow.token;
+    saveSession(loginRow.id, loginRow.token);
+    ui.authErrors = {};
+    ui.fProyecto = String(row.proyectoId);
+    ui.fEtapa = String(row.etapa||'');
+    ui.showEtapaPrompt = false;
+    toast('¡Bienvenido de nuevo, '+row.nombre+'!');
+    render();
+    return;
+  }
+
+  if (kind === 'perfil'){
+    var pNombre = (fd.get('nombre')||'').trim();
+    var pApellido = (fd.get('apellido')||'').trim();
+    var pTelefono = fd.get('telefono')||'';
+    var pProyectoId = parseInt(fd.get('proyectoId'),10) || 1;
+    var pEtapaVal = fd.get('etapa')||'';
+    var pDireccion = (fd.get('direccion')||'').trim();
+    var pDigits = digitsOnly(pTelefono);
+    var perrs = {};
+    if (pNombre.length < 2) perrs.nombre = 'Ingresa tu nombre.';
+    if (pApellido.length < 2) perrs.apellido = 'Ingresa tu apellido.';
+    if (!isValidPeruCel(pTelefono)) perrs.telefono = 'Ingresa 9 dígitos válidos (empieza con 9).';
+    if (!isValidEtapa(pEtapaVal)) perrs.etapa = 'Ingresa el número de tu etapa.';
+    if (Object.keys(perrs).length){ ui.perfilErrors = perrs; render(); return; }
+    var pEtapaNum = parseInt(pEtapaVal,10);
+    var upd = await sb.rpc('ec_actualizar_perfil', {
+      p_token: sessionToken, p_nombre: pNombre, p_apellido: pApellido, p_telefono: pDigits,
+      p_proyecto_id: pProyectoId, p_etapa: pEtapaNum, p_direccion: pDireccion
+    });
+    if (upd.error){
+      if (handleSessionError(upd.error)){ render(); return; }
+      var umsg = (upd.error.message||'').toLowerCase();
+      ui.perfilErrors = /telefono_duplicado/.test(umsg) ? {telefono:'Ese WhatsApp ya está en uso por otra cuenta.'} : {nombre:'No se pudo guardar. Intenta de nuevo.'};
+      render(); return;
+    }
+    identity = { id:identity.id, nombre:pNombre, apellido:pApellido, telefono:pDigits, proyectoId:pProyectoId, etapa:pEtapaNum, direccion:pDireccion };
+    ui.perfilErrors = {};
+    ui.fProyecto = String(pProyectoId);
+    ui.fEtapa = String(pEtapaNum);
+    toast('Datos actualizados.');
+    await refreshServicios();
+    render();
+    return;
+  }
+
+  if (kind === 'password'){
+    var nueva = fd.get('nueva')||'';
+    var nueva2 = fd.get('nueva2')||'';
+    var werrs = {};
+    if (nueva.length < 6) werrs.nueva = 'Mínimo 6 caracteres.';
+    if (nueva !== nueva2) werrs.nueva2 = 'Las contraseñas no coinciden.';
+    if (Object.keys(werrs).length){ ui.passwordErrors = werrs; render(); return; }
+    var pwRes = await sb.rpc('ec_cambiar_password', { p_token: sessionToken, p_nueva: nueva });
+    if (pwRes.error){
+      if (handleSessionError(pwRes.error)){ render(); return; }
+      ui.passwordErrors = {nueva:'No se pudo actualizar. Intenta de nuevo.'}; render(); return;
+    }
+    ui.passwordErrors = {};
+    ui.showPasswordChange = false;
+    toast('Contraseña actualizada.');
+    render();
+    return;
+  }
+
+  if (kind === 'servicio'){
+    var errors = validateServicioForm(fd);
+    ui.formErrors = errors;
+    if (Object.keys(errors).length){ render(); return; }
+    var editId = form.getAttribute('data-id');
+    var titulo = (fd.get('titulo')||'').trim();
+    var descripcion = (fd.get('descripcion')||'').trim();
+    var categoriaId = parseInt(fd.get('categoriaId'),10);
+    var precioMin = parseFloat(fd.get('precioMin'));
+    var precioMax = parseFloat(fd.get('precioMax'));
+    var svcProyectoId = parseInt(fd.get('proyectoId'),10);
+    if (editId){
+      var updS = await sb.rpc('ec_editar_servicio', {
+        p_token: sessionToken, p_servicio_id: editId, p_titulo: titulo, p_descripcion: descripcion,
+        p_categoria_id: categoriaId, p_precio_min: precioMin, p_precio_max: precioMax, p_proyecto_id: svcProyectoId
+      });
+      if (updS.error){
+        if (handleSessionError(updS.error)){ render(); return; }
+        toast('No se pudo guardar. Intenta de nuevo.'); render(); return;
+      }
+      toast('Servicio actualizado.');
+      ui.view = 'mios';
+      await refreshServicios();
+      render();
+    } else {
+      var insS = await sb.rpc('ec_crear_servicio', {
+        p_token: sessionToken, p_titulo: titulo, p_descripcion: descripcion,
+        p_categoria_id: categoriaId, p_precio_min: precioMin, p_precio_max: precioMax, p_proyecto_id: svcProyectoId
+      });
+      if (insS.error){
+        if (handleSessionError(insS.error)){ render(); return; }
+        toast('No se pudo publicar. Intenta de nuevo.'); render(); return;
+      }
+      toast('¡Tu servicio ya está publicado!');
+      ui.view = 'detalle';
+      ui.selectedId = insS.data;
+      await refreshServicios();
+      render();
+    }
+    return;
+  }
+
+  if (kind === 'resena'){
+    var sid = form.getAttribute('data-id');
+    var starsWrap = document.getElementById('resena-stars');
+    var puntuacion = parseInt(starsWrap.getAttribute('data-value'),10) || 0;
+    var comentario = (fd.get('comentario')||'').trim();
+    if (puntuacion < 1){ ui.formErrors = {resena:'Selecciona una calificación de estrellas.'}; render(); return; }
+    if (comentario.length < 5){ ui.formErrors = {resena:'Escribe un comentario un poco más largo.'}; render(); return; }
+    var insR = await sb.rpc('ec_crear_resena', { p_token: sessionToken, p_servicio_id: sid, p_puntuacion: puntuacion, p_comentario: comentario });
+    if (insR.error){
+      if (handleSessionError(insR.error)){ render(); return; }
+      ui.formErrors = {resena:'No se pudo enviar tu reseña. Intenta de nuevo.'}; render(); return;
+    }
+    ui.formErrors = {};
+    toast('¡Gracias por tu reseña!');
+    ui.view = 'detalle';
+    ui.selectedId = sid;
+    await refreshServicios();
+    render();
+    return;
+  }
+});
+
+async function init(){
+  render();
+  try{
+    var saved = JSON.parse(localStorage.getItem('ec_session_v2'));
+    if (saved && saved.userId && saved.token){
+      var row = await loadUsuario(saved.userId);
+      if (row){
+        identity = row;
+        sessionToken = saved.token;
+        ui.fProyecto = String(row.proyectoId);
+        ui.fEtapa = String(row.etapa||'');
+        ui.showEtapaPrompt = false;
+      } else {
+        clearSession();
+      }
+    }
+  }catch(e){ console.error(e); }
+  await refreshServicios();
+  loading = false;
+  render();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
