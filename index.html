@@ -123,16 +123,21 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .chip-row{display:flex;gap:6px;flex-wrap:wrap;}
 .chip{
   border:1px solid var(--border);background:var(--surface-2);color:var(--ink-soft);border-radius:999px;
-  padding:6px 12px;font-size:0.8rem;font-weight:600;cursor:pointer;
+  padding:10px 14px;min-height:40px;display:inline-flex;align-items:center;font-size:0.8rem;font-weight:600;cursor:pointer;
+  transition:transform 150ms ease;
 }
 .chip.active{background:var(--teal);border-color:var(--teal);color:var(--teal-ink);}
+.chip:active{transform:scale(0.96);}
 
 .cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;}
 .cat-pill{
-  flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);
-  color:var(--ink-soft);border-radius:999px;padding:7px 13px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;
+  flex:none;display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);
+  color:var(--ink-soft);border-radius:999px;padding:10px 16px;min-height:44px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;
+  transition:transform 150ms ease;
 }
 .cat-pill.active{background:var(--ink);border-color:var(--ink);color:var(--bg);}
+.cat-pill:active{transform:scale(0.96);}
+.cat-pill svg{flex:none;}
 
 .section-heading{display:flex;align-items:baseline;justify-content:space-between;margin:4px 0 12px;}
 .section-heading h2{font-size:1.15rem;}
@@ -148,6 +153,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   -webkit-mask-image: radial-gradient(circle 9px at calc(100% - 20px) 0, transparent 98%, #000 100%);
   mask-image: radial-gradient(circle 9px at calc(100% - 20px) 0, transparent 98%, #000 100%);
   display:flex;flex-direction:column;
+  transition:transform 150ms ease, box-shadow 150ms ease;
+}
+.card:active{transform:scale(0.98);}
+@media (hover:hover) and (pointer:fine){
+  .card:hover{box-shadow:0 2px 4px rgba(15,30,50,0.08), 0 8px 22px rgba(15,30,50,0.12);transform:translateY(-2px);}
 }
 .card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1;}
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
@@ -167,22 +177,28 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .empty-state{
   text-align:center;padding:48px 20px;color:var(--ink-soft);
 }
-.empty-state .icon{font-size:2.2rem;margin-bottom:8px;}
+.empty-state .icon{display:flex;justify-content:center;margin-bottom:10px;color:var(--ink-faint);}
 .empty-state h3{margin-bottom:6px;}
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;
-  padding:12px 18px;font-weight:700;font-size:0.92rem;cursor:pointer;font-family:var(--font-body);
+  padding:13px 18px;min-height:44px;font-weight:700;font-size:0.92rem;cursor:pointer;font-family:var(--font-body);
+  transition:transform 120ms ease, filter 150ms ease;
 }
+.btn:active{transform:scale(0.97);}
 .btn-primary{background:var(--paprika);color:var(--paprika-ink);}
-.btn-primary:hover{filter:brightness(1.05);}
-.btn-secondary{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);}
 .btn-teal{background:var(--teal);color:var(--teal-ink);}
+@media (hover:hover) and (pointer:fine){
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-teal:hover{filter:brightness(1.08);}
+  .btn-secondary:hover,.btn-ghost:hover{background:var(--surface-2);}
+}
+.btn-secondary{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);}
 .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
 .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border);}
 .btn-block{width:100%;}
 .btn[disabled]{opacity:0.5;cursor:not-allowed;}
-.btn-sm{padding:8px 12px;font-size:0.82rem;border-radius:6px;}
+.btn-sm{padding:10px 14px;min-height:40px;font-size:0.82rem;border-radius:6px;}
 
 .back-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 .back-btn{
@@ -212,7 +228,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .demo-callout{
   background:var(--surface-2);border:1px dashed var(--border);border-radius:10px;padding:12px 14px;
   font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:9px;
 }
+.demo-callout svg{margin-top:2px;color:var(--ink-faint);}
 .wa-btn{
   display:flex;align-items:center;justify-content:center;gap:10px;background:var(--whatsapp);color:var(--whatsapp-ink);
   border-radius:10px;padding:15px;font-weight:800;font-size:1rem;text-decoration:none;box-shadow:var(--shadow);margin-bottom:12px;
@@ -254,7 +272,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-faint);
   font-size:0.68rem;font-weight:700;padding:6px 10px;cursor:pointer;border-radius:8px;flex:1;max-width:110px;
 }
-.tab-btn .tab-icon{font-size:1.25rem;}
+.tab-btn .tab-icon{display:flex;}
 .tab-btn.active{color:var(--paprika);}
 @media (min-width:900px){
   .tabbar{position:static;border-top:none;border-bottom:1px solid var(--border);justify-content:flex-start;
@@ -278,7 +296,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .stat-tile .label{font-size:0.68rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;font-weight:700;}
 
 .mysvc-item{display:flex;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;align-items:center;}
-.mysvc-icon{flex:none;width:44px;height:44px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.mysvc-icon{flex:none;width:44px;height:44px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--paprika);}
 .mysvc-info{flex:1;min-width:0;}
 .mysvc-info h4{font-size:0.92rem;margin-bottom:2px;}
 .mysvc-meta{font-size:0.78rem;color:var(--ink-faint);}
@@ -360,13 +378,13 @@ function isValidEtapa(v){
 function isSessionError(err){ return !!(err && /sesion_invalida/.test(err.message||'')); }
 
 var CATEGORIAS = [
-  {id:1, nombre:'Construcción', icono:'🔨'},
-  {id:2, nombre:'Servicios', icono:'🛠️'},
-  {id:3, nombre:'Comercio', icono:'🏪'},
-  {id:4, nombre:'Educación', icono:'📚'},
-  {id:5, nombre:'Salud', icono:'⚕️'},
-  {id:6, nombre:'Belleza', icono:'💇'},
-  {id:7, nombre:'Otros', icono:'✨'}
+  {id:1, nombre:'Construcción', icono:'hammer'},
+  {id:2, nombre:'Servicios', icono:'gear'},
+  {id:3, nombre:'Comercio', icono:'store'},
+  {id:4, nombre:'Educación', icono:'book'},
+  {id:5, nombre:'Salud', icono:'heart'},
+  {id:6, nombre:'Belleza', icono:'scissors'},
+  {id:7, nombre:'Otros', icono:'sparkle'}
 ];
 var PROYECTOS = [
   {id:1, nombre:'Vive Hogar Castilla', ciudad:'Piura'},
@@ -549,8 +567,9 @@ function visibleServicios(){
   return list;
 }
 
-function svgSearch(){
-  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+function svgSearch(size){
+  var s = size || 18;
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
 }
 function svgWa(){
   return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4a8.9 8.9 0 0 0-7.7 13.4L3 21l3.7-1.3a8.9 8.9 0 0 0 5.34 1.8h0a8.9 8.9 0 0 0 8.9-8.9 8.86 8.86 0 0 0-3.34-6.28ZM12.05 20a7.4 7.4 0 0 1-3.78-1.04l-.27-.16-2.24.78.75-2.18-.18-.28A7.42 7.42 0 1 1 19.45 12 7.42 7.42 0 0 1 12.05 20Zm4.07-5.56c-.22-.11-1.31-.65-1.51-.72s-.35-.11-.5.11-.58.72-.71.87-.26.16-.48.05a6.08 6.08 0 0 1-1.79-1.1 6.7 6.7 0 0 1-1.24-1.54c-.13-.22 0-.34.1-.45s.22-.26.33-.39a1.5 1.5 0 0 0 .22-.37.4.4 0 0 0 0-.39c-.05-.11-.5-1.2-.68-1.64s-.36-.37-.5-.38h-.43a.83.83 0 0 0-.6.28 2.53 2.53 0 0 0-.79 1.88 4.39 4.39 0 0 0 .92 2.33 10 10 0 0 0 3.85 3.4c.54.23.96.37 1.29.47a3.1 3.1 0 0 0 1.42.09 2.33 2.33 0 0 0 1.53-1.08 1.9 1.9 0 0 0 .13-1.08c-.06-.1-.2-.16-.42-.27Z"/></svg>';
@@ -559,10 +578,31 @@ function svgPin(){
   return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
 }
 
+function iconSvg(name, size){
+  var s = size || 20;
+  var inner = {
+    hammer:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>',
+    gear:'<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M12 3v2.2M12 18.8V21M4.9 7l1.9 1.1M17.2 15.9l1.9 1.1M3 12h2.2M18.8 12H21M4.9 17l1.9-1.1M17.2 8.1l1.9-1.1M8.1 4.9l1.1 1.9M14.8 17.2l1.1 1.9M15.9 4.9l-1.1 1.9M9.2 17.2l-1.1 1.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    store:'<path d="M4 9.5L5 4h14l1 5.5M4 9.5a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0M5.5 9.8V19a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.8M10 20v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>',
+    book:'<path d="M12 6.8c-1.6-1.1-4.2-1.6-8-1.6v12.6c3.8 0 6.4.5 8 1.6 1.6-1.1 4.2-1.6 8-1.6V5.2c-3.8 0-6.4.5-8 1.6zM12 6.8v12.6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>',
+    heart:'<path d="M12 20s-7.3-4.5-9.3-8.8C1.3 7.8 3.2 4.4 6.6 4.4c2 0 3.4 1.3 5.4 3.4 2-2.1 3.4-3.4 5.4-3.4 3.4 0 5.3 3.4 3.9 6.8C19.3 15.5 12 20 12 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>',
+    scissors:'<circle cx="6.2" cy="6.2" r="2.2" stroke="currentColor" stroke-width="1.5"/><circle cx="6.2" cy="17.8" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M7.9 7.6L20 18.5M7.9 16.4L20 5.5M8 12l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    sparkle:'<path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    home:'<path d="M4 11.5L12 4l8 7.5M6 10.2V19a1 1 0 0 0 1 1h3v-5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5h3a1 1 0 0 0 1-1v-8.8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>',
+    plus:'<circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M12 8.3v7.4M8.3 12h7.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+    folder:'<path d="M3 7a1 1 0 0 1 1-1h4.8l1.8 1.8H20a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    user:'<circle cx="12" cy="8.2" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+    toolbox:'<rect x="3" y="9.5" width="18" height="9.5" rx="1.6" stroke="currentColor" stroke-width="1.6"/><path d="M8.3 9.5V7.3a2 2 0 0 1 2-2h3.4a2 2 0 0 1 2 2v2.2M3 14h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    info:'<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="8.3" r="0.9" fill="currentColor"/><path d="M11 11h1.4v6H11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    lock:'<rect x="5" y="10.3" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.3V7.3a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+  };
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex:none;">'+(inner[name]||'')+'</svg>';
+}
+
 function catPillsHtml(active){
   return CATEGORIAS.map(function(c){
     return '<button type="button" class="cat-pill'+(String(active)===String(c.id)?' active':'')+'" data-action="set-cat" data-value="'+c.id+'">'+
-      '<span>'+c.icono+'</span><span>'+esc(c.nombre)+'</span></button>';
+      iconSvg(c.icono,16)+'<span>'+esc(c.nombre)+'</span></button>';
   }).join('');
 }
 
@@ -573,7 +613,7 @@ function cardHtml(s){
   return '<div class="card" data-action="open" data-id="'+s.id+'">'+
     '<div class="card-body">'+
       '<div class="card-top">'+
-        '<span class="badge">'+cat.icono+' '+esc(cat.nombre)+'</span>'+
+        '<span class="badge">'+iconSvg(cat.icono,13)+esc(cat.nombre)+'</span>'+
         (s.demo ? '<span class="badge badge-demo">Ejemplo</span>' : '')+
       '</div>'+
       '<h3>'+esc(s.titulo)+'</h3>'+
@@ -608,14 +648,14 @@ function renderHeader(){
 
 function renderTabbar(){
   var tabs = [
-    {id:'home', icon:'🏠', label:'Inicio'},
-    {id:'publicar', icon:'➕', label:'Publicar'},
-    {id:'mios', icon:'🗂️', label:'Mis servicios'},
-    {id:'perfil', icon:'👤', label:'Perfil'}
+    {id:'home', icon:'home', label:'Inicio'},
+    {id:'publicar', icon:'plus', label:'Publicar'},
+    {id:'mios', icon:'folder', label:'Mis servicios'},
+    {id:'perfil', icon:'user', label:'Perfil'}
   ];
   return '<nav class="tabbar">'+tabs.map(function(t){
     return '<button type="button" class="tab-btn'+(ui.view===t.id?' active':'')+'" data-action="nav" data-value="'+t.id+'">'+
-      '<span class="tab-icon">'+t.icon+'</span><span>'+t.label+'</span></button>';
+      '<span class="tab-icon">'+iconSvg(t.icon,22)+'</span><span>'+t.label+'</span></button>';
   }).join('')+'</nav>';
 }
 
@@ -697,7 +737,7 @@ function renderHome(){
   html += '<div class="section-heading"><h2>Servicios</h2><span class="count">'+list.length+' resultado'+(list.length===1?'':'s')+'</span></div>';
 
   if (!list.length){
-    html += '<div class="empty-state"><div class="icon">🔍</div><h3>No encontramos servicios</h3><p>Prueba con otra categoría o palabra de búsqueda.</p></div>';
+    html += '<div class="empty-state"><div class="icon">'+svgSearch(40)+'</div><h3>No encontramos servicios</h3><p>Prueba con otra categoría o palabra de búsqueda.</p></div>';
   } else {
     html += '<div class="grid">'+list.map(cardHtml).join('')+'</div>';
   }
@@ -717,9 +757,9 @@ function renderDetalle(){
   var alreadyReviewed = identity && s.resenas.some(function(r){ return r.autorId === identity.id; });
 
   var html = '<div class="back-row"><button type="button" class="back-btn" data-action="nav" data-value="home">← Volver</button></div>';
-  html += '<div class="detail-photo">'+cat.icono+'</div>';
+  html += '<div class="detail-photo" style="color:var(--paprika);">'+iconSvg(cat.icono,48)+'</div>';
   html += '<div class="detail-head">';
-  html += '<div class="meta-row"><span class="badge">'+cat.icono+' '+esc(cat.nombre)+'</span>'+(s.demo?'<span class="badge badge-demo">Ejemplo</span>':'')+'</div>';
+  html += '<div class="meta-row"><span class="badge">'+iconSvg(cat.icono,13)+esc(cat.nombre)+'</span>'+(s.demo?'<span class="badge badge-demo">Ejemplo</span>':'')+'</div>';
   html += '<h1>'+esc(s.titulo)+'</h1>';
   html += '<div class="rating" style="margin-top:6px;"><span class="stars">'+starsRow(rating)+'</span> '+(rating?rating.toFixed(1):'Sin calificar')+' ('+s.resenas.length+' reseña'+(s.resenas.length===1?'':'s')+')</div>';
   html += '</div>';
@@ -733,7 +773,7 @@ function renderDetalle(){
   html += '<div class="panel"><h4>Precio</h4><p style="font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;">'+priceTxt+'</p></div>';
 
   if (s.demo){
-    html += '<div class="demo-callout">📌 Este es un servicio de ejemplo para mostrar cómo funciona ViveHogarConecta. No tiene un contacto real — ¡publica el tuyo!</div>';
+    html += '<div class="demo-callout">'+iconSvg('info',17)+'<span>Este es un servicio de ejemplo para mostrar cómo funciona ViveHogarConecta. No tiene un contacto real — ¡publica el tuyo!</span></div>';
   } else {
     var msg = 'Hola, vi tu servicio "'+s.titulo+'" en ViveHogarConecta. ¿Sigue disponible?';
     html += '<a class="wa-btn" href="'+waLink(s.autorTelefono, msg)+'" target="_blank" rel="noopener">'+svgWa()+' Contactar por WhatsApp</a>';
@@ -807,7 +847,7 @@ function authForm(){
         '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Creando cuenta…':'Crear cuenta')+'</button>'+
       '</form>';
   }
-  html += '<p style="font-size:0.72rem;color:var(--ink-faint);margin-top:14px;">🔒 Tu cuenta y contraseña quedan protegidas por Supabase, la misma base de datos que usa Ahorra Lima — no un candado casero.</p>';
+  html += '<p style="font-size:0.72rem;color:var(--ink-faint);margin-top:14px;display:flex;align-items:flex-start;gap:6px;"><span style="margin-top:1px;">'+iconSvg('lock',14)+'</span><span>Tu cuenta y contraseña quedan protegidas por Supabase, la misma base de datos que usa Ahorra Lima — no un candado casero.</span></p>';
   html += '</div>';
   return html;
 }
@@ -827,7 +867,7 @@ function renderPublicar(){
     (e.titulo?'<span class="err">'+esc(e.titulo)+'</span>':'<span class="hint">Sé claro y directo, mínimo 8 caracteres.</span>')+
   '</div>';
   html += '<div class="form-field"><label>Categoría</label><select name="categoriaId">'+
-    CATEGORIAS.map(function(c){ return '<option value="'+c.id+'" '+((editing?editing.categoriaId:1)===c.id?'selected':'')+'>'+c.icono+' '+esc(c.nombre)+'</option>'; }).join('')+
+    CATEGORIAS.map(function(c){ return '<option value="'+c.id+'" '+((editing?editing.categoriaId:1)===c.id?'selected':'')+'>'+esc(c.nombre)+'</option>'; }).join('')+
   '</select></div>';
   html += '<div class="form-field"><label>Descripción</label>'+
     '<textarea name="descripcion" rows="4" placeholder="Describe tu servicio, experiencia y disponibilidad...">'+esc(editing?editing.descripcion:'')+'</textarea>'+
@@ -849,7 +889,7 @@ function renderPublicar(){
 function renderMios(){
   var html = '<h2 style="margin-bottom:14px;">Mis servicios</h2>';
   if (!identity){
-    html += '<div class="empty-state"><div class="icon">🗂️</div><h3>Aún no tienes cuenta</h3><p>Crea tu cuenta en Perfil para empezar a publicar.</p>'+
+    html += '<div class="empty-state"><div class="icon">'+iconSvg('folder',40)+'</div><h3>Aún no tienes cuenta</h3><p>Crea tu cuenta en Perfil para empezar a publicar.</p>'+
       '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="perfil">Ir a Perfil</button></div>';
     return html;
   }
@@ -865,7 +905,7 @@ function renderMios(){
   '</div>';
 
   if (!mine.length){
-    html += '<div class="empty-state"><div class="icon">🧰</div><h3>Todavía no publicaste nada</h3><p>Ofrece tu primer servicio a la comunidad.</p>'+
+    html += '<div class="empty-state"><div class="icon">'+iconSvg('toolbox',40)+'</div><h3>Todavía no publicaste nada</h3><p>Ofrece tu primer servicio a la comunidad.</p>'+
       '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="publicar">Publicar servicio</button></div>';
     return html;
   }
@@ -874,7 +914,7 @@ function renderMios(){
     var cat = catById(s.categoriaId);
     var rating = avgRating(s);
     return '<div class="mysvc-item">'+
-      '<div class="mysvc-icon">'+cat.icono+'</div>'+
+      '<div class="mysvc-icon">'+iconSvg(cat.icono,20)+'</div>'+
       '<div class="mysvc-info"><h4>'+esc(s.titulo)+'</h4><div class="mysvc-meta">'+(rating?rating.toFixed(1)+' ★ · ':'')+s.resenas.length+' reseñas · '+fmtMoney(s.precioMin)+(s.precioMin!==s.precioMax?'–'+fmtMoney(s.precioMax):'')+'</div></div>'+
       '<div class="mysvc-actions">'+
         '<button type="button" class="btn btn-ghost btn-sm" data-action="edit-svc" data-id="'+s.id+'">Editar</button>'+
