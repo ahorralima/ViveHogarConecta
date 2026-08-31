@@ -388,18 +388,17 @@ var CATEGORIAS = [
   {id:7, nombre:'Otros', icono:'sparkle'}
 ];
 var PROYECTOS = [
-  {id:1, nombre:'Vive Hogar Castilla', ciudad:'Piura'},
-  {id:2, nombre:'Vive Hogar Sullana', ciudad:'Sullana'}
+  {id:1, nombre:'Vive Hogar Castilla', ciudad:'Piura', lat:-5.1593648, lng:-80.5039108},
+  {id:2, nombre:'Vive Hogar Sullana', ciudad:'Sullana', lat:-4.9493673, lng:-80.6961149}
 ];
 function catById(id){ for (var i=0;i<CATEGORIAS.length;i++) if (CATEGORIAS[i].id===id) return CATEGORIAS[i]; return CATEGORIAS[6]; }
 function proyById(id){ for (var i=0;i<PROYECTOS.length;i++) if (PROYECTOS[i].id===id) return PROYECTOS[i]; return PROYECTOS[0]; }
 function mapsUrl(s){
   var proy = proyById(s.proyectoId);
-  var parts = [];
-  if (s.direccion) parts.push(s.direccion);
-  parts.push(proy.nombre + (s.etapa ? ' Etapa ' + s.etapa : ''));
-  parts.push(proy.ciudad + ', Perú');
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(parts.join(', '));
+  // Usamos las coordenadas reales del proyecto como destino: Google Maps
+  // geocodifica mal un destino de solo texto (p.ej. "Vive Hogar Castilla, Piura, Peru")
+  // en el endpoint de direcciones, y puede llevar a un lugar equivocado en Lima.
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + proy.lat + ',' + proy.lng;
 }
 function fullName(u){ return u.nombre + ' ' + u.apellido; }
 
