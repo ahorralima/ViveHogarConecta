@@ -965,6 +965,11 @@ function renderPerfil(){
   html += '<button type="button" class="btn btn-ghost btn-block" data-action="logout">Cerrar sesión</button>'+
     '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:8px;text-align:center;">Esto no borra los servicios que ya publicaste — bórralos desde "Mis servicios" si lo necesitas.</p>';
 
+  html += '<div class="panel" style="margin-top:16px;"><h4>Eliminar cuenta</h4>'+
+    '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:12px;">Esto borra tu cuenta, tus servicios publicados y tus reseñas de forma permanente. No se puede deshacer.</p>'+
+    '<button type="button" class="btn btn-danger btn-block" data-action="delete-account">Eliminar mi cuenta</button>'+
+  '</div>';
+
   html += '<p class="footer-note">ViveHogarConecta · Proyecto piloto de Ingenium para Vive Hogar Castilla y Sullana · v0.2</p>';
   return html;
 }
@@ -1111,6 +1116,20 @@ document.addEventListener('click', async function(ev){
       ui.view = 'home';
       render();
       toast('Sesión cerrada.');
+    }
+  } else if (action === 'delete-account'){
+    if (confirm('¿Seguro que quieres eliminar tu cuenta? Se borrarán tu perfil, tus servicios publicados y tus reseñas de forma permanente. Esta acción no se puede deshacer.')){
+      var delAcc = await sb.rpc('ec_eliminar_cuenta', { p_token: sessionToken });
+      if (delAcc.error){
+        toast('No se pudo eliminar la cuenta. Intenta de nuevo.');
+      } else {
+        identity = null;
+        sessionToken = null;
+        clearSession();
+        ui.view = 'home';
+        render();
+        toast('Tu cuenta fue eliminada.');
+      }
     }
   }
 });
