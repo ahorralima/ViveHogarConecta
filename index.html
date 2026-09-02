@@ -1127,6 +1127,7 @@ document.addEventListener('click', async function(ev){
         sessionToken = null;
         clearSession();
         ui.view = 'home';
+        await refreshServicios();
         render();
         toast('Tu cuenta fue eliminada.');
       }
