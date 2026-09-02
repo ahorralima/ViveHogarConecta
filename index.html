@@ -196,6 +196,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 }
 .btn-secondary{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);}
 .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+.btn-link-danger{background:none;border:none;color:var(--ink-faint);font-size:0.8rem;text-decoration:underline;padding:4px;}
 .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border);}
 .btn-block{width:100%;}
 .btn[disabled]{opacity:0.5;cursor:not-allowed;}
@@ -781,6 +782,10 @@ function renderDetalle(){
   html += '<a class="maps-btn" href="'+mapsUrl(s)+'" target="_blank" rel="noopener">'+svgPin()+' Cómo llegar hasta ahí</a>';
   if (!s.direccion) html += '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:-10px;margin-bottom:16px;text-align:center;">Ubicación aproximada — este vecino no dejó una referencia exacta.</p>';
 
+  if (!s.demo){
+    html += '<p style="text-align:center;margin-bottom:16px;"><button type="button" class="btn-link-danger" data-action="reportar-servicio" data-id="'+s.id+'">Reportar este servicio</button></p>';
+  }
+
   html += '<div class="panel"><h4>Reseñas ('+s.resenas.length+')</h4>';
   if (!s.resenas.length){
     html += '<p style="font-size:0.88rem;color:var(--ink-faint);">Todavía no hay reseñas.</p>';
@@ -1116,6 +1121,14 @@ document.addEventListener('click', async function(ev){
       ui.view = 'home';
       render();
       toast('Sesión cerrada.');
+    }
+  } else if (action === 'reportar-servicio'){
+    var reportId = t.getAttribute('data-id');
+    var motivo = prompt('¿Por qué quieres reportar este servicio? (Ej. contenido falso, ofensivo o inapropiado)');
+    if (motivo && motivo.trim()){
+      var repRes = await sb.rpc('ec_reportar_servicio', { p_servicio_id: reportId, p_motivo: motivo.trim(), p_token: sessionToken || null });
+      if (repRes.error) toast('No se pudo enviar el reporte. Intenta de nuevo.');
+      else toast('Gracias, revisaremos este servicio.');
     }
   } else if (action === 'delete-account'){
     if (confirm('¿Seguro que quieres eliminar tu cuenta? Se borrarán tu perfil, tus servicios publicados y tus reseñas de forma permanente. Esta acción no se puede deshacer.')){
