@@ -331,10 +331,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 @keyframes popIn{0%{transform:scale(0.6);opacity:0;}100%{transform:scale(1);opacity:1;}}
 
 .gate-screen{display:flex;flex-direction:column;min-height:100vh;padding:40px 28px;justify-content:center;align-items:center;width:100%;background:linear-gradient(160deg,var(--paprika),var(--teal));}
-.gate-screen > *{max-width:560px;width:100%;}
-.gate-screen h2{font-size:1.7rem;color:#fff;text-align:center;}
-.gate-screen p{font-size:1.05rem;color:rgba(255,255,255,0.9);text-align:center;}
-.gate-btn{margin-bottom:16px;padding:22px 18px;line-height:1.5;font-size:1.15rem;}
+.gate-screen-inner{max-width:420px;width:100%;display:flex;flex-direction:column;align-items:center;}
+.gate-screen h2{font-size:2.1rem;color:#fff;text-align:center;margin-top:6px;}
+.gate-screen p{font-size:1.15rem;color:rgba(255,255,255,0.92);text-align:center;}
+.gate-btn{margin-bottom:16px;padding:24px 20px;line-height:1.5;font-size:1.2rem;width:100%;}
 .gate-btn small{display:block;font-weight:400;opacity:0.85;font-size:0.9rem;margin-top:4px;}
 
 .interesado-screen{padding:16px;max-width:640px;margin:0 auto;}
@@ -1053,13 +1053,13 @@ function renderSplash(){
 }
 
 function renderGate(){
-  return '<div class="gate-screen">'+
-    '<div class="splash-logo" style="margin-bottom:18px;">'+houseMarkSvg()+'</div>'+
-    '<h2 style="text-align:center;">ViveHogarConecta</h2>'+
-    '<p style="margin:10px 0 28px;">Cuéntanos quién eres para mostrarte lo que te interesa.</p>'+
+  return '<div class="gate-screen"><div class="gate-screen-inner">'+
+    '<div class="splash-logo splash-logo-lg" style="margin-bottom:22px;">'+houseMarkSvg()+'</div>'+
+    '<h2>Bienvenido a Vive Hogar</h2>'+
+    '<p style="margin:12px 0 32px;">Cuéntanos quién eres para mostrarte lo que te interesa.</p>'+
     '<button type="button" class="btn btn-primary btn-block gate-btn" data-action="gate-cliente">🏠 Soy cliente<br><small>Ya tengo mi casa en Vive Hogar</small></button>'+
     '<button type="button" class="btn btn-secondary btn-block gate-btn" data-action="gate-interesado">🔍 Estoy interesado<br><small>Quiero información para comprar</small></button>'+
-  '</div>';
+  '</div></div>';
 }
 
 function renderClienteVerificacion(){
