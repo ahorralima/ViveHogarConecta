@@ -318,6 +318,23 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:14px;color:var(--ink-soft);}
 .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--paprika);animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+.splash-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--paprika),var(--teal));padding:24px;text-align:center;animation:fadeIn 0.4s ease;}
+.splash-logo{background:#fff;border-radius:24px;padding:20px;display:inline-flex;box-shadow:0 12px 30px rgba(0,0,0,0.18);animation:popIn 0.6s cubic-bezier(.2,.9,.3,1.3);}
+.splash-logo-lg .brand-mark{width:96px;height:auto;}
+.splash-title{color:#fff;font-size:1.4rem;margin-top:24px;line-height:1.4;}
+.splash-title span{color:var(--gold-fill);font-weight:800;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes popIn{0%{transform:scale(0.6);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+.gate-screen{display:flex;flex-direction:column;min-height:100vh;padding:32px 20px;justify-content:center;max-width:480px;margin:0 auto;}
+.gate-btn{margin-bottom:14px;padding:16px;line-height:1.5;}
+.gate-btn small{font-weight:400;opacity:0.85;font-size:0.78rem;}
+
+.interesado-screen{padding:16px;max-width:640px;margin:0 auto;}
+.etapa-vhs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.etapa-vhs-card{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 8px;font-weight:700;font-size:0.9rem;text-align:center;}
+.etapa-vhs-card:not(:disabled):active{transform:scale(0.96);}
 </style>
 </head>
 <body>
@@ -508,8 +525,20 @@ var ui = {
   authBusy: false,
   perfilErrors: {},
   passwordErrors: {},
-  showPasswordChange: false
+  showPasswordChange: false,
+  showSplash: true,
+  clienteErrors: {},
+  clienteBusy: false,
+  interesadoView: 'info',
+  interesadoProyecto: 'sullana'
 };
+
+var appGate = null;
+try { appGate = JSON.parse(localStorage.getItem('ec_gate_v1')); } catch(e) { appGate = null; }
+function setGate(g){
+  appGate = g;
+  try { localStorage.setItem('ec_gate_v1', JSON.stringify(appGate)); } catch(e){}
+}
 
 var toastTimer = null;
 
@@ -980,9 +1009,95 @@ function renderPerfil(){
   return html;
 }
 
+function renderSplash(){
+  return '<div class="splash-screen">'+
+    '<div class="splash-logo splash-logo-lg">'+houseMarkSvg()+'</div>'+
+    '<h1 class="splash-title">Bienvenido a la familia<br><span>Vive Hogar</span></h1>'+
+  '</div>';
+}
+
+function renderGate(){
+  return '<div class="gate-screen">'+
+    '<div class="splash-logo" style="margin-bottom:18px;">'+houseMarkSvg()+'</div>'+
+    '<h2 style="text-align:center;">ViveHogarConecta</h2>'+
+    '<p style="text-align:center;color:var(--ink-soft);margin:10px 0 28px;">Cuéntanos quién eres para mostrarte lo que te interesa.</p>'+
+    '<button type="button" class="btn btn-primary btn-block gate-btn" data-action="gate-cliente">🏠 Soy cliente<br><small>Ya tengo mi casa en Vive Hogar</small></button>'+
+    '<button type="button" class="btn btn-outline btn-block gate-btn" data-action="gate-interesado">🔍 Estoy interesado<br><small>Quiero información para comprar</small></button>'+
+  '</div>';
+}
+
+function renderClienteVerificacion(){
+  var e = ui.clienteErrors || {};
+  return '<div class="gate-screen">'+
+    '<button type="button" class="back-btn" data-action="gate-back" style="align-self:flex-start;margin-bottom:16px;">← Volver</button>'+
+    '<h2>Verifica que eres cliente</h2>'+
+    '<p style="color:var(--ink-soft);margin:10px 0 24px;">Ingresa tus datos tal como figuran en tu contrato, para confirmar que tienes una vivienda en Vive Hogar.</p>'+
+    '<form data-form="cliente-verificar">'+
+      '<div class="form-field"><label>Nombre completo</label><input class="text-input" type="text" name="nombre" required minlength="4" placeholder="Como aparece en tu DNI" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
+      '<div class="form-field"><label>DNI</label><input class="text-input" type="text" name="dni" required inputmode="numeric" placeholder="12345678" />'+(e.dni?'<span class="err">'+esc(e.dni)+'</span>':'')+'</div>'+
+      (e.general ? '<div class="err" style="margin-bottom:12px;">'+esc(e.general)+'</div>' : '')+
+      '<button type="submit" class="btn btn-primary btn-block" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Verificando…':'Verificar')+'</button>'+
+    '</form>'+
+  '</div>';
+}
+
+function renderInteresado(){
+  var proy = ui.interesadoProyecto;
+  var html = '<div class="interesado-screen">';
+  html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
+  html += '<h2 style="margin-top:12px;">Conoce Vive Hogar</h2>';
+  html += '<div class="proyecto-switch" style="margin:16px 0;">'+
+    '<button type="button" class="cat-pill '+(proy==='castilla'?'active':'')+'" data-action="interesado-proyecto" data-value="castilla">Vive Hogar Castilla</button>'+
+    '<button type="button" class="cat-pill '+(proy==='sullana'?'active':'')+'" data-action="interesado-proyecto" data-value="sullana">Vive Hogar Sullana</button>'+
+  '</div>';
+
+  html += '<div class="panel"><h4>Lo esencial</h4>'+
+    '<ul style="margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.7;">'+
+      '<li>Vivienda de 25 m² sobre 62.5 m² de terreno, con luz, agua y desagüe.</li>'+
+      '<li>Bono Familiar Habitacional que se descuenta directo del precio.</li>'+
+      '<li>Cuota fija desde S/ 450 al mes (no varía con tasas de interés).</li>'+
+      '<li>Título de propiedad a tu nombre.</li>'+
+    '</ul></div>';
+
+  if (proy === 'sullana'){
+    html += '<div class="panel"><h4>Etapas disponibles</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Toca una etapa para ver fotos reales y el precio.</p>'+
+      '<div class="etapa-vhs-grid">'+
+        [1,2,3,4,5,7].map(function(n){
+          return '<button type="button" class="etapa-vhs-card" data-action="interesado-etapa" data-value="'+n+'">Etapa '+n+'</button>';
+        }).join('')+
+        '<button type="button" class="etapa-vhs-card" disabled style="opacity:.45;">Etapa 6<br><small>Próximamente</small></button>'+
+        '<button type="button" class="etapa-vhs-card" disabled style="opacity:.45;">Etapa 8<br><small>Próximamente</small></button>'+
+        '<button type="button" class="etapa-vhs-card" disabled style="opacity:.45;">Etapa 9<br><small>Próximamente</small></button>'+
+      '</div></div>';
+  } else {
+    html += '<div class="panel"><p style="color:var(--ink-faint);font-size:0.9rem;">Estamos preparando el mapa de Vive Hogar Castilla — muy pronto disponible aquí.</p></div>';
+  }
+
+  html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/51934042610?text='+encodeURIComponent('Hola, quiero información sobre Vive Hogar '+(proy==='sullana'?'Sullana':'Castilla'))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
+  html += '</div>';
+  return html;
+}
+
 function renderApp(){
   if (loading){
     document.getElementById('app').innerHTML = '<div class="loading-screen"><div class="spinner"></div><p>Cargando ViveHogarConecta…</p></div>';
+    return;
+  }
+  if (ui.showSplash){
+    document.getElementById('app').innerHTML = renderSplash();
+    return;
+  }
+  if (!appGate){
+    document.getElementById('app').innerHTML = renderGate();
+    return;
+  }
+  if (appGate === 'cliente-pendiente'){
+    document.getElementById('app').innerHTML = renderClienteVerificacion();
+    return;
+  }
+  if (appGate === 'interesado'){
+    document.getElementById('app').innerHTML = renderInteresado();
     return;
   }
   var body = '';
@@ -1146,6 +1261,21 @@ document.addEventListener('click', async function(ev){
         toast('Tu cuenta fue eliminada.');
       }
     }
+  } else if (action === 'gate-cliente'){
+    setGate('cliente-pendiente');
+    render();
+  } else if (action === 'gate-interesado'){
+    setGate('interesado');
+    render();
+  } else if (action === 'gate-back'){
+    setGate(null);
+    render();
+  } else if (action === 'interesado-proyecto'){
+    ui.interesadoProyecto = t.getAttribute('data-value');
+    render();
+  } else if (action === 'interesado-etapa'){
+    var etapaN = t.getAttribute('data-value');
+    toast('Fotos y precio de la Etapa '+etapaN+' — muy pronto disponible aquí.');
   }
 });
 
@@ -1169,6 +1299,26 @@ document.addEventListener('submit', async function(ev){
   var kind = form.getAttribute('data-form');
   var fd = new FormData(form);
 
+  if (kind === 'cliente-verificar'){
+    var vNombre = (fd.get('nombre')||'').trim();
+    var vDni = (fd.get('dni')||'').trim();
+    var vErrs = {};
+    if (vNombre.length < 4) vErrs.nombre = 'Ingresa tu nombre completo.';
+    if (!/^\d{5,8}$/.test(vDni)) vErrs.dni = 'Ingresa un DNI válido.';
+    if (Object.keys(vErrs).length){ ui.clienteErrors = vErrs; render(); return; }
+    ui.clienteBusy = true; ui.clienteErrors = {}; render();
+    var verRes = await sb.rpc('ec_verificar_cliente_vhs', { p_nombre: vNombre, p_dni: vDni });
+    ui.clienteBusy = false;
+    if (verRes.error || !verRes.data || !verRes.data[0] || !verRes.data[0].verificado){
+      ui.clienteErrors = {general:'No encontramos ese nombre y DNI en nuestros registros. Revisa que estén escritos igual que en tu contrato, o contacta a soporte.'};
+      render();
+      return;
+    }
+    setGate('cliente-verificado');
+    render();
+    toast('¡Verificado! Bienvenido de nuevo.');
+    return;
+  }
   if (kind === 'registro'){
     var nombre = (fd.get('nombre')||'').trim();
     var apellido = (fd.get('apellido')||'').trim();
@@ -1396,9 +1546,11 @@ async function init(){
       }
     }
   }catch(e){ console.error(e); }
+  if (!appGate && identity){ setGate('cliente-verificado'); }
   await refreshServicios();
   loading = false;
   render();
+  setTimeout(function(){ ui.showSplash = false; render(); }, 1600);
 }
 
 init();
