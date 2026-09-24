@@ -396,10 +396,11 @@ function catById(id){ for (var i=0;i<CATEGORIAS.length;i++) if (CATEGORIAS[i].id
 function proyById(id){ for (var i=0;i<PROYECTOS.length;i++) if (PROYECTOS[i].id===id) return PROYECTOS[i]; return PROYECTOS[0]; }
 function mapsUrl(s){
   var proy = proyById(s.proyectoId);
-  // Usamos las coordenadas reales del proyecto como destino: Google Maps
-  // geocodifica mal un destino de solo texto (p.ej. "Vive Hogar Castilla, Piura, Peru")
-  // en el endpoint de direcciones, y puede llevar a un lugar equivocado en Lima.
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + proy.lat + ',' + proy.lng;
+  // Apple Maps (maps.apple.com): en iOS abre la app nativa de Mapas (requisito de
+  // Apple, Guideline 4 - Design). En Android/escritorio abre el mapa web de Apple,
+  // que también funciona. Usamos coordenadas exactas, no texto, por el mismo motivo
+  // que antes (evitar que geocodifique mal el destino).
+  return 'https://maps.apple.com/?daddr=' + proy.lat + ',' + proy.lng;
 }
 function fullName(u){ return u.nombre + ' ' + u.apellido; }
 
