@@ -320,8 +320,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 .splash-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--paprika),var(--teal));padding:24px;text-align:center;animation:fadeIn 0.4s ease;}
-.splash-logo{background:#fff;border-radius:24px;padding:20px;display:inline-flex;box-shadow:0 12px 30px rgba(0,0,0,0.18);animation:popIn 0.6s cubic-bezier(.2,.9,.3,1.3);}
-.splash-logo-lg .brand-mark{width:96px;height:auto;}
+.splash-logo{display:inline-flex;filter:drop-shadow(0 12px 24px rgba(0,0,0,0.25));animation:popIn 0.6s cubic-bezier(.2,.9,.3,1.3);}
+.splash-logo-lg .brand-mark{width:150px;height:auto;background:#fff;border-radius:28px;padding:16px;}
 .splash-title{color:#fff;font-size:1.4rem;margin-top:24px;line-height:1.4;}
 .splash-title span{color:var(--gold-fill);font-weight:800;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
@@ -962,6 +962,7 @@ function renderMios(){
 
 function renderPerfil(){
   var html = '<h2 style="margin-bottom:14px;">Perfil</h2>';
+  html += '<p style="margin-bottom:18px;"><button type="button" class="btn-link-danger" style="color:var(--paprika);" data-action="gate-reset">← Volver a "Soy cliente / Estoy interesado"</button></p>';
   if (!identity){
     return html + authForm();
   }
@@ -1270,6 +1271,11 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'gate-back'){
     setGate(null);
     render();
+  } else if (action === 'gate-reset'){
+    if (confirm('¿Volver a la pantalla de inicio? Podrás elegir de nuevo "Soy cliente" o "Estoy interesado".')){
+      setGate(null);
+      render();
+    }
   } else if (action === 'interesado-proyecto'){
     ui.interesadoProyecto = t.getAttribute('data-value');
     render();
@@ -1314,6 +1320,14 @@ document.addEventListener('submit', async function(ev){
       render();
       return;
     }
+    var vData = verRes.data[0];
+    var vProyectoId = (vData.proyecto === 'castilla') ? 1 : 2;
+    var vEtapaMatch = /\d+/.exec(vData.etapa || '');
+    var vEtapaNum = vEtapaMatch ? vEtapaMatch[0] : '';
+    ui.fProyecto = String(vProyectoId);
+    ui.fEtapa = vEtapaNum;
+    ui.showEtapaPrompt = false;
+    saveLocalPref(vProyectoId, vEtapaNum);
     setGate('cliente-verificado');
     render();
     toast('¡Verificado! Bienvenido de nuevo.');
