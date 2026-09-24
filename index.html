@@ -319,9 +319,12 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--paprika);animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
+.vhs-gradient-bg{background:linear-gradient(160deg,var(--paprika),var(--teal));}
 .splash-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--paprika),var(--teal));padding:24px;text-align:center;animation:fadeIn 0.4s ease;}
-.splash-logo{display:inline-flex;filter:drop-shadow(0 12px 24px rgba(0,0,0,0.25));animation:popIn 0.6s cubic-bezier(.2,.9,.3,1.3);}
-.splash-logo-lg .brand-mark{width:320px;height:auto;background:#fff;border-radius:36px;padding:26px;}
+.splash-logo{display:inline-flex;background:#fff;border-radius:20px;padding:14px;filter:drop-shadow(0 12px 24px rgba(0,0,0,0.25));animation:popIn 0.6s cubic-bezier(.2,.9,.3,1.3);}
+.splash-logo .brand-mark{width:90px;height:auto;display:block;}
+.splash-logo-lg{padding:26px;border-radius:36px;}
+.splash-logo-lg .brand-mark{width:220px;height:auto;}
 .splash-title{color:#fff;font-size:2rem;margin-top:28px;line-height:1.35;max-width:22ch;}
 .splash-title span{color:var(--gold-fill);font-weight:800;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
@@ -357,7 +360,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .interesado-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;background:linear-gradient(160deg,var(--paprika),var(--teal));color:#fff;}
 .interesado-loading p{color:rgba(255,255,255,0.95);}
 
-.interesado-bienvenida{max-width:420px;padding-top:24px;padding-bottom:80px;}
+.interesado-bienvenida-wrap{min-height:100vh;display:flex;flex-direction:column;padding:28px 24px 100px;}
+.back-btn-on-dark{color:rgba(255,255,255,0.9)!important;}
+.interesado-bienvenida{max-width:420px;margin:0 auto;width:100%;padding-top:24px;}
+.interesado-bienvenida-card{margin-top:28px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:16px;padding:16px;}
 
 .fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
 .fab:active{transform:scale(0.94);}
@@ -1125,19 +1131,20 @@ function renderInteresadoCargando(){
 function renderInteresadoBienvenida(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
-  var html = '<div class="interesado-screen interesado-bienvenida">';
-  html += '<button type="button" class="back-btn" style="display:block;" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
-  html += '<div class="splash-logo" style="margin:22px auto 14px;display:block;width:fit-content;">'+houseMarkSvg()+'</div>';
-  html += '<h2 style="text-align:center;">Bienvenido a '+esc(nombreProy)+'</h2>';
-  html += '<p style="text-align:center;color:var(--ink-soft);font-style:italic;margin-top:4px;">Amor que construye.</p>';
-  html += '<div style="margin-top:28px;display:flex;flex-direction:column;gap:12px;">';
+  var html = '<div class="interesado-bienvenida-wrap vhs-gradient-bg">';
+  html += '<button type="button" class="back-btn back-btn-on-dark" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  html += '<div class="interesado-bienvenida">';
+  html += '<div class="splash-logo splash-logo-lg" style="margin:22px auto 14px;">'+houseMarkSvg()+'</div>';
+  html += '<h2 style="text-align:center;color:#fff;">Bienvenido a '+esc(nombreProy)+'</h2>';
+  html += '<p style="text-align:center;color:rgba(255,255,255,0.9);font-style:italic;margin-top:4px;">Amor que construye.</p>';
+  html += '<div class="interesado-bienvenida-card">';
   if (proy === 'sullana'){
     html += '<button type="button" class="btn btn-primary btn-block" data-action="interesado-ver-mapa">Ver mapa del proyecto</button>';
   } else {
     html += '<button type="button" class="btn btn-secondary btn-block" disabled style="opacity:.6;">Mapa próximamente</button>';
   }
   html += '<a class="btn btn-secondary btn-block" href="'+VHS_SITIOS_WEB[proy]+'" target="_blank" rel="noopener">Ver nuestra página web</a>';
-  html += '</div></div>';
+  html += '</div></div></div>';
   html += '<a class="fab" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener" aria-label="Contactar asesor" title="Contacta a un asesor de ventas">💬</a>';
   return html;
 }
