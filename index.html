@@ -321,7 +321,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .splash-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--paprika),var(--teal));padding:24px;text-align:center;animation:fadeIn 0.4s ease;}
 .splash-logo{display:inline-flex;filter:drop-shadow(0 12px 24px rgba(0,0,0,0.25));animation:popIn 0.6s cubic-bezier(.2,.9,.3,1.3);}
-.splash-logo-lg .brand-mark{width:220px;height:auto;background:#fff;border-radius:32px;padding:20px;}
+.splash-logo-lg .brand-mark{width:320px;height:auto;background:#fff;border-radius:36px;padding:26px;}
 .splash-title{color:#fff;font-size:2rem;margin-top:28px;line-height:1.35;max-width:22ch;}
 .splash-title span{color:var(--gold-fill);font-weight:800;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
@@ -347,6 +347,20 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-vhs-hotspot.active span{background:var(--gold-fill);color:#222;}
 .mapa-vhs-hotspot:active{transform:scale(0.97);}
 .mapa-vhs-detail{background:var(--surface-2);border-radius:12px;padding:16px;margin-top:12px;}
+
+.proyecto-pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.proyecto-pick-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 12px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+.proyecto-pick-card:active{transform:scale(0.97);}
+.proyecto-pick-media .brand-mark{width:72px;height:auto;}
+.proyecto-pick-name{font-weight:700;font-size:0.95rem;text-align:center;}
+
+.interesado-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;background:linear-gradient(160deg,var(--paprika),var(--teal));color:#fff;}
+.interesado-loading p{color:rgba(255,255,255,0.95);}
+
+.interesado-bienvenida{max-width:420px;padding-top:24px;padding-bottom:80px;}
+
+.fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
+.fab:active{transform:scale(0.94);}
 </style>
 </head>
 <body>
@@ -543,7 +557,8 @@ var ui = {
   clienteBusy: false,
   interesadoView: 'info',
   interesadoProyecto: 'sullana',
-  interesadoEtapaSel: null
+  interesadoEtapaSel: null,
+  interesadoStep: 'elegir'
 };
 
 var appGate = null;
@@ -1069,15 +1084,70 @@ var ETAPAS_SULLANA_MAPA = [
 ];
 function etapaVhsById(n){ for (var i=0;i<ETAPAS_SULLANA_MAPA.length;i++) if (ETAPAS_SULLANA_MAPA[i].n===n) return ETAPAS_SULLANA_MAPA[i]; return null; }
 
-function renderInteresado(){
-  var proy = ui.interesadoProyecto;
+var VHS_DATOS_CURIOSOS = {
+  sullana: '¿Sabías que Vive Hogar Sullana ya ha entregado más de 2,500 viviendas en 5 etapas de éxito?',
+  castilla: '¿Sabías que Vive Hogar Castilla es reconocido por el Fondo MiVivienda como uno de los mejores proyectos Techo Propio de Piura?'
+};
+var VHS_SITIOS_WEB = {
+  sullana: 'https://sullana.vivehogar.com.pe',
+  castilla: 'https://castilla.vivehogar.com.pe'
+};
+var VHS_WHATSAPP = '51934042610';
+
+function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<h2 style="margin-top:12px;">Conoce Vive Hogar</h2>';
-  html += '<div class="proyecto-switch" style="margin:16px 0;">'+
-    '<button type="button" class="cat-pill '+(proy==='castilla'?'active':'')+'" data-action="interesado-proyecto" data-value="castilla">Vive Hogar Castilla</button>'+
-    '<button type="button" class="cat-pill '+(proy==='sullana'?'active':'')+'" data-action="interesado-proyecto" data-value="sullana">Vive Hogar Sullana</button>'+
+  html += '<h2 style="margin-top:12px;">¡Qué bueno que estés interesado!</h2>';
+  html += '<p style="color:var(--ink-soft);margin:8px 0 22px;">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
+  html += '<div class="proyecto-pick-grid">'+
+    '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
+      '<div class="proyecto-pick-media">'+houseMarkSvg()+'</div>'+
+      '<div class="proyecto-pick-name">Vive Hogar Castilla</div>'+
+    '</button>'+
+    '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
+      '<div class="proyecto-pick-media">'+houseMarkSvg()+'</div>'+
+      '<div class="proyecto-pick-name">Vive Hogar Sullana</div>'+
+    '</button>'+
   '</div>';
+  html += '</div>';
+  return html;
+}
+
+function renderInteresadoCargando(){
+  var proy = ui.interesadoProyecto;
+  return '<div class="interesado-loading">'+
+    '<div class="spinner" style="border-top-color:#fff;border-color:rgba(255,255,255,0.35);"></div>'+
+    '<p style="font-weight:700;font-size:1.1rem;margin-top:18px;">¡Qué gran elección!</p>'+
+    '<p style="margin-top:10px;max-width:32ch;">'+esc(VHS_DATOS_CURIOSOS[proy] || '')+'</p>'+
+  '</div>';
+}
+
+function renderInteresadoBienvenida(){
+  var proy = ui.interesadoProyecto;
+  var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
+  var html = '<div class="interesado-screen interesado-bienvenida">';
+  html += '<button type="button" class="back-btn" style="display:block;" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  html += '<div class="splash-logo" style="margin:22px auto 14px;display:block;width:fit-content;">'+houseMarkSvg()+'</div>';
+  html += '<h2 style="text-align:center;">Bienvenido a '+esc(nombreProy)+'</h2>';
+  html += '<p style="text-align:center;color:var(--ink-soft);font-style:italic;margin-top:4px;">Amor que construye.</p>';
+  html += '<div style="margin-top:28px;display:flex;flex-direction:column;gap:12px;">';
+  if (proy === 'sullana'){
+    html += '<button type="button" class="btn btn-primary btn-block" data-action="interesado-ver-mapa">Ver mapa del proyecto</button>';
+  } else {
+    html += '<button type="button" class="btn btn-secondary btn-block" disabled style="opacity:.6;">Mapa próximamente</button>';
+  }
+  html += '<a class="btn btn-secondary btn-block" href="'+VHS_SITIOS_WEB[proy]+'" target="_blank" rel="noopener">Ver nuestra página web</a>';
+  html += '</div></div>';
+  html += '<a class="fab" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener" aria-label="Contactar asesor" title="Contacta a un asesor de ventas">💬</a>';
+  return html;
+}
+
+function renderInteresadoMapa(){
+  var proy = ui.interesadoProyecto;
+  var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
+  var html = '<div class="interesado-screen">';
+  html += '<button type="button" class="back-btn" data-action="interesado-volver-bienvenida">← Volver</button>';
+  html += '<h2 style="margin-top:12px;">Mapa de '+esc(nombreProy)+'</h2>';
 
   html += '<div class="panel"><h4>Lo esencial</h4>'+
     '<ul style="margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.7;">'+
@@ -1115,13 +1185,18 @@ function renderInteresado(){
       }
     }
     html += '</div>';
-  } else {
-    html += '<div class="panel"><p style="color:var(--ink-faint);font-size:0.9rem;">Estamos preparando el mapa de Vive Hogar Castilla — muy pronto disponible aquí.</p></div>';
   }
 
-  html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/51934042610?text='+encodeURIComponent('Hola, quiero información sobre Vive Hogar '+(proy==='sullana'?'Sullana':'Castilla')+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
+  html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
   html += '</div>';
   return html;
+}
+
+function renderInteresado(){
+  if (ui.interesadoStep === 'cargando') return renderInteresadoCargando();
+  if (ui.interesadoStep === 'bienvenida') return renderInteresadoBienvenida();
+  if (ui.interesadoStep === 'mapa') return renderInteresadoMapa();
+  return renderInteresadoElegir();
 }
 
 function renderApp(){
@@ -1310,6 +1385,7 @@ document.addEventListener('click', async function(ev){
     setGate('cliente-pendiente');
     render();
   } else if (action === 'gate-interesado'){
+    ui.interesadoStep = 'elegir';
     setGate('interesado');
     render();
   } else if (action === 'gate-back'){
@@ -1322,6 +1398,18 @@ document.addEventListener('click', async function(ev){
     }
   } else if (action === 'interesado-proyecto'){
     ui.interesadoProyecto = t.getAttribute('data-value');
+    ui.interesadoEtapaSel = null;
+    ui.interesadoStep = 'cargando';
+    render();
+    setTimeout(function(){ ui.interesadoStep = 'bienvenida'; render(); }, 1700);
+  } else if (action === 'interesado-cambiar-proyecto'){
+    ui.interesadoStep = 'elegir';
+    render();
+  } else if (action === 'interesado-ver-mapa'){
+    ui.interesadoStep = 'mapa';
+    render();
+  } else if (action === 'interesado-volver-bienvenida'){
+    ui.interesadoStep = 'bienvenida';
     render();
   } else if (action === 'interesado-etapa'){
     ui.interesadoEtapaSel = t.getAttribute('data-value');
