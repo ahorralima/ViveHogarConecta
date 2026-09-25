@@ -1155,7 +1155,9 @@ function cuotasResumen(rows){
   var hoy = new Date(); hoy.setHours(0,0,0,0);
   var atrasadas = [], pendientes = [], pagadas = [];
   rows.forEach(function(r){
-    if (r.fecha_pago){
+    // "PAGADO" = saldo en 0. "PENDIENTE" o "PAGADO PARCIALMENTE" siguen
+    // teniendo saldo por cobrar aunque ya tengan una fecha de pago parcial.
+    if (r.estado_pago === 'PAGADO'){
       pagadas.push(r);
     } else {
       var venc = new Date(r.fecha_vencimiento+'T00:00:00');
@@ -1169,7 +1171,7 @@ function cuotasResumen(rows){
   var montoVencidoSinPagar = atrasadas.reduce(function(s,r){ return s + (Number(r.saldo)||0); }, 0);
   var montoTotalPactado = rows.reduce(function(s,r){ return s + (Number(r.monto_a_pagar)||0); }, 0);
   var pctMorosidad = montoTotalPactado > 0 ? (montoVencidoSinPagar / montoTotalPactado * 100) : 0;
-  var saldoTotalPendiente = rows.reduce(function(s,r){ return r.fecha_pago ? s : s + (Number(r.saldo)||0); }, 0);
+  var saldoTotalPendiente = atrasadas.concat(pendientes).reduce(function(s,r){ return s + (Number(r.saldo)||0); }, 0);
   var proxima = atrasadas.concat(pendientes)[0] || null;
 
   return {atrasadas:atrasadas, pendientes:pendientes, pagadas:pagadas, montoVencidoSinPagar:montoVencidoSinPagar, montoTotalPactado:montoTotalPactado, pctMorosidad:pctMorosidad, saldoTotalPendiente:saldoTotalPendiente, proxima:proxima};
@@ -1177,11 +1179,11 @@ function cuotasResumen(rows){
 
 function cuotaRowHtml(r, kind){
   var chip = kind==='atrasada' ? '<span class="cuota-chip cuota-chip-danger">Atrasada</span>'
-    : kind==='pendiente' ? '<span class="cuota-chip cuota-chip-neutral">Por vencer</span>'
+    : kind==='pendiente' ? (r.estado_pago==='PAGADO PARCIALMENTE' ? '<span class="cuota-chip cuota-chip-warn">Pago parcial</span>' : '<span class="cuota-chip cuota-chip-neutral">Por vencer</span>')
     : (r.fecha_pago && r.fecha_pago > r.fecha_vencimiento ? '<span class="cuota-chip cuota-chip-warn">Pagada tarde</span>' : '<span class="cuota-chip cuota-chip-ok">Pagada a tiempo</span>');
   var fechaLinea = kind==='pagada'
     ? 'Pagada el '+fmtFechaAbs(r.fecha_pago)+' · vencía '+fmtFechaAbs(r.fecha_vencimiento)
-    : 'Vence '+fmtFechaAbs(r.fecha_vencimiento);
+    : (r.estado_pago==='PAGADO PARCIALMENTE' ? 'Vence '+fmtFechaAbs(r.fecha_vencimiento)+' · abonado '+fmtMoney(r.monto_pagado) : 'Vence '+fmtFechaAbs(r.fecha_vencimiento));
   return '<div class="cuota-row">'+
     '<div class="cuota-row-main">'+
       '<div class="cuota-row-top"><strong>'+esc(r.tipo_cuota||'Cuota')+'</strong>'+chip+'</div>'+
