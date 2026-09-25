@@ -1647,7 +1647,7 @@ document.addEventListener('submit', async function(ev){
     if (!/^\d{5,8}$/.test(vDni)) vErrs.dni = 'Ingresa un DNI válido.';
     if (Object.keys(vErrs).length){ ui.clienteErrors = vErrs; render(); return; }
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
-    var verRes = await sb.rpc('ec_verificar_cliente_vhs', { p_nombre: vNombre, p_dni: vDni });
+    var verRes = await sb.rpc('ec_verificar_cliente_vhs_v2', { p_nombre: vNombre, p_dni: vDni });
     ui.clienteBusy = false;
     if (verRes.error || !verRes.data || !verRes.data[0] || !verRes.data[0].verificado){
       ui.clienteErrors = {general:'No encontramos ese nombre y DNI en nuestros registros. Revisa que estén escritos igual que en tu contrato, o contacta a soporte.'};
