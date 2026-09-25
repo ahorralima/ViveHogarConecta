@@ -1725,6 +1725,10 @@ document.addEventListener('submit', async function(ev){
     saveLocalPref(vProyectoId, vEtapaNum);
     saveClienteNombre(vData.nombre_completo || vNombre);
     saveClienteDni(vDni);
+    // Siempre limpiar el cache de cuotas al verificar, aunque sea el
+    // mismo cliente de antes, para nunca arrastrar datos de otra persona.
+    ui.cuotasData = null;
+    ui.cuotasError = '';
     setGate('cliente-verificado');
     render();
     toast('¡Verificado! Bienvenido de nuevo.');
