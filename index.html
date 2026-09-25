@@ -234,6 +234,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cuota-chip-neutral{background:rgba(46,95,138,0.1);color:#2E5F8A;}
 .cuota-chip-ok{background:rgba(60,150,110,0.12);color:#2E9463;}
 .cuota-chip-warn{background:rgba(217,124,63,0.14);color:var(--paprika);}
+.cuotas-donut-card{text-align:center;}
+.cuota-comentario{margin-top:12px;padding:10px 14px;border-radius:10px;font-size:0.88rem;font-weight:600;text-align:center;}
+.cuota-comentario-ok{background:rgba(60,150,110,0.1);color:#2E9463;}
+.cuota-comentario-danger{background:rgba(178,59,59,0.1);color:var(--danger);}
 .provider-row{display:flex;align-items:center;gap:12px;}
 .avatar{
   flex:none;width:44px;height:44px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);
@@ -1177,11 +1181,37 @@ function cuotasResumen(rows){
 
   var montoVencidoSinPagar = atrasadas.reduce(function(s,r){ return s + (Number(r.saldo)||0); }, 0);
   var montoTotalPactado = rows.reduce(function(s,r){ return s + (Number(r.monto_a_pagar)||0); }, 0);
+  var montoTotalPagado = rows.reduce(function(s,r){ return s + (Number(r.monto_pagado)||0); }, 0);
   var pctMorosidad = montoTotalPactado > 0 ? (montoVencidoSinPagar / montoTotalPactado * 100) : 0;
+  var pctPagado = montoTotalPactado > 0 ? Math.min(100, montoTotalPagado / montoTotalPactado * 100) : 0;
   var saldoTotalPendiente = atrasadas.concat(pendientes).reduce(function(s,r){ return s + (Number(r.saldo)||0); }, 0);
   var proxima = atrasadas.concat(pendientes)[0] || null;
 
-  return {atrasadas:atrasadas, pendientes:pendientes, pagadas:pagadas, montoVencidoSinPagar:montoVencidoSinPagar, montoTotalPactado:montoTotalPactado, pctMorosidad:pctMorosidad, saldoTotalPendiente:saldoTotalPendiente, proxima:proxima};
+  return {atrasadas:atrasadas, pendientes:pendientes, pagadas:pagadas, montoVencidoSinPagar:montoVencidoSinPagar, montoTotalPactado:montoTotalPactado, montoTotalPagado:montoTotalPagado, pctMorosidad:pctMorosidad, pctPagado:pctPagado, saldoTotalPendiente:saldoTotalPendiente, proxima:proxima};
+}
+
+function cuotasComentario(r){
+  if (r.atrasadas.length){
+    return {tono:'danger', texto:'Tienes '+r.atrasadas.length+' cuota'+(r.atrasadas.length>1?'s':'')+' atrasada'+(r.atrasadas.length>1?'s':'')+' por '+fmtMoney(r.montoVencidoSinPagar)+'. Ponte al día lo antes posible.'};
+  }
+  if (r.pctPagado >= 99.5){
+    return {tono:'ok', texto:'¡Felicidades! Ya terminaste de pagar tu crédito.'};
+  }
+  return {tono:'ok', texto:'Vas al día con tus pagos. ¡Sigue así!'};
+}
+
+function donutCuotasSvg(pct){
+  var r = 52, c = 2*Math.PI*r;
+  var dash = c * Math.max(0,Math.min(100,pct)) / 100;
+  var color = pct >= 99.5 ? '#2E9463' : 'var(--paprika)';
+  return '<svg viewBox="0 0 120 120" width="140" height="140" style="display:block;margin:0 auto;">'+
+    '<circle cx="60" cy="60" r="'+r+'" fill="none" stroke="var(--border)" stroke-width="12"/>'+
+    '<circle cx="60" cy="60" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="12" '+
+      'stroke-dasharray="'+dash.toFixed(1)+' '+c.toFixed(1)+'" stroke-linecap="round" '+
+      'transform="rotate(-90 60 60)"/>'+
+    '<text x="60" y="55" text-anchor="middle" font-size="22" font-weight="800" fill="var(--ink)">'+pct.toFixed(0)+'%</text>'+
+    '<text x="60" y="74" text-anchor="middle" font-size="10" fill="var(--ink-faint)">pagado</text>'+
+  '</svg>';
 }
 
 function cuotaRowHtml(r, kind){
@@ -1220,6 +1250,13 @@ function renderCuotas(){
   }
 
   var r = cuotasResumen(rows);
+  var comentario = cuotasComentario(r);
+
+  html += '<div class="panel cuotas-donut-card">'+
+    donutCuotasSvg(r.pctPagado)+
+    '<p style="text-align:center;font-size:0.85rem;color:var(--ink-faint);margin-top:6px;">'+fmtMoney(r.montoTotalPagado)+' pagado de '+fmtMoney(r.montoTotalPactado)+'</p>'+
+    '<div class="cuota-comentario '+(comentario.tono==='danger'?'cuota-comentario-danger':'cuota-comentario-ok')+'">'+esc(comentario.texto)+'</div>'+
+  '</div>';
 
   html += '<div class="cuotas-summary-grid">'+
     '<div class="cuota-stat"><div class="cuota-stat-label">Morosidad</div><div class="cuota-stat-value" style="color:'+(r.pctMorosidad>0?'var(--danger)':'var(--teal)')+';">'+r.pctMorosidad.toFixed(1)+'%</div></div>'+
