@@ -336,6 +336,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .gate-screen p{font-size:1.15rem;color:rgba(255,255,255,0.92);text-align:center;}
 .gate-screen .form-field label{color:#fff;}
 .gate-screen .form-field .hint{color:rgba(255,255,255,0.75);}
+.gate-screen .form-field .err{color:#FFC2C2;}
+.gate-screen .form-err-general{color:#FFC2C2;font-size:0.85rem;font-weight:600;margin-bottom:12px;background:rgba(178,59,59,0.25);border:1px solid rgba(255,194,194,0.4);border-radius:10px;padding:10px 12px;}
 .gate-btn{margin-bottom:16px;padding:24px 20px;line-height:1.5;font-size:1.2rem;width:100%;}
 .gate-btn small{display:block;font-weight:400;opacity:0.85;font-size:0.9rem;margin-top:4px;}
 
@@ -1083,7 +1085,7 @@ function renderClienteVerificacion(){
     '<form data-form="cliente-verificar">'+
       '<div class="form-field"><label>Nombre completo</label><input class="text-input" type="text" name="nombre" required minlength="4" placeholder="Como aparece en tu DNI" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
       '<div class="form-field"><label>DNI</label><input class="text-input" type="text" name="dni" required inputmode="numeric" placeholder="12345678" />'+(e.dni?'<span class="err">'+esc(e.dni)+'</span>':'')+'</div>'+
-      (e.general ? '<div class="err" style="margin-bottom:12px;">'+esc(e.general)+'</div>' : '')+
+      (e.general ? '<div class="form-err-general">'+esc(e.general)+'</div>' : '')+
       '<button type="submit" class="btn btn-primary btn-block" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Verificando…':'Verificar')+'</button>'+
     '</form>'+
   '</div></div>';
