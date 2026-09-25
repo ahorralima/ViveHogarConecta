@@ -424,6 +424,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .proyecto-pick-arrow{display:none;}
 .proyecto-pick-sub{font-size:0.78rem;color:var(--ink-faint);text-align:center;padding:0 10px;}
 .proyecto-pick-name-accent{color:var(--purple);}
+.proyecto-pick-name .n1{color:var(--paprika);}
+.proyecto-pick-name .n2{color:var(--teal);}
 .proyecto-pick-stats{list-style:none;margin:8px 0 0;padding:0;font-size:0.92rem;color:var(--purple);font-weight:700;text-align:left;}
 .proyecto-pick-stats li{padding-left:16px;position:relative;line-height:1.65;}
 .proyecto-pick-stats li::before{content:'•';position:absolute;left:2px;color:var(--purple);}
@@ -1426,7 +1428,7 @@ function renderInteresadoElegir(){
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" /></div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar <span class="proyecto-pick-name-accent">Castilla</span></span><span class="proyecto-pick-arrow">›</span></div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Castilla</span></span></div>'+
       '<ul class="proyecto-pick-stats">'+
         '<li>7,000 casas en total</li>'+
         '<li>Desde S/ 20,500</li>'+
@@ -1435,7 +1437,7 @@ function renderInteresadoElegir(){
     '</button>'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" /></div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar <span class="proyecto-pick-name-accent">Sullana</span></span><span class="proyecto-pick-arrow">›</span></div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Sullana</span></span></div>'+
       '<ul class="proyecto-pick-stats">'+
         '<li>5,220 casas en total</li>'+
         '<li>Desde S/ 20,500</li>'+
