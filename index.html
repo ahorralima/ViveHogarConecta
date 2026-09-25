@@ -549,6 +549,13 @@ function handleSessionError(err){
 var localPref = null;
 try { localPref = JSON.parse(localStorage.getItem('ec_local_pref_v1')); } catch(e) { localPref = null; }
 
+var clienteNombreVerificado = null;
+try { clienteNombreVerificado = localStorage.getItem('ec_cliente_nombre_v1') || null; } catch(e) { clienteNombreVerificado = null; }
+function saveClienteNombre(nombre){
+  clienteNombreVerificado = nombre;
+  try { localStorage.setItem('ec_cliente_nombre_v1', nombre); } catch(e){}
+}
+
 var ui = {
   view: 'home',
   selectedId: null,
@@ -759,7 +766,8 @@ function etapaPromptHtml(){
 
 function renderHome(){
   var list = visibleServicios();
-  var greeting = identity && identity.nombre ? '¡Hola, '+esc(identity.nombre.split(' ')[0])+'!' : 'Bienvenido a ViveHogarConecta';
+  var greetName = (identity && identity.nombre) ? identity.nombre : clienteNombreVerificado;
+  var greeting = greetName ? '¡Hola, '+esc(greetName.split(' ')[0])+'!' : 'Bienvenido a ViveHogarConecta';
   var html = '<h2 style="margin-bottom:12px;">'+greeting+'</h2>';
 
   if (ui.showEtapaPrompt){
@@ -1492,6 +1500,7 @@ document.addEventListener('submit', async function(ev){
     ui.fEtapa = vEtapaNum;
     ui.showEtapaPrompt = false;
     saveLocalPref(vProyectoId, vEtapaNum);
+    saveClienteNombre(vNombre);
     setGate('cliente-verificado');
     render();
     toast('¡Verificado! Bienvenido de nuevo.');
