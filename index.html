@@ -197,6 +197,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .btn-secondary{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);}
 .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
 .btn-link-danger{background:none;border:none;color:var(--ink-faint);font-size:0.8rem;text-decoration:underline;padding:4px;}
+.btn-link-inline{background:none;border:none;color:var(--paprika);font-size:0.85rem;text-decoration:underline;padding:0;font-weight:600;}
 .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border);}
 .btn-block{width:100%;}
 .btn[disabled]{opacity:0.5;cursor:not-allowed;}
@@ -826,7 +827,9 @@ function renderHome(){
 
   if (clienteNombreVerificado && clienteDniVerificado){
     html += '<div class="onboard-banner" style="background:rgba(46,95,138,0.08);border-color:rgba(46,95,138,0.25);">'+
-      '<div class="txt"><strong>¿Cómo va tu crédito?</strong> Revisa tus cuotas, tu próximo pago y tu historial.</div>'+
+      '<div class="txt"><strong>¿Cómo va tu crédito?</strong> Revisa tus cuotas, tu próximo pago y tu historial.'+
+        '<div style="font-size:0.78rem;color:var(--ink-faint);margin-top:4px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
+      '</div>'+
       '<button type="button" class="btn btn-secondary btn-sm" data-action="nav" data-value="cuotas">Ver mis cuotas</button>'+
     '</div>';
   }
@@ -1239,7 +1242,10 @@ function cuotaRowHtml(r, kind){
 
 function renderCuotas(){
   var html = '<div class="back-row"><button type="button" class="back-btn" data-action="nav" data-value="home">← Volver</button></div>';
-  html += '<h2 style="margin-bottom:14px;">Mis cuotas</h2>';
+  html += '<h2 style="margin-bottom:4px;">Mis cuotas</h2>';
+  if (clienteNombreVerificado){
+    html += '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:14px;">Viendo cuotas de <strong>'+esc(toTitleCase(clienteNombreVerificado))+'</strong> · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">¿No eres tú? Cambiar de cliente</button></p>';
+  }
 
   if (ui.cuotasBusy){
     html += '<div class="interesado-loading" style="position:static;color:var(--ink-soft);"><div class="spinner"></div><p style="margin-top:12px;">Cargando tu estado de cuenta…</p></div>';
@@ -1640,6 +1646,17 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'gate-reset'){
     if (confirm('¿Volver a la pantalla de inicio? Podrás elegir de nuevo "Soy cliente" o "Estoy interesado".')){
       setGate(null);
+      render();
+    }
+  } else if (action === 'cambiar-cliente'){
+    if (confirm('¿Cambiar de cliente? Vas a tener que ingresar el nombre y DNI del nuevo cliente.')){
+      setGate(null);
+      clienteNombreVerificado = null;
+      clienteDniVerificado = null;
+      try { localStorage.removeItem('ec_cliente_nombre_v1'); localStorage.removeItem('ec_cliente_dni_v1'); } catch(e){}
+      ui.cuotasData = null;
+      ui.cuotasError = '';
+      ui.view = 'home';
       render();
     }
   } else if (action === 'interesado-proyecto'){
