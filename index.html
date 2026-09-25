@@ -409,8 +409,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .streetview-wrap{position:relative;width:100%;padding-top:56%;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
-.interesado-elegir-header{display:flex;align-items:center;gap:10px;margin:14px 0 4px;}
+.interesado-elegir-header{display:flex;align-items:center;gap:14px;margin:14px 0 4px;}
 .interesado-elegir-header img{width:96px;height:auto;}
+.interesado-elegir-logo-text{font-weight:800;font-size:2.1rem;}
+.interesado-elegir-logo-text .n1{color:var(--paprika);}
+.interesado-elegir-logo-text .n2{color:var(--teal);}
 .interesado-elegir-title{font-size:2.3rem;font-weight:800;color:var(--paprika);line-height:1.15;margin:14px 0 6px;}
 .interesado-elegir-sub{color:var(--ink-soft);font-size:1.15rem;margin:0 0 28px;}
 .proyecto-pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;}
@@ -429,6 +432,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .proyecto-pick-stats{list-style:none;margin:10px 0 0;padding:0;font-size:1.15rem;color:var(--purple);font-weight:700;text-align:left;display:inline-block;}
 .proyecto-pick-stats li{padding-left:20px;position:relative;line-height:1.75;}
 .proyecto-pick-stats li::before{content:'•';position:absolute;left:3px;color:var(--purple);}
+.proyecto-pick-accent-celeste{color:#1E9BD7;}
+.proyecto-pick-stats-celeste{color:#1E9BD7;}
+.proyecto-pick-stats-celeste li::before{color:#1E9BD7;}
 .interesado-elegir-footer{margin-top:28px;text-align:center;}
 .interesado-elegir-footer p{color:var(--ink-faint);font-size:0.88rem;margin-bottom:10px;}
 
@@ -1422,14 +1428,14 @@ var VHS_WHATSAPP = '51934042610';
 function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<div class="interesado-elegir-header">'+houseMarkSvg()+'</div>';
+  html += '<div class="interesado-elegir-header">'+houseMarkSvg()+'<span class="interesado-elegir-logo-text"><span class="n1">Vive</span> <span class="n2">Hogar</span></span></div>';
   html += '<h2 class="interesado-elegir-title">¡Qué bueno que estés interesado!</h2>';
   html += '<p class="interesado-elegir-sub">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" /></div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Castilla</span></span></div>'+
-      '<ul class="proyecto-pick-stats">'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent proyecto-pick-accent-celeste">Castilla</span></span></div>'+
+      '<ul class="proyecto-pick-stats proyecto-pick-stats-celeste">'+
         '<li>7,000 casas en total</li>'+
         '<li>Desde S/ 20,500</li>'+
         '<li>+3,000 entregadas</li>'+
