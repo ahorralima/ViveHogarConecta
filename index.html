@@ -354,14 +354,14 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes popIn{0%{transform:scale(0.6);opacity:0;}100%{transform:scale(1);opacity:1;}}
 
-.gate-screen{display:flex;flex-direction:column;min-height:100vh;padding:40px 28px;justify-content:center;align-items:center;width:100%;background:linear-gradient(160deg,#2E6DA4,#2D6B45);}
+.gate-screen{display:flex;flex-direction:column;min-height:100vh;padding:40px 28px;justify-content:center;align-items:center;width:100%;background:#fff;}
 .gate-screen-inner{max-width:420px;width:100%;display:flex;flex-direction:column;align-items:center;}
-.gate-screen h2{font-size:2.1rem;color:#fff;text-align:center;margin-top:6px;}
-.gate-screen p{font-size:1.15rem;color:rgba(255,255,255,0.92);text-align:center;}
-.gate-screen .form-field label{color:#fff;}
-.gate-screen .form-field .hint{color:rgba(255,255,255,0.75);}
-.gate-screen .form-field .err{color:#FFC2C2;}
-.gate-screen .form-err-general{color:#FFC2C2;font-size:0.85rem;font-weight:600;margin-bottom:12px;background:rgba(178,59,59,0.25);border:1px solid rgba(255,194,194,0.4);border-radius:10px;padding:10px 12px;}
+.gate-screen h2{font-size:2.1rem;color:var(--ink);text-align:center;margin-top:6px;}
+.gate-screen p{font-size:1.15rem;color:var(--ink-soft);text-align:center;}
+.gate-screen .form-field label{color:var(--ink);}
+.gate-screen .form-field .hint{color:var(--ink-faint);}
+.gate-screen .form-field .err{color:var(--danger);}
+.gate-screen .form-err-general{color:var(--danger);font-size:0.85rem;font-weight:600;margin-bottom:12px;background:rgba(178,59,59,0.08);border:1px solid rgba(178,59,59,0.25);border-radius:10px;padding:10px 12px;}
 .gate-btn{margin-bottom:16px;padding:24px 20px;line-height:1.5;font-size:1.2rem;width:100%;}
 .gate-btn small{display:block;font-weight:400;opacity:0.85;font-size:0.9rem;margin-top:4px;}
 
@@ -432,13 +432,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .interesado-elegir-footer{margin-top:28px;text-align:center;}
 .interesado-elegir-footer p{color:var(--ink-faint);font-size:0.88rem;margin-bottom:10px;}
 
-.interesado-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;background:linear-gradient(160deg,#2E6DA4,#2D6B45);color:#fff;}
-.interesado-loading p{color:rgba(255,255,255,0.95);}
+.interesado-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;background:#fff;color:var(--ink);}
+.interesado-loading p{color:var(--ink-soft);}
 
-.interesado-bienvenida-wrap{min-height:100vh;display:flex;flex-direction:column;padding:28px 24px 100px;}
+.interesado-bienvenida-wrap{min-height:100vh;display:flex;flex-direction:column;padding:28px 24px 100px;background:#fff;}
 .back-btn-on-dark{color:rgba(255,255,255,0.9)!important;}
 .interesado-bienvenida{max-width:420px;margin:0 auto;width:100%;padding-top:24px;}
-.interesado-bienvenida-card{margin-top:28px;display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:16px;padding:16px;}
+.interesado-bienvenida-card{margin-top:28px;display:flex;flex-direction:column;gap:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:16px;}
 
 .fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
 .fab:active{transform:scale(0.94);}
@@ -1207,7 +1207,7 @@ function renderGate(){
 function renderClienteVerificacion(){
   var e = ui.clienteErrors || {};
   return '<div class="gate-screen"><div class="gate-screen-inner">'+
-    '<button type="button" class="back-btn back-btn-on-dark" data-action="gate-back" style="align-self:flex-start;margin-bottom:16px;">← Volver</button>'+
+    '<button type="button" class="back-btn" data-action="gate-back" style="align-self:flex-start;margin-bottom:16px;">← Volver</button>'+
     '<h2>Verifica que eres cliente</h2>'+
     '<p style="margin:10px 0 24px;">Ingresa tus datos tal como figuran en tu contrato, para confirmar que tienes una vivienda en Vive Hogar.</p>'+
     '<form data-form="cliente-verificar">'+
@@ -1456,7 +1456,7 @@ function renderInteresadoElegir(){
 function renderInteresadoCargando(){
   var proy = ui.interesadoProyecto;
   return '<div class="interesado-loading">'+
-    '<div class="spinner" style="border-top-color:#fff;border-color:rgba(255,255,255,0.35);"></div>'+
+    '<div class="spinner"></div>'+
     '<p style="font-weight:700;font-size:1.1rem;margin-top:18px;">¡Qué gran elección!</p>'+
     '<p style="margin-top:10px;max-width:32ch;">'+esc(VHS_DATOS_CURIOSOS[proy] || '')+'</p>'+
   '</div>';
@@ -1465,12 +1465,12 @@ function renderInteresadoCargando(){
 function renderInteresadoBienvenida(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
-  var html = '<div class="interesado-bienvenida-wrap vhs-gradient-bg">';
-  html += '<button type="button" class="back-btn back-btn-on-dark" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  var html = '<div class="interesado-bienvenida-wrap">';
+  html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
   html += '<div class="interesado-bienvenida">';
   html += '<div class="splash-logo splash-logo-lg" style="margin:22px auto 14px;">'+houseMarkSvg()+'</div>';
-  html += '<h2 style="text-align:center;color:#fff;">Bienvenido a '+esc(nombreProy)+'</h2>';
-  html += '<p style="text-align:center;color:rgba(255,255,255,0.9);font-style:italic;margin-top:4px;">Amor que construye.</p>';
+  html += '<h2 style="text-align:center;color:var(--ink);">Bienvenido a '+esc(nombreProy)+'</h2>';
+  html += '<p style="text-align:center;color:var(--ink-soft);font-style:italic;margin-top:4px;">Amor que construye.</p>';
   html += '<div class="interesado-bienvenida-card">';
   html += '<button type="button" class="btn btn-primary btn-block" data-action="interesado-ver-mapa">Ver mapa del proyecto</button>';
   html += '<a class="btn btn-secondary btn-block" href="'+VHS_SITIOS_WEB[proy]+'" target="_blank" rel="noopener">Ver nuestra página web</a>';
