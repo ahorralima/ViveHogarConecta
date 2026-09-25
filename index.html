@@ -354,10 +354,17 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-vhs-detail{background:var(--surface-2);border-radius:12px;padding:16px;margin-top:12px;}
 
 .proyecto-pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.proyecto-pick-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:0 0 14px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 6px 18px rgba(0,0,0,0.1);overflow:hidden;}
-.proyecto-pick-card:active{transform:scale(0.97);}
-.proyecto-pick-photo{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+.proyecto-pick-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:0 0 14px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 6px 18px rgba(0,0,0,0.1);overflow:hidden;transition:box-shadow 0.15s,transform 0.15s;}
+.proyecto-pick-card:active{transform:scale(0.97);box-shadow:0 3px 10px rgba(0,0,0,0.12);}
+.proyecto-pick-photo-wrap{position:relative;width:100%;}
+.proyecto-pick-photo{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(1.08) contrast(1.03);}
+.proyecto-pick-photo-wrap::after{content:'';position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(to top,rgba(0,0,0,0.28),rgba(0,0,0,0));pointer-events:none;}
+.proyecto-pick-name-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;}
 .proyecto-pick-name{font-weight:700;font-size:0.95rem;text-align:center;}
+.proyecto-pick-arrow{color:var(--paprika);font-weight:700;font-size:0.9rem;}
+.proyecto-pick-sub{font-size:0.78rem;color:var(--ink-faint);text-align:center;padding:0 10px;}
+.interesado-elegir-footer{margin-top:28px;text-align:center;}
+.interesado-elegir-footer p{color:var(--ink-faint);font-size:0.88rem;margin-bottom:10px;}
 
 .interesado-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;background:linear-gradient(160deg,var(--paprika),var(--teal));color:#fff;}
 .interesado-loading p{color:rgba(255,255,255,0.95);}
@@ -1112,13 +1119,19 @@ function renderInteresadoElegir(){
   html += '<p style="color:var(--ink-soft);font-size:1.05rem;margin:10px 0 24px;">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
-      '<img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" />'+
-      '<div class="proyecto-pick-name">Vive Hogar Castilla</div>'+
+      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" /></div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar Castilla</span><span class="proyecto-pick-arrow">›</span></div>'+
+      '<div class="proyecto-pick-sub">Piura · Información próximamente</div>'+
     '</button>'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
-      '<img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" />'+
-      '<div class="proyecto-pick-name">Vive Hogar Sullana</div>'+
+      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" /></div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar Sullana</span><span class="proyecto-pick-arrow">›</span></div>'+
+      '<div class="proyecto-pick-sub">Piura · Mapa y precios disponibles</div>'+
     '</button>'+
+  '</div>';
+  html += '<div class="interesado-elegir-footer">'+
+    '<p>¿Tienes dudas antes de elegir?</p>'+
+    '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, tengo dudas sobre los proyectos Vive Hogar')+'" target="_blank" rel="noopener">💬 Escríbenos por WhatsApp</a>'+
   '</div>';
   html += '</div>';
   return html;
