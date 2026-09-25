@@ -415,6 +415,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .proyecto-pick-name{font-weight:700;font-size:0.95rem;text-align:center;}
 .proyecto-pick-arrow{color:var(--paprika);font-weight:700;font-size:0.9rem;}
 .proyecto-pick-sub{font-size:0.78rem;color:var(--ink-faint);text-align:center;padding:0 10px;}
+.proyecto-pick-name-accent{color:var(--purple);}
+.proyecto-pick-stats{list-style:none;margin:6px 10px 0;padding:0;font-size:0.74rem;color:var(--ink-soft);font-weight:600;text-align:left;}
+.proyecto-pick-stats li{padding-left:14px;position:relative;line-height:1.5;}
+.proyecto-pick-stats li::before{content:'•';position:absolute;left:2px;color:var(--purple);}
 .interesado-elegir-footer{margin-top:28px;text-align:center;}
 .interesado-elegir-footer p{color:var(--ink-faint);font-size:0.88rem;margin-bottom:10px;}
 
@@ -1412,13 +1416,21 @@ function renderInteresadoElegir(){
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" /></div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar Castilla</span><span class="proyecto-pick-arrow">›</span></div>'+
-      '<div class="proyecto-pick-sub">Piura · Información próximamente</div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar <span class="proyecto-pick-name-accent">Castilla</span></span><span class="proyecto-pick-arrow">›</span></div>'+
+      '<ul class="proyecto-pick-stats">'+
+        '<li>7,000 casas en total</li>'+
+        '<li>Desde S/ 20,500</li>'+
+        '<li>+3,000 entregadas</li>'+
+      '</ul>'+
     '</button>'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" /></div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar Sullana</span><span class="proyecto-pick-arrow">›</span></div>'+
-      '<div class="proyecto-pick-sub">Piura · Mapa y precios disponibles</div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name">Vive Hogar <span class="proyecto-pick-name-accent">Sullana</span></span><span class="proyecto-pick-arrow">›</span></div>'+
+      '<ul class="proyecto-pick-stats">'+
+        '<li>5,220 casas en total</li>'+
+        '<li>Desde S/ 20,500</li>'+
+        '<li>+1,200 vendidas</li>'+
+      '</ul>'+
     '</button>'+
   '</div>';
   html += '<div class="interesado-elegir-footer">'+
