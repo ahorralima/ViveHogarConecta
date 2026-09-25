@@ -579,6 +579,12 @@ function saveClienteNombre(nombre){
   try { localStorage.setItem('ec_cliente_nombre_v1', nombre); } catch(e){}
 }
 
+var ADMIN_DNI = '76011940';
+function esAdmin(){
+  if (!clienteDniVerificado) return false;
+  return clienteDniVerificado.replace(/^0+/,'') === ADMIN_DNI.replace(/^0+/,'');
+}
+
 var clienteDniVerificado = null;
 try { clienteDniVerificado = localStorage.getItem('ec_cliente_dni_v1') || null; } catch(e) { clienteDniVerificado = null; }
 function saveClienteDni(dni){
@@ -925,6 +931,10 @@ function renderDetalle(){
   if (!s.demo){
     html += '<p style="text-align:center;margin-bottom:16px;"><button type="button" class="btn-link-danger" data-action="reportar-servicio" data-id="'+s.id+'">Reportar este servicio</button></p>';
   }
+  if (!s.demo && esAdmin()){
+    html += '<div class="panel" style="border-color:var(--danger);background:rgba(178,59,59,0.06);"><h4 style="color:var(--danger);">Panel de administrador</h4>'+
+      '<button type="button" class="btn btn-danger btn-block" data-action="admin-del-svc" data-id="'+s.id+'">Eliminar este servicio (admin)</button></div>';
+  }
 
   html += '<div class="panel"><h4>Reseñas ('+s.resenas.length+')</h4>';
   if (!s.resenas.length){
@@ -935,6 +945,7 @@ function renderDetalle(){
         '<div class="stars">'+starsRow(r.puntuacion)+'</div>'+
         '<div class="review-text">'+esc(r.comentario)+'</div>'+
         (identity && r.autorId===identity.id ? '<button type="button" class="btn btn-danger btn-sm" style="margin-top:6px;" data-action="del-resena" data-id="'+s.id+'" data-rid="'+r.id+'">Borrar mi reseña</button>' : '')+
+        (esAdmin() && !(identity && r.autorId===identity.id) ? '<button type="button" class="btn btn-danger btn-sm" style="margin-top:6px;" data-action="admin-del-resena" data-rid="'+r.id+'">Eliminar reseña (admin)</button>' : '')+
       '</div>';
     }).join('');
   }
@@ -1589,6 +1600,24 @@ document.addEventListener('click', async function(ev){
       var del = await sb.rpc('ec_borrar_servicio', { p_token: sessionToken, p_servicio_id: idDel });
       if (del.error){ if (!handleSessionError(del.error)) toast('No se pudo borrar. Intenta de nuevo.'); }
       else { toast('Servicio borrado.'); ui.view = 'mios'; }
+      await refreshServicios();
+      render();
+    }
+  } else if (action === 'admin-del-svc'){
+    var idAdminDel = t.getAttribute('data-id');
+    if (esAdmin() && confirm('¿Eliminar este servicio como administrador? Esta acción no se puede deshacer.')){
+      var delA = await sb.rpc('ec_admin_borrar_servicio', { p_dni: clienteDniVerificado, p_servicio_id: idAdminDel });
+      if (delA.error) toast('No se pudo borrar. Intenta de nuevo.');
+      else { toast('Servicio eliminado.'); ui.view = 'home'; }
+      await refreshServicios();
+      render();
+    }
+  } else if (action === 'admin-del-resena'){
+    var ridAdminDel = t.getAttribute('data-rid');
+    if (esAdmin() && confirm('¿Eliminar esta reseña como administrador?')){
+      var delAR = await sb.rpc('ec_admin_borrar_resena', { p_dni: clienteDniVerificado, p_resena_id: ridAdminDel });
+      if (delAR.error) toast('No se pudo borrar. Intenta de nuevo.');
+      else toast('Reseña eliminada.');
       await refreshServicios();
       render();
     }
