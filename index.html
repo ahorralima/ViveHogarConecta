@@ -219,6 +219,21 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px;}
 .panel h4{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-faint);margin-bottom:8px;}
+
+.cuotas-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.cuota-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.cuota-stat-label{font-size:0.75rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;}
+.cuota-stat-value{font-size:1.4rem;font-weight:800;margin-top:4px;}
+.cuota-list{display:flex;flex-direction:column;gap:10px;}
+.cuota-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.cuota-row-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cuota-row-sub{font-size:0.8rem;color:var(--ink-faint);margin-top:2px;}
+.cuota-row-monto{font-weight:800;white-space:nowrap;}
+.cuota-chip{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:999px;}
+.cuota-chip-danger{background:rgba(178,59,59,0.12);color:var(--danger);}
+.cuota-chip-neutral{background:rgba(46,95,138,0.1);color:#2E5F8A;}
+.cuota-chip-ok{background:rgba(60,150,110,0.12);color:#2E9463;}
+.cuota-chip-warn{background:rgba(217,124,63,0.14);color:var(--paprika);}
 .provider-row{display:flex;align-items:center;gap:12px;}
 .avatar{
   flex:none;width:44px;height:44px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);
@@ -556,6 +571,13 @@ function saveClienteNombre(nombre){
   try { localStorage.setItem('ec_cliente_nombre_v1', nombre); } catch(e){}
 }
 
+var clienteDniVerificado = null;
+try { clienteDniVerificado = localStorage.getItem('ec_cliente_dni_v1') || null; } catch(e) { clienteDniVerificado = null; }
+function saveClienteDni(dni){
+  clienteDniVerificado = dni;
+  try { localStorage.setItem('ec_cliente_dni_v1', dni); } catch(e){}
+}
+
 var ui = {
   view: 'home',
   selectedId: null,
@@ -582,7 +604,10 @@ var ui = {
   interesadoView: 'info',
   interesadoProyecto: 'sullana',
   interesadoEtapaSel: null,
-  interesadoStep: 'elegir'
+  interesadoStep: 'elegir',
+  cuotasBusy: false,
+  cuotasError: '',
+  cuotasData: null
 };
 
 var appGate = null;
@@ -778,6 +803,13 @@ function renderHome(){
     html += '<div class="onboard-banner">'+
       '<div class="txt"><strong>Ofrece o encuentra servicios sin salir del proyecto.</strong> Crea tu cuenta para publicar y dejar reseñas.</div>'+
       '<button type="button" class="btn btn-teal btn-sm" data-action="nav" data-value="perfil">Empezar</button>'+
+    '</div>';
+  }
+
+  if (clienteNombreVerificado && clienteDniVerificado){
+    html += '<div class="onboard-banner" style="background:rgba(46,95,138,0.08);border-color:rgba(46,95,138,0.25);">'+
+      '<div class="txt"><strong>¿Cómo va tu crédito?</strong> Revisa tus cuotas, tu próximo pago y tu historial.</div>'+
+      '<button type="button" class="btn btn-secondary btn-sm" data-action="nav" data-value="cuotas">Ver mis cuotas</button>'+
     '</div>';
   }
 
@@ -1099,6 +1131,123 @@ function renderClienteVerificacion(){
   '</div></div>';
 }
 
+function fmtFechaAbs(iso){
+  if (!iso) return '';
+  try{ return new Date(iso+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+  catch(e){ return iso; }
+}
+
+async function cargarCuotas(){
+  ui.cuotasBusy = true; ui.cuotasError = ''; render();
+  var res = await sb.rpc('ec_cuotas_cliente_vhs', { p_nombre: clienteNombreVerificado, p_dni: clienteDniVerificado });
+  ui.cuotasBusy = false;
+  if (res.error){
+    ui.cuotasError = 'No pudimos cargar tus cuotas en este momento. Intenta de nuevo más tarde o escríbenos por WhatsApp.';
+    ui.cuotasData = null;
+    render();
+    return;
+  }
+  ui.cuotasData = res.data || [];
+  render();
+}
+
+function cuotasResumen(rows){
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  var atrasadas = [], pendientes = [], pagadas = [];
+  rows.forEach(function(r){
+    if (r.fecha_pago){
+      pagadas.push(r);
+    } else {
+      var venc = new Date(r.fecha_vencimiento+'T00:00:00');
+      if (venc < hoy) atrasadas.push(r); else pendientes.push(r);
+    }
+  });
+  atrasadas.sort(function(a,b){ return a.fecha_vencimiento < b.fecha_vencimiento ? -1 : 1; });
+  pendientes.sort(function(a,b){ return a.fecha_vencimiento < b.fecha_vencimiento ? -1 : 1; });
+  pagadas.sort(function(a,b){ return a.fecha_pago < b.fecha_pago ? 1 : -1; });
+
+  var montoVencidoSinPagar = atrasadas.reduce(function(s,r){ return s + (Number(r.saldo)||0); }, 0);
+  var montoTotalPactado = rows.reduce(function(s,r){ return s + (Number(r.monto_a_pagar)||0); }, 0);
+  var pctMorosidad = montoTotalPactado > 0 ? (montoVencidoSinPagar / montoTotalPactado * 100) : 0;
+  var saldoTotalPendiente = rows.reduce(function(s,r){ return r.fecha_pago ? s : s + (Number(r.saldo)||0); }, 0);
+  var proxima = atrasadas.concat(pendientes)[0] || null;
+
+  return {atrasadas:atrasadas, pendientes:pendientes, pagadas:pagadas, montoVencidoSinPagar:montoVencidoSinPagar, montoTotalPactado:montoTotalPactado, pctMorosidad:pctMorosidad, saldoTotalPendiente:saldoTotalPendiente, proxima:proxima};
+}
+
+function cuotaRowHtml(r, kind){
+  var chip = kind==='atrasada' ? '<span class="cuota-chip cuota-chip-danger">Atrasada</span>'
+    : kind==='pendiente' ? '<span class="cuota-chip cuota-chip-neutral">Por vencer</span>'
+    : (r.fecha_pago && r.fecha_pago > r.fecha_vencimiento ? '<span class="cuota-chip cuota-chip-warn">Pagada tarde</span>' : '<span class="cuota-chip cuota-chip-ok">Pagada a tiempo</span>');
+  var fechaLinea = kind==='pagada'
+    ? 'Pagada el '+fmtFechaAbs(r.fecha_pago)+' · vencía '+fmtFechaAbs(r.fecha_vencimiento)
+    : 'Vence '+fmtFechaAbs(r.fecha_vencimiento);
+  return '<div class="cuota-row">'+
+    '<div class="cuota-row-main">'+
+      '<div class="cuota-row-top"><strong>'+esc(r.tipo_cuota||'Cuota')+'</strong>'+chip+'</div>'+
+      '<div class="cuota-row-sub">'+fechaLinea+'</div>'+
+    '</div>'+
+    '<div class="cuota-row-monto">'+fmtMoney(kind==='pagada' ? r.monto_pagado : r.saldo)+'</div>'+
+  '</div>';
+}
+
+function renderCuotas(){
+  var html = '<div class="back-row"><button type="button" class="back-btn" data-action="nav" data-value="home">← Volver</button></div>';
+  html += '<h2 style="margin-bottom:14px;">Mis cuotas</h2>';
+
+  if (ui.cuotasBusy){
+    html += '<div class="interesado-loading" style="position:static;color:var(--ink-soft);"><div class="spinner"></div><p style="margin-top:12px;">Cargando tu estado de cuenta…</p></div>';
+    return html;
+  }
+  if (ui.cuotasError){
+    html += '<div class="panel"><p style="color:var(--danger);">'+esc(ui.cuotasError)+'</p>'+
+      '<button type="button" class="btn btn-secondary btn-block" style="margin-top:10px;" data-action="cuotas-reintentar">Reintentar</button></div>';
+    return html;
+  }
+  var rows = ui.cuotasData || [];
+  if (!rows.length){
+    html += '<div class="panel"><p style="color:var(--ink-soft);">No encontramos cuotas registradas para tu cuenta.</p></div>';
+    return html;
+  }
+
+  var r = cuotasResumen(rows);
+
+  html += '<div class="cuotas-summary-grid">'+
+    '<div class="cuota-stat"><div class="cuota-stat-label">Morosidad</div><div class="cuota-stat-value" style="color:'+(r.pctMorosidad>0?'var(--danger)':'var(--teal)')+';">'+r.pctMorosidad.toFixed(1)+'%</div></div>'+
+    '<div class="cuota-stat"><div class="cuota-stat-label">Saldo pendiente</div><div class="cuota-stat-value">'+fmtMoney(r.saldoTotalPendiente)+'</div></div>'+
+  '</div>';
+
+  if (r.proxima){
+    html += '<div class="panel" style="border-color:var(--paprika);background:rgba(217,124,63,0.08);">'+
+      '<h4>Próximo pago</h4>'+
+      '<p style="font-size:1.3rem;font-weight:800;margin-top:4px;">'+fmtMoney(r.proxima.saldo)+'</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);">Vence '+fmtFechaAbs(r.proxima.fecha_vencimiento)+'</p>'+
+    '</div>';
+  }
+
+  if (r.atrasadas.length){
+    html += '<div class="panel"><h4>Cuotas atrasadas ('+r.atrasadas.length+')</h4><div class="cuota-list">'+
+      r.atrasadas.map(function(x){ return cuotaRowHtml(x,'atrasada'); }).join('')+
+    '</div></div>';
+  }
+
+  if (r.pendientes.length){
+    html += '<div class="panel"><h4>Cuotas pendientes</h4><div class="cuota-list">'+
+      r.pendientes.map(function(x){ return cuotaRowHtml(x,'pendiente'); }).join('')+
+    '</div></div>';
+  }
+
+  if (r.pagadas.length){
+    html += '<div class="panel"><h4>Historial de pagos</h4><div class="cuota-list">'+
+      r.pagadas.map(function(x){ return cuotaRowHtml(x,'pagada'); }).join('')+
+    '</div></div>';
+  }
+
+  html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre mis cuotas pendientes')+'" target="_blank" rel="noopener">💬 Consultar / pagar por WhatsApp</a>';
+
+  return html;
+}
+
 var ETAPAS_SULLANA_MAPA = [
   {n:1, top:'25%', left:'51%', width:'20%', height:'20%', precioBono:59140, precioSinBono:12595},
   {n:2, top:'45%', left:'58%', width:'22%', height:'18%', precioBono:58111, precioSinBono:11566},
@@ -1266,6 +1415,7 @@ function renderApp(){
   else if (ui.view === 'publicar') body = renderPublicar();
   else if (ui.view === 'mios') body = renderMios();
   else if (ui.view === 'perfil') body = renderPerfil();
+  else if (ui.view === 'cuotas') body = renderCuotas();
   else body = renderHome();
 
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
@@ -1330,6 +1480,9 @@ document.addEventListener('click', async function(ev){
     if (value !== 'publicar') ui.editingId = null;
     window.scrollTo(0,0);
     render();
+    if (value === 'cuotas' && !ui.cuotasData && !ui.cuotasBusy) cargarCuotas();
+  } else if (action === 'cuotas-reintentar'){
+    cargarCuotas();
   } else if (action === 'set-authmode'){
     ui.authMode = value;
     ui.authErrors = {};
@@ -1501,6 +1654,7 @@ document.addEventListener('submit', async function(ev){
     ui.showEtapaPrompt = false;
     saveLocalPref(vProyectoId, vEtapaNum);
     saveClienteNombre(vNombre);
+    saveClienteDni(vDni);
     setGate('cliente-verificado');
     render();
     toast('¡Verificado! Bienvenido de nuevo.');
