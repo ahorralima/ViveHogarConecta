@@ -409,19 +409,23 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .streetview-wrap{position:relative;width:100%;padding-top:56%;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
-.proyecto-pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.proyecto-pick-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:0 0 14px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 6px 18px rgba(0,0,0,0.1);overflow:hidden;transition:box-shadow 0.15s,transform 0.15s;}
-.proyecto-pick-card:active{transform:scale(0.97);box-shadow:0 3px 10px rgba(0,0,0,0.12);}
-.proyecto-pick-photo-wrap{position:relative;width:100%;}
+.interesado-elegir-header{display:flex;align-items:center;gap:10px;margin:14px 0 4px;}
+.interesado-elegir-header img{width:44px;height:auto;}
+.interesado-elegir-title{font-size:1.9rem;font-weight:800;color:var(--paprika);line-height:1.15;margin:14px 0 4px;}
+.interesado-elegir-sub{color:var(--ink-soft);font-size:1.05rem;margin:0 0 22px;}
+.proyecto-pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.proyecto-pick-card{background:none;border:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:0;overflow:visible;transition:transform 0.15s;}
+.proyecto-pick-card:active{transform:scale(0.97);}
+.proyecto-pick-photo-wrap{position:relative;width:100%;border-radius:18px;overflow:hidden;box-shadow:0 10px 24px -8px rgba(0,0,0,0.35);}
 .proyecto-pick-photo{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(1.08) contrast(1.03);}
 .proyecto-pick-photo-wrap::after{content:'';position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(to top,rgba(0,0,0,0.28),rgba(0,0,0,0));pointer-events:none;}
-.proyecto-pick-name-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;}
-.proyecto-pick-name{font-weight:700;font-size:0.95rem;text-align:center;}
-.proyecto-pick-arrow{color:var(--paprika);font-weight:700;font-size:0.9rem;}
+.proyecto-pick-name-row{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:12px;}
+.proyecto-pick-name{font-weight:800;font-size:1.35rem;text-align:center;color:var(--ink);line-height:1.15;}
+.proyecto-pick-arrow{display:none;}
 .proyecto-pick-sub{font-size:0.78rem;color:var(--ink-faint);text-align:center;padding:0 10px;}
 .proyecto-pick-name-accent{color:var(--purple);}
-.proyecto-pick-stats{list-style:none;margin:6px 10px 0;padding:0;font-size:0.74rem;color:var(--ink-soft);font-weight:600;text-align:left;}
-.proyecto-pick-stats li{padding-left:14px;position:relative;line-height:1.5;}
+.proyecto-pick-stats{list-style:none;margin:8px 0 0;padding:0;font-size:0.92rem;color:var(--purple);font-weight:700;text-align:left;}
+.proyecto-pick-stats li{padding-left:16px;position:relative;line-height:1.65;}
 .proyecto-pick-stats li::before{content:'•';position:absolute;left:2px;color:var(--purple);}
 .interesado-elegir-footer{margin-top:28px;text-align:center;}
 .interesado-elegir-footer p{color:var(--ink-faint);font-size:0.88rem;margin-bottom:10px;}
@@ -1416,8 +1420,9 @@ var VHS_WHATSAPP = '51934042610';
 function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<h2 style="margin-top:12px;font-size:1.7rem;">¡Qué bueno que estés interesado!</h2>';
-  html += '<p style="color:var(--ink-soft);font-size:1.05rem;margin:10px 0 24px;">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
+  html += '<div class="interesado-elegir-header">'+houseMarkSvg()+'</div>';
+  html += '<h2 class="interesado-elegir-title">¡Qué bueno que estés interesado!</h2>';
+  html += '<p class="interesado-elegir-sub">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" /></div>'+
