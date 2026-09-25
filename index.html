@@ -413,6 +413,9 @@ function esc(s){
   });
 }
 function uid(prefix){ return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function toTitleCase(s){
+  return String(s||'').toLowerCase().replace(/(^|\s)\S/g, function(c){ return c.toUpperCase(); });
+}
 function fmtMoney(n){
   var v = Number(n)||0;
   return 'S/ ' + v.toLocaleString('es-PE', {maximumFractionDigits:0});
@@ -791,8 +794,12 @@ function etapaPromptHtml(){
 
 function renderHome(){
   var list = visibleServicios();
-  var greetName = (identity && identity.nombre) ? identity.nombre : clienteNombreVerificado;
-  var greeting = greetName ? '¡Hola, '+esc(greetName.split(' ')[0])+'!' : 'Bienvenido a ViveHogarConecta';
+  // identity.nombre lo escribe el usuario como "Nombre Apellido" (primera palabra = nombre).
+  // clienteNombreVerificado viene del padrón oficial como "Apellidos Nombres" (ultima palabra = nombre).
+  var greetFirst = (identity && identity.nombre) ? identity.nombre.trim().split(/\s+/)[0] : null;
+  var greetLast = (!greetFirst && clienteNombreVerificado) ? clienteNombreVerificado.trim().split(/\s+/).pop() : null;
+  var greetName = greetFirst || greetLast;
+  var greeting = greetName ? '¡Hola, '+esc(toTitleCase(greetName))+'!' : 'Bienvenido a ViveHogarConecta';
   var html = '<h2 style="margin-bottom:12px;">'+greeting+'</h2>';
 
   if (ui.showEtapaPrompt){
