@@ -654,9 +654,16 @@ async function refreshServicios(){
 }
 
 function visibleServicios(){
-  var list = STATE.servicios.concat(DEMO_SERVICIOS).filter(function(s){ return s.activo !== false; });
-  if (ui.fProyecto !== 'all') list = list.filter(function(s){ return String(s.proyectoId) === ui.fProyecto; });
-  if (ui.fEtapa) list = list.filter(function(s){ return String(s.etapa) === ui.fEtapa; });
+  var real = STATE.servicios.filter(function(s){ return s.activo !== false; });
+  var demo = DEMO_SERVICIOS.filter(function(s){ return s.activo !== false; });
+  if (ui.fProyecto !== 'all'){
+    real = real.filter(function(s){ return String(s.proyectoId) === ui.fProyecto; });
+    demo = demo.filter(function(s){ return String(s.proyectoId) === ui.fProyecto; });
+  }
+  // Los reales sí se filtran por etapa (cercanía real). Los ejemplos NO,
+  // para que ninguna etapa se vea vacía sin servicios de referencia.
+  if (ui.fEtapa) real = real.filter(function(s){ return String(s.etapa) === ui.fEtapa; });
+  var list = real.concat(demo);
   if (ui.fCategoria) list = list.filter(function(s){ return String(s.categoriaId) === String(ui.fCategoria); });
   if (ui.fPrecio){
     var lo=0, hi=Infinity;
