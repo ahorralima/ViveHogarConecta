@@ -1600,6 +1600,13 @@ function renderInteresadoMapa(){
       }
     }
     html += '</div>';
+
+    html += '<div class="panel"><h4>Cómo llegar</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Ubicación general del proyecto en Google Maps. Toca "Abrir en Google Maps" y arrastra el muñequito amarillo (Street View) para ver fotos reales de la calle.</p>'+
+      '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Abrir en Google Maps (Street View)</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?daddr='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
+    '</div>';
   } else {
     html += '<div class="panel"><h4>Mapa del proyecto</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Toca una manzana del plano real para ver los lotes y precios.</p>'+
@@ -1637,6 +1644,7 @@ function renderInteresadoMapa(){
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Ubicación general del proyecto en Google Maps. Toca "Abrir en Google Maps" y arrastra el muñequito amarillo (Street View) para ver fotos reales de la calle.</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps/@'+PROYECTOS[0].lat+','+PROYECTOS[0].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Abrir en Google Maps (Street View)</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?daddr='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
     '</div>';
   }
 
