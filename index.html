@@ -454,10 +454,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .interesado-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;text-align:center;background:#fff;color:var(--ink);}
 .interesado-loading p{color:var(--ink-soft);}
 
-.interesado-bienvenida-wrap{min-height:100vh;display:flex;flex-direction:column;padding:28px 24px 100px;background:#fff;}
-.back-btn-on-dark{color:rgba(255,255,255,0.9)!important;}
-.interesado-bienvenida{max-width:420px;margin:0 auto;width:100%;padding-top:24px;}
-.interesado-bienvenida-card{margin-top:28px;display:flex;flex-direction:column;gap:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:16px;}
+.interesado-bienvenida-wrap{position:relative;min-height:100vh;display:flex;flex-direction:column;padding:28px 24px 100px;overflow:hidden;}
+.interesado-bienvenida-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.interesado-bienvenida-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,25,40,0.55) 0%,rgba(10,25,40,0.35) 35%,rgba(8,20,32,0.75) 75%,rgba(8,20,32,0.88) 100%);}
+.back-btn-on-dark{color:rgba(255,255,255,0.9)!important;position:relative;z-index:1;}
+.interesado-bienvenida{position:relative;z-index:1;max-width:420px;margin:0 auto;width:100%;padding-top:24px;}
+.interesado-bienvenida h2, .interesado-bienvenida p{text-shadow:0 2px 10px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
+.interesado-bienvenida-card{margin-top:28px;display:flex;flex-direction:column;gap:12px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 28px -8px rgba(0,0,0,0.45);}
 
 .fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
 .fab:active{transform:scale(0.94);}
@@ -1227,17 +1230,35 @@ function renderGate(){
 
 function renderClienteVerificacion(){
   var e = ui.clienteErrors || {};
-  return '<div class="gate-screen"><div class="gate-screen-inner">'+
-    '<button type="button" class="back-btn" data-action="gate-back" style="align-self:flex-start;margin-bottom:16px;">← Volver</button>'+
-    '<h2>Verifica que eres cliente</h2>'+
-    '<p style="margin:10px 0 24px;">Ingresa tus datos tal como figuran en tu contrato, para confirmar que tienes una vivienda en Vive Hogar.</p>'+
+  var html = '<div class="interesado-screen">';
+  html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
+  html += '<h2 style="margin-top:12px;">Verifica que eres cliente</h2>';
+  html += '<p style="color:var(--ink-soft);margin-top:6px;max-width:56ch;">Ingresa tus datos tal como figuran en tu contrato, para confirmar que tienes una vivienda en Vive Hogar.</p>';
+
+  html += '<div class="panel"><h4>¿Para qué sirve verificarte?</h4>'+
+    '<ul style="margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.8;">'+
+      '<li>Revisa tus cuotas, tu próximo pago y tu historial completo.</li>'+
+      '<li>Publica y responde en el marketplace de servicios de tu proyecto.</li>'+
+      '<li>Accede a información exclusiva para clientes con vivienda en Vive Hogar.</li>'+
+    '</ul></div>';
+
+  html += '<div class="panel"><h4>Tus datos</h4>'+
+    '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:14px;">Usa el mismo nombre y DNI con el que firmaste tu contrato — así los encontramos en nuestros registros.</p>'+
     '<form data-form="cliente-verificar">'+
       '<div class="form-field"><label>Nombre completo</label><input class="text-input" type="text" name="nombre" required minlength="4" placeholder="Como aparece en tu DNI" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
       '<div class="form-field"><label>DNI</label><input class="text-input" type="text" name="dni" required inputmode="numeric" placeholder="12345678" />'+(e.dni?'<span class="err">'+esc(e.dni)+'</span>':'')+'</div>'+
       (e.general ? '<div class="form-err-general">'+esc(e.general)+'</div>' : '')+
       '<button type="submit" class="btn btn-primary btn-block" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Verificando…':'Verificar')+'</button>'+
     '</form>'+
-  '</div></div>';
+  '</div>';
+
+  html += '<div class="panel"><h4>¿No encuentras tus datos?</h4>'+
+    '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Escríbenos por WhatsApp y te ayudamos a revisar tu contrato.</p>'+
+    '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no puedo verificar mis datos de cliente en la app')+'" target="_blank" rel="noopener">💬 Escríbenos por WhatsApp</a>'+
+  '</div>';
+
+  html += '</div>';
+  return html;
 }
 
 function fmtFechaAbs(iso){
@@ -1490,12 +1511,15 @@ function renderInteresadoCargando(){
 function renderInteresadoBienvenida(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
+  var fotoProy = proy === 'sullana' ? SULLANA_CARD_DATAURI : CASTILLA_CARD_DATAURI;
   var html = '<div class="interesado-bienvenida-wrap">';
-  html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  html += '<img class="interesado-bienvenida-photo" src="'+fotoProy+'" alt="" />';
+  html += '<div class="interesado-bienvenida-scrim"></div>';
+  html += '<button type="button" class="back-btn back-btn-on-dark" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
   html += '<div class="interesado-bienvenida">';
-  html += '<div style="max-width:200px;margin:22px auto 14px;"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:100%;display:block;" /></div>';
-  html += '<h2 style="text-align:center;color:var(--ink);">Bienvenido a '+esc(nombreProy)+'</h2>';
-  html += '<p style="text-align:center;color:var(--ink-soft);font-style:italic;margin-top:4px;">Amor que construye.</p>';
+  html += '<div style="max-width:200px;margin:22px auto 14px;background:#fff;border-radius:16px;padding:8px 14px;box-shadow:0 10px 28px -8px rgba(0,0,0,0.45);"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:100%;display:block;" /></div>';
+  html += '<h2 style="text-align:center;color:#fff;">Bienvenido a '+esc(nombreProy)+'</h2>';
+  html += '<p style="text-align:center;color:rgba(255,255,255,0.9);font-style:italic;margin-top:4px;">Amor que construye.</p>';
   html += '<div class="interesado-bienvenida-card">';
   html += '<button type="button" class="btn btn-primary btn-block" data-action="interesado-ver-mapa">Ver mapa del proyecto</button>';
   html += '<a class="btn btn-secondary btn-block" href="'+VHS_SITIOS_WEB[proy]+'" target="_blank" rel="noopener">Ver nuestra página web</a>';
