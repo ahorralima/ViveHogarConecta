@@ -367,25 +367,21 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .gate-screen-v2{position:relative;min-height:100vh;width:100%;overflow:hidden;background:#1B3A56;}
 .gate-v2-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 65%;}
-.gate-v2-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,25,40,0.55) 0%,rgba(10,25,40,0.05) 28%,rgba(10,25,40,0.15) 55%,rgba(8,20,32,0.92) 82%,rgba(8,20,32,0.97) 100%);}
-.gate-v2-content{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:28px 20px 32px;box-sizing:border-box;}
-.gate-v2-logo{align-self:center;background:#fff;border-radius:18px;padding:6px 10px;box-shadow:0 10px 28px -8px rgba(0,0,0,0.45);display:flex;flex-direction:column;align-items:center;gap:10px;}
-.gate-v2-logo-img{width:220px;height:auto;display:block;}
+.gate-v2-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,20,32,0) 0%,rgba(8,20,32,0.22) 42%,rgba(8,20,32,0.55) 68%,rgba(8,20,32,0.88) 100%);}
+.gate-v2-content{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:18px 20px 32px;box-sizing:border-box;}
+.gate-v2-logo{align-self:center;background:#fff;border-radius:14px;padding:5px 8px;box-shadow:0 10px 28px -8px rgba(0,0,0,0.45);display:flex;flex-direction:column;align-items:center;gap:10px;}
+.gate-v2-logo-img{width:140px;height:auto;display:block;}
 .gate-v2-logo-text{display:flex;flex-direction:column;align-items:center;line-height:1.1;}
 .gate-v2-logo-text .n1{color:var(--paprika);font-weight:800;font-size:2.3rem;}
 .gate-v2-logo-text .n2{color:var(--teal);font-weight:800;font-size:2.3rem;margin-left:2px;}
 .gate-v2-logo-text small{color:#8a3a7a;font-size:1rem;letter-spacing:0.04em;text-transform:uppercase;margin-top:1px;}
 .gate-v2-bottom{max-width:460px;width:100%;margin:0 auto;}
-.gate-v2-bottom h2{color:#fff;font-size:2.7rem;text-align:center;margin:0 0 10px;text-shadow:0 2px 10px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
-.gate-v2-bottom p{color:rgba(255,255,255,0.95);font-size:1.5rem;text-align:center;margin:0 0 14px;text-shadow:0 2px 8px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
-.gate-v2-badge{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);color:#fff;font-size:0.82rem;font-weight:600;border-radius:999px;padding:6px 14px;width:fit-content;margin:0 auto 18px;text-align:center;}
-.gate-v2-choices{display:flex;gap:20px;}
-.gate-v2-choice{flex:1;display:flex;align-items:center;gap:16px;border:none;border-radius:18px;padding:26px 20px;text-align:left;font-size:1.25rem;font-weight:700;line-height:1.35;color:#12202E;box-shadow:0 8px 20px -6px rgba(0,0,0,0.4);}
-.gate-v2-choice small{display:block;font-weight:400;font-size:1rem;opacity:0.8;}
-.gate-v2-choice:active{transform:scale(0.97);}
-.gate-v2-choice-icon{flex:none;width:58px;height:58px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
-.gate-v2-choice-blue{background:#BFE0F5;}
-.gate-v2-choice-green{background:#C9EAC9;}
+.gate-v2-bottom h2{color:#fff;font-size:2.3rem;text-align:center;margin:0 0 10px;text-shadow:0 2px 10px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
+.gate-v2-bottom p{color:rgba(255,255,255,0.95);font-size:1.15rem;text-align:center;margin:0 0 16px;text-shadow:0 2px 8px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
+.gate-v2-badge{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);color:#fff;font-size:0.85rem;font-weight:600;border-radius:999px;padding:7px 16px;width:fit-content;margin:0 auto 22px;text-align:center;}
+.gate-v2-cta-primary{display:block;width:100%;box-sizing:border-box;background:var(--teal);color:#fff;border:none;border-radius:16px;padding:18px 20px;text-align:center;font-size:1.15rem;font-weight:800;box-shadow:0 10px 24px -6px rgba(0,0,0,0.5);}
+.gate-v2-cta-primary:active{transform:scale(0.98);}
+.gate-v2-cta-secondary{display:block;width:100%;background:none;border:none;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.7);font-size:1rem;font-weight:600;text-decoration:underline;padding:16px 10px 4px;text-align:center;}
 
 .interesado-screen{padding:16px;max-width:960px;margin:0 auto;}
 .etapa-vhs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -1216,13 +1212,11 @@ function renderGate(){
     '<div class="gate-v2-content">'+
       '<div class="gate-v2-logo"><img class="gate-v2-logo-img" src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" /></div>'+
       '<div class="gate-v2-bottom">'+
-        '<h2>Bienvenido a Vive Hogar</h2>'+
-        '<p>Cuéntanos quién eres para mostrarte lo que te interesa.</p>'+
+        '<h2>Encuentra tu próximo hogar</h2>'+
+        '<p>Conoce nuestros proyectos inmobiliarios en el norte del Perú.</p>'+
         '<div class="gate-v2-badge">🏡 +2,500 viviendas entregadas</div>'+
-        '<div class="gate-v2-choices">'+
-          '<button type="button" class="gate-v2-choice gate-v2-choice-blue" data-action="gate-cliente"><span class="gate-v2-choice-icon">🏠</span><span>Ya tengo mi casa<br><small>en Vive Hogar</small></span></button>'+
-          '<button type="button" class="gate-v2-choice gate-v2-choice-green" data-action="gate-interesado"><span class="gate-v2-choice-icon">🔍</span><span>Quiero información<br><small>sobre los proyectos</small></span></button>'+
-        '</div>'+
+        '<button type="button" class="gate-v2-cta-primary" data-action="gate-interesado">🔍 Quiero información</button>'+
+        '<button type="button" class="gate-v2-cta-secondary" data-action="gate-cliente">Ya tengo mi casa en Vive Hogar</button>'+
       '</div>'+
     '</div>'+
   '</div>';
