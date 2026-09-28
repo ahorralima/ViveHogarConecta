@@ -1968,9 +1968,19 @@ document.addEventListener('submit', async function(ev){
     if (!/^\d{5,8}$/.test(vDni)) vErrs.dni = 'Ingresa un DNI válido.';
     if (Object.keys(vErrs).length){ ui.clienteErrors = vErrs; render(); return; }
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
-    var verRes = await sb.rpc('ec_verificar_cliente_vhs_v2', { p_nombre: vNombre, p_dni: vDni });
+    var verRes;
+    try {
+      verRes = await sb.rpc('ec_verificar_cliente_vhs_v2', { p_nombre: vNombre, p_dni: vDni });
+    } catch (netErr){
+      verRes = { error: netErr };
+    }
     ui.clienteBusy = false;
-    if (verRes.error || !verRes.data || !verRes.data[0] || !verRes.data[0].verificado){
+    if (verRes.error){
+      ui.clienteErrors = {general:'No pudimos conectarnos para verificar tus datos. Revisa tu conexión a internet e intenta de nuevo en unos segundos.'};
+      render();
+      return;
+    }
+    if (!verRes.data || !verRes.data[0] || !verRes.data[0].verificado){
       ui.clienteErrors = {general:'No encontramos ese nombre y DNI en nuestros registros. Revisa que estén escritos igual que en tu contrato, o contacta a soporte.'};
       render();
       return;
