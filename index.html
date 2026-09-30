@@ -682,6 +682,26 @@ function saveClienteBloque(bloque){
   try { localStorage.setItem('ec_cliente_bloque_v1', bloque || ''); } catch(e){}
 }
 
+var clienteLoteVerificado = null;
+try { clienteLoteVerificado = localStorage.getItem('ec_cliente_lote_v1') || null; } catch(e) { clienteLoteVerificado = null; }
+function saveClienteLote(lote){
+  clienteLoteVerificado = lote;
+  try { localStorage.setItem('ec_cliente_lote_v1', lote || ''); } catch(e){}
+}
+
+var clienteGestoraNombre = null;
+try { clienteGestoraNombre = localStorage.getItem('ec_cliente_gestora_nombre_v1') || null; } catch(e) { clienteGestoraNombre = null; }
+var clienteGestoraTelefono = null;
+try { clienteGestoraTelefono = localStorage.getItem('ec_cliente_gestora_tel_v1') || null; } catch(e) { clienteGestoraTelefono = null; }
+function saveClienteGestora(nombre, telefono){
+  clienteGestoraNombre = nombre;
+  clienteGestoraTelefono = telefono;
+  try {
+    localStorage.setItem('ec_cliente_gestora_nombre_v1', nombre || '');
+    localStorage.setItem('ec_cliente_gestora_tel_v1', telefono || '');
+  } catch(e){}
+}
+
 var ui = {
   view: 'home',
   selectedId: null,
@@ -1195,9 +1215,18 @@ function renderMiCasa(){
       '<li>Proyecto: <strong>'+esc(proyNombre)+'</strong></li>'+
       (localPref && localPref.etapa ? '<li>Etapa: <strong>'+esc(String(localPref.etapa))+'</strong></li>' : '')+
       (clienteBloqueVerificado ? '<li>Manzana: <strong>'+esc(clienteBloqueVerificado)+'</strong></li>' : '')+
+      (clienteLoteVerificado ? '<li>Lote: <strong>'+esc(clienteLoteVerificado)+'</strong></li>' : '')+
     '</ul>'+
     '<button type="button" class="btn btn-primary btn-block" data-action="micasa-ver-mapa">Ver mapa de mi etapa</button>'+
   '</div>';
+
+  if (clienteGestoraNombre && clienteGestoraTelefono){
+    html += '<div class="panel"><h4 style="margin-bottom:10px;">Pagar mi cuota</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Tu gestora de cobranza es <strong>'+esc(toTitleCase(clienteGestoraNombre))+'</strong>. Paga tu cuota por Yape o Plin a su número, y envíale el comprobante por WhatsApp.</p>'+
+      '<div class="lote-row-precio" style="font-size:1.2rem;margin-bottom:10px;">'+esc(clienteGestoraTelefono.replace(/^51/,''))+'</div>'+
+      '<a class="btn btn-primary btn-block" href="https://wa.me/'+esc(clienteGestoraTelefono)+'?text='+encodeURIComponent('Hola, te acabo de hacer el pago de mi cuota, te comparto el comprobante.')+'" target="_blank" rel="noopener">💬 Enviar comprobante por WhatsApp</a>'+
+    '</div>';
+  }
   return html;
 }
 
@@ -2198,7 +2227,7 @@ document.addEventListener('submit', async function(ev){
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
     var verRes;
     try {
-      verRes = await sb.rpc('ec_verificar_cliente_vhs_v2', { p_nombre: vNombre, p_dni: vDni });
+      verRes = await sb.rpc('ec_verificar_cliente_vhs_v3', { p_nombre: vNombre, p_dni: vDni });
     } catch (netErr){
       verRes = { error: netErr };
     }
@@ -2224,6 +2253,8 @@ document.addEventListener('submit', async function(ev){
     saveClienteNombre(vData.nombre_completo || vNombre);
     saveClienteDni(vDni);
     saveClienteBloque(vData.bloque || '');
+    saveClienteLote(vData.lote || '');
+    saveClienteGestora(vData.gestora_nombre || '', vData.gestora_telefono || '');
     // Siempre limpiar el cache de cuotas al verificar, aunque sea el
     // mismo cliente de antes, para nunca arrastrar datos de otra persona.
     ui.cuotasData = null;
