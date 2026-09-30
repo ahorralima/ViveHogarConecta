@@ -411,6 +411,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-hotspot.lote-neutral{background:rgba(120,120,120,0.28);}
 .lote-hotspot.lote-warn{background:rgba(248,177,50,0.38);}
 .lote-hotspot.active{background:rgba(57,126,173,0.55);border:2px solid var(--paprika);z-index:2;}
+.lote-hotspot-mine{outline:3px solid #F8B132;outline-offset:1px;box-shadow:0 0 0 2px #fff,0 0 10px 2px rgba(248,177,50,0.9);z-index:3;}
+.lote-hotspot-mine-label{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:#F8B132;color:#222;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);}
+.lote-row-mine{border-color:#F8B132!important;background:rgba(248,177,50,0.08)!important;}
+.cuota-chip-mine{background:rgba(248,177,50,0.25);color:#7a5200;}
 .lote-hotspot.lote-recreacion{background:rgba(46,160,90,0.08);border:1px dashed rgba(46,160,90,0.4);cursor:default;pointer-events:none;}
 .lote-legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:0.75rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-legend span{display:flex;align-items:center;gap:5px;}
@@ -1209,16 +1213,25 @@ function renderMiCasa(){
     return html;
   }
   var proyNombre = (localPref && String(localPref.proyectoId) === '1') ? 'Vive Hogar Castilla' : 'Vive Hogar Sullana';
+  var esSullana = !(localPref && String(localPref.proyectoId) === '1');
+  var etapaNum = (localPref && localPref.etapa) ? String(localPref.etapa) : '';
   html += '<div class="panel">'+
     '<h4 style="margin-bottom:10px;">Tu vivienda</h4>'+
-    '<ul style="margin:0 0 14px;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.9;">'+
+    '<ul style="margin:0 0 4px;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.9;">'+
       '<li>Proyecto: <strong>'+esc(proyNombre)+'</strong></li>'+
-      (localPref && localPref.etapa ? '<li>Etapa: <strong>'+esc(String(localPref.etapa))+'</strong></li>' : '')+
+      (etapaNum ? '<li>Etapa: <strong>'+esc(etapaNum)+'</strong></li>' : '')+
       (clienteBloqueVerificado ? '<li>Manzana: <strong>'+esc(clienteBloqueVerificado)+'</strong></li>' : '')+
       (clienteLoteVerificado ? '<li>Lote: <strong>'+esc(clienteLoteVerificado)+'</strong></li>' : '')+
     '</ul>'+
-    '<button type="button" class="btn btn-primary btn-block" data-action="micasa-ver-mapa">Ver mapa de mi etapa</button>'+
   '</div>';
+
+  if (esSullana && etapaNum === '5'){
+    html += '<div class="panel">'+renderMapaEtapa5Html()+'</div>';
+  } else if (!esSullana && etapaNum === '11'){
+    html += '<div class="panel"><h4 style="margin-bottom:10px;">Mapa de tu manzana</h4>'+renderMapaCastilla11Html()+'</div>';
+  } else {
+    html += '<div class="panel"><p style="color:var(--ink-faint);font-size:0.9rem;">El mapa detallado lote por lote de tu etapa todavía está en preparación. Muy pronto vas a poder ver aquí tu casa marcada en el plano real.</p></div>';
+  }
 
   if (clienteGestoraNombre && clienteGestoraTelefono){
     html += '<div class="panel"><h4 style="margin-bottom:10px;">Pagar mi cuota</h4>'+
@@ -1620,6 +1633,127 @@ function renderInteresadoBienvenida(){
   return html;
 }
 
+function renderMapaEtapa5Html(){
+  var html = '<div class="mapa-vhs-detail">';
+  html += '<h4 style="margin-bottom:6px;">Etapa 5 — elige tu casa</h4>';
+  html += '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:10px;">Toca directamente el lote que te interesa en el plano real.</p>';
+  html += '<div class="lote-legend">'+
+    '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
+    '<span><i class="lote-dot lote-dot-neutral"></i> Vendido</span>'+
+    '<span><i class="lote-dot lote-dot-warn"></i> Separado / bloqueado</span>'+
+  '</div>';
+  html += '<div class="mapa-vhs-wrap mapa-lotes-wrap">'+
+      '<img class="mapa-vhs-img" src="'+MAPA_ETAPA5_LOTES_DATAURI+'" alt="Plano de la Etapa 5 de Vive Hogar Sullana" />'+
+      ETAPA5_RECREACION_PLANO.map(function(r){
+        return '<div class="lote-hotspot lote-recreacion" style="top:'+r.t+'%;left:'+r.le+'%;width:'+r.w+'%;height:'+r.h+'%;" title="Área de recreación común"></div>';
+      }).join('')+
+      ETAPA5_LOTES_PLANO.map(function(l){
+        var key = l.m+'|'+l.l;
+        var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : (l.e === 'SEPARADO' || l.e === 'BLOQUEADO') ? 'lote-warn' : 'lote-neutral';
+        var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
+        return '<div role="button" tabindex="0" class="lote-hotspot '+cls+mine+(ui.interesadoLoteSel===key?' active':'')+'" '+
+          'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
+          'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'</div>';
+      }).join('')+
+    '</div>';
+
+  if (ui.interesadoLoteSel){
+    var selParts = ui.interesadoLoteSel.split('|');
+    var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === selParts[0] && String(l.l) === selParts[1]; })[0];
+    if (lote){
+      var estadoInfo = lote.e === 'DISPONIBLE' ? {cls:'ok', txt:'Disponible'}
+        : lote.e === 'VENDIDO' ? {cls:'neutral', txt:'Vendido'}
+        : lote.e === 'SEPARADO' ? {cls:'warn', txt:'Separado'}
+        : lote.e === 'BLOQUEADO' ? {cls:'warn', txt:'Bloqueado'}
+        : lote.e === 'DEVUELTO' ? {cls:'warn', txt:'Devuelto'}
+        : {cls:'neutral', txt:esc(lote.e||'')};
+      html += '<div class="mapa-vhs-detail" style="margin-top:12px;">';
+      html += '<h4 style="margin-bottom:10px;">Manzana '+esc(lote.m)+' · Lote '+esc(String(lote.l))+' '+
+        '<span class="cuota-chip cuota-chip-'+estadoInfo.cls+'">'+estadoInfo.txt+'</span></h4>';
+      html += '<ul style="margin:0 0 12px;padding-left:18px;color:var(--ink-soft);font-size:0.9rem;line-height:1.8;">'+
+        '<li>Vista: '+esc(lote.v||'')+'</li>'+
+        '<li>Área de terreno: '+parseFloat(lote.a).toFixed(2)+' m²</li>'+
+      '</ul>';
+      html += '<div class="lote-row-precio" style="font-size:1.3rem;">'+fmtMoney(lote.pv)+'</div>';
+      if (lote.d){
+        html += '<p style="font-size:0.78rem;color:var(--ink-faint);">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
+      }
+      if (lote.e === 'DISPONIBLE'){
+        var calcModo = ui.loteCalcModo || 'cuotas';
+        var calcMeses = ui.loteCalcMeses || 24;
+        var saldoFinanciar = Math.max(0, lote.pv - SEPARACION_LOTE);
+        var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
+        html += '<div class="cuotas-calc">';
+        html += '<div class="cuotas-calc-tabs">'+
+          '<button type="button" class="cuotas-calc-tab'+(calcModo==='contado'?' active':'')+'" data-action="lote-calc-modo" data-value="contado">Al contado</button>'+
+          '<button type="button" class="cuotas-calc-tab'+(calcModo==='cuotas'?' active':'')+'" data-action="lote-calc-modo" data-value="cuotas">En cuotas</button>'+
+        '</div>';
+        if (calcModo === 'cuotas'){
+          html += '<div class="cuotas-calc-slider-row">'+
+            '<input type="range" id="lote-calc-meses" min="6" max="36" step="6" value="'+calcMeses+'" />'+
+            '<span class="cuotas-calc-meses-label">'+calcMeses+' meses</span>'+
+          '</div>';
+          html += '<div class="cuotas-calc-result">'+
+            '<div class="cuotas-calc-label">Cuota mensual</div>'+
+            '<div class="cuotas-calc-amount">'+fmtMoney(cuotaMensual)+'</div>'+
+            '<div class="cuotas-calc-sub">sobre '+fmtMoney(saldoFinanciar)+' financiados · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+          '</div>';
+        } else {
+          html += '<div class="cuotas-calc-result">'+
+            '<div class="cuotas-calc-label">Saldo en un solo pago</div>'+
+            '<div class="cuotas-calc-amount">'+fmtMoney(saldoFinanciar)+'</div>'+
+            '<div class="cuotas-calc-sub">Precio '+fmtMoney(lote.pv)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+          '</div>';
+        }
+        html += '<p class="cuotas-calc-disclaimer">Simulación referencial, sin intereses. Sujeta a confirmación con tu asesora.</p>';
+        html += '</div>';
+        var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana ('+fmtMoney(lote.pv)+'). ¿Podemos coordinar una cita con una asesora?');
+        html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
+          '<button type="button" class="btn btn-secondary btn-block" data-action="descargar-cotizacion" data-value="'+esc(lote.m)+'|'+esc(String(lote.l))+'">📄 Descargar cotización (PDF)</button>'+
+          '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
+          '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg.replace('coordinar%20una%20cita%20con%20una%20asesora','saber%20c%C3%B3mo%20reservarlo')+'" target="_blank" rel="noopener">💳 Cómo reservar este lote</a>'+
+        '</div>';
+      }
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderMapaCastilla11Html(){
+  var html = '<div class="mapa-vhs-wrap">'+
+    '<img class="mapa-vhs-img" src="'+MAPA_ETAPA11_CASTILLA_DATAURI+'" alt="Plano de la Etapa 11 de Vive Hogar Castilla" />'+
+    ETAPA11_CASTILLA_MANZANAS.map(function(m){
+      return '<button type="button" class="mapa-vhs-hotspot'+(ui.interesadoManzanaSel===m.n?' active':'')+'" '+
+        'style="top:'+m.top+'%;left:'+m.left+'%;width:'+m.width+'%;height:'+m.height+'%;" '+
+        'data-action="interesado-manzana" data-value="'+m.n+'"><span>'+m.n+'</span></button>';
+    }).join('')+
+  '</div>';
+
+  if (ui.interesadoManzanaSel){
+    var lotes = lotesDeManzana(ui.interesadoManzanaSel);
+    html += '<div class="mapa-vhs-detail">';
+    html += '<h4 style="margin-bottom:10px;">Manzana '+esc(ui.interesadoManzanaSel)+' · '+lotes.length+' lote'+(lotes.length===1?'':'s')+'</h4>';
+    html += '<div class="lote-list">'+lotes.map(function(l){
+      var estadoInfo = l.estado === 'PREVENTA' ? {cls:'ok', txt:'Disponible'}
+        : l.estado === 'VENTA POR APROBAR' ? {cls:'warn', txt:'Reservado'}
+        : {cls:'sold', txt:'Vendido'};
+      var mine = ui.miCasaLote && String(l.n) === String(ui.miCasaLote);
+      return '<div class="lote-row'+(mine?' lote-row-mine':'')+'">'+
+        '<div class="lote-row-main"><strong>Lote '+esc(l.n)+'</strong>'+
+          '<span class="cuota-chip cuota-chip-'+(estadoInfo.cls==='ok'?'ok':estadoInfo.cls==='warn'?'warn':'neutral')+'">'+estadoInfo.txt+'</span>'+
+          (mine?'<span class="cuota-chip cuota-chip-mine">Tu casa</span>':'')+
+        '</div>'+
+        '<div class="lote-row-sub">'+esc(l.vista||'')+(l.area?' · '+parseFloat(l.area).toFixed(0)+' m²':'')+'</div>'+
+        '<div class="lote-row-precio">'+fmtMoney(l.precio)+'</div>'+
+      '</div>';
+    }).join('')+'</div>';
+    html += '</div>';
+  }
+  return html;
+}
+
 function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
@@ -1661,89 +1795,7 @@ function renderInteresadoMapa(){
       '</div>';
 
     if (ui.interesadoEtapaSel && String(ui.interesadoEtapaSel) === '5'){
-      html += '<div class="mapa-vhs-detail">';
-      html += '<h4 style="margin-bottom:6px;">Etapa 5 — elige tu casa</h4>';
-      html += '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:10px;">Toca directamente el lote que te interesa en el plano real.</p>';
-      html += '<div class="lote-legend">'+
-        '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
-        '<span><i class="lote-dot lote-dot-neutral"></i> Vendido</span>'+
-        '<span><i class="lote-dot lote-dot-warn"></i> Separado / bloqueado</span>'+
-      '</div>';
-      html += '<div class="mapa-vhs-wrap mapa-lotes-wrap">'+
-          '<img class="mapa-vhs-img" src="'+MAPA_ETAPA5_LOTES_DATAURI+'" alt="Plano de la Etapa 5 de Vive Hogar Sullana" />'+
-          ETAPA5_RECREACION_PLANO.map(function(r){
-            return '<div class="lote-hotspot lote-recreacion" style="top:'+r.t+'%;left:'+r.le+'%;width:'+r.w+'%;height:'+r.h+'%;" title="Área de recreación común"></div>';
-          }).join('')+
-          ETAPA5_LOTES_PLANO.map(function(l){
-            var key = l.m+'|'+l.l;
-            var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : (l.e === 'SEPARADO' || l.e === 'BLOQUEADO') ? 'lote-warn' : 'lote-neutral';
-            return '<div role="button" tabindex="0" class="lote-hotspot '+cls+(ui.interesadoLoteSel===key?' active':'')+'" '+
-              'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
-              'data-action="interesado-lote" data-value="'+key+'"></div>';
-          }).join('')+
-        '</div>';
-
-      if (ui.interesadoLoteSel){
-        var selParts = ui.interesadoLoteSel.split('|');
-        var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === selParts[0] && String(l.l) === selParts[1]; })[0];
-        if (lote){
-          var estadoInfo = lote.e === 'DISPONIBLE' ? {cls:'ok', txt:'Disponible'}
-            : lote.e === 'VENDIDO' ? {cls:'neutral', txt:'Vendido'}
-            : lote.e === 'SEPARADO' ? {cls:'warn', txt:'Separado'}
-            : lote.e === 'BLOQUEADO' ? {cls:'warn', txt:'Bloqueado'}
-            : lote.e === 'DEVUELTO' ? {cls:'warn', txt:'Devuelto'}
-            : {cls:'neutral', txt:esc(lote.e||'')};
-          html += '<div class="mapa-vhs-detail" style="margin-top:12px;">';
-          html += '<h4 style="margin-bottom:10px;">Manzana '+esc(lote.m)+' · Lote '+esc(String(lote.l))+' '+
-            '<span class="cuota-chip cuota-chip-'+estadoInfo.cls+'">'+estadoInfo.txt+'</span></h4>';
-          html += '<ul style="margin:0 0 12px;padding-left:18px;color:var(--ink-soft);font-size:0.9rem;line-height:1.8;">'+
-            '<li>Vista: '+esc(lote.v||'')+'</li>'+
-            '<li>Área de terreno: '+parseFloat(lote.a).toFixed(2)+' m²</li>'+
-          '</ul>';
-          html += '<div class="lote-row-precio" style="font-size:1.3rem;">'+fmtMoney(lote.pv)+'</div>';
-          if (lote.d){
-            html += '<p style="font-size:0.78rem;color:var(--ink-faint);">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
-          }
-          if (lote.e === 'DISPONIBLE'){
-            var calcModo = ui.loteCalcModo || 'cuotas';
-            var calcMeses = ui.loteCalcMeses || 24;
-            var saldoFinanciar = Math.max(0, lote.pv - SEPARACION_LOTE);
-            var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
-            html += '<div class="cuotas-calc">';
-            html += '<div class="cuotas-calc-tabs">'+
-              '<button type="button" class="cuotas-calc-tab'+(calcModo==='contado'?' active':'')+'" data-action="lote-calc-modo" data-value="contado">Al contado</button>'+
-              '<button type="button" class="cuotas-calc-tab'+(calcModo==='cuotas'?' active':'')+'" data-action="lote-calc-modo" data-value="cuotas">En cuotas</button>'+
-            '</div>';
-            if (calcModo === 'cuotas'){
-              html += '<div class="cuotas-calc-slider-row">'+
-                '<input type="range" id="lote-calc-meses" min="6" max="36" step="6" value="'+calcMeses+'" />'+
-                '<span class="cuotas-calc-meses-label">'+calcMeses+' meses</span>'+
-              '</div>';
-              html += '<div class="cuotas-calc-result">'+
-                '<div class="cuotas-calc-label">Cuota mensual</div>'+
-                '<div class="cuotas-calc-amount">'+fmtMoney(cuotaMensual)+'</div>'+
-                '<div class="cuotas-calc-sub">sobre '+fmtMoney(saldoFinanciar)+' financiados · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
-              '</div>';
-            } else {
-              html += '<div class="cuotas-calc-result">'+
-                '<div class="cuotas-calc-label">Saldo en un solo pago</div>'+
-                '<div class="cuotas-calc-amount">'+fmtMoney(saldoFinanciar)+'</div>'+
-                '<div class="cuotas-calc-sub">Precio '+fmtMoney(lote.pv)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
-              '</div>';
-            }
-            html += '<p class="cuotas-calc-disclaimer">Simulación referencial, sin intereses. Sujeta a confirmación con tu asesora.</p>';
-            html += '</div>';
-            var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana ('+fmtMoney(lote.pv)+'). ¿Podemos coordinar una cita con una asesora?');
-            html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
-              '<button type="button" class="btn btn-secondary btn-block" data-action="descargar-cotizacion" data-value="'+esc(lote.m)+'|'+esc(String(lote.l))+'">📄 Descargar cotización (PDF)</button>'+
-              '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
-              '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg.replace('coordinar%20una%20cita%20con%20una%20asesora','saber%20c%C3%B3mo%20reservarlo')+'" target="_blank" rel="noopener">💳 Cómo reservar este lote</a>'+
-            '</div>';
-          }
-        }
-        html += '</div>';
-      }
-      html += '</div>';
+      html += renderMapaEtapa5Html();
     } else if (ui.interesadoEtapaSel){
       var esel = etapaVhsById(parseInt(ui.interesadoEtapaSel,10));
       if (esel){
@@ -1770,34 +1822,8 @@ function renderInteresadoMapa(){
   } else {
     html += '<div class="panel"><h4>Mapa del proyecto</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Toca una manzana del plano real para ver los lotes y precios.</p>'+
-      '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:12px;">Piloto: por ahora solo tenemos el detalle de la <strong>Etapa 11</strong>. Las demás etapas de Castilla, muy pronto.</p>'+
-      '<div class="mapa-vhs-wrap">'+
-        '<img class="mapa-vhs-img" src="'+MAPA_ETAPA11_CASTILLA_DATAURI+'" alt="Plano de la Etapa 11 de Vive Hogar Castilla" />'+
-        ETAPA11_CASTILLA_MANZANAS.map(function(m){
-          return '<button type="button" class="mapa-vhs-hotspot'+(ui.interesadoManzanaSel===m.n?' active':'')+'" '+
-            'style="top:'+m.top+'%;left:'+m.left+'%;width:'+m.width+'%;height:'+m.height+'%;" '+
-            'data-action="interesado-manzana" data-value="'+m.n+'"><span>'+m.n+'</span></button>';
-        }).join('')+
-      '</div>';
-
-    if (ui.interesadoManzanaSel){
-      var lotes = lotesDeManzana(ui.interesadoManzanaSel);
-      html += '<div class="mapa-vhs-detail">';
-      html += '<h4 style="margin-bottom:10px;">Manzana '+esc(ui.interesadoManzanaSel)+' · '+lotes.length+' lote'+(lotes.length===1?'':'s')+'</h4>';
-      html += '<div class="lote-list">'+lotes.map(function(l){
-        var estadoInfo = l.estado === 'PREVENTA' ? {cls:'ok', txt:'Disponible'}
-          : l.estado === 'VENTA POR APROBAR' ? {cls:'warn', txt:'Reservado'}
-          : {cls:'sold', txt:'Vendido'};
-        return '<div class="lote-row">'+
-          '<div class="lote-row-main"><strong>Lote '+esc(l.n)+'</strong>'+
-            '<span class="cuota-chip cuota-chip-'+(estadoInfo.cls==='ok'?'ok':estadoInfo.cls==='warn'?'warn':'neutral')+'">'+estadoInfo.txt+'</span>'+
-          '</div>'+
-          '<div class="lote-row-sub">'+esc(l.vista||'')+(l.area?' · '+parseFloat(l.area).toFixed(0)+' m²':'')+'</div>'+
-          '<div class="lote-row-precio">'+fmtMoney(l.precio)+'</div>'+
-        '</div>';
-      }).join('')+'</div>';
-      html += '</div>';
-    }
+      '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:12px;">Piloto: por ahora solo tenemos el detalle de la <strong>Etapa 11</strong>. Las demás etapas de Castilla, muy pronto.</p>';
+    html += renderMapaCastilla11Html();
     html += '</div>';
 
     html += '<div class="panel"><h4>Cómo llegar</h4>'+
@@ -1911,6 +1937,14 @@ document.addEventListener('click', async function(ev){
     ui.passwordErrors = {};
     ui.showPasswordChange = false;
     if (value !== 'publicar') ui.editingId = null;
+    if (value === 'micasa' && clienteBloqueVerificado){
+      ui.miCasaKey = clienteLoteVerificado ? (clienteBloqueVerificado+'|'+clienteLoteVerificado) : null;
+      ui.miCasaLote = clienteLoteVerificado || null;
+      ui.interesadoProyecto = (localPref && String(localPref.proyectoId) === '1') ? 'castilla' : 'sullana';
+      ui.interesadoEtapaSel = (localPref && localPref.etapa) ? String(localPref.etapa) : null;
+      ui.interesadoManzanaSel = clienteBloqueVerificado;
+      ui.interesadoLoteSel = ui.miCasaKey;
+    }
     window.scrollTo(0,0);
     render();
     if (value === 'cuotas' && !ui.cuotasData && !ui.cuotasBusy) cargarCuotas();
