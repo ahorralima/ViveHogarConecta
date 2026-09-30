@@ -706,6 +706,7 @@ var ui = {
   interesadoEtapaSel: null,
   interesadoManzanaSel: null,
   interesadoLoteSel: null,
+  interesadoDesdeMiCasa: false,
   loteCalcModo: 'cuotas',
   loteCalcMeses: 24,
   interesadoStep: 'elegir',
@@ -1974,18 +1975,23 @@ document.addEventListener('click', async function(ev){
     }
   } else if (action === 'gate-cliente'){
     setGate('cliente-pendiente');
+    window.scrollTo(0,0);
     render();
   } else if (action === 'gate-interesado'){
     ui.interesadoStep = 'elegir';
+    ui.interesadoDesdeMiCasa = false;
     setGate('interesado');
+    window.scrollTo(0,0);
     render();
   } else if (action === 'gate-back'){
-    if (clienteNombreVerificado && clienteDniVerificado){
+    if (ui.interesadoDesdeMiCasa && clienteNombreVerificado && clienteDniVerificado){
       setGate('cliente-verificado');
       ui.view = 'micasa';
+      ui.interesadoDesdeMiCasa = false;
     } else {
       setGate(null);
     }
+    window.scrollTo(0,0);
     render();
   } else if (action === 'micasa-ver-mapa'){
     ui.interesadoProyecto = (localPref && String(localPref.proyectoId) === '1') ? 'castilla' : 'sullana';
@@ -1993,11 +1999,14 @@ document.addEventListener('click', async function(ev){
     ui.interesadoManzanaSel = null;
     ui.interesadoLoteSel = null;
     ui.interesadoStep = 'mapa';
+    ui.interesadoDesdeMiCasa = true;
     setGate('interesado');
+    window.scrollTo(0,0);
     render();
   } else if (action === 'gate-reset'){
     if (confirm('¿Volver a la pantalla de inicio? Podrás elegir de nuevo "Soy cliente" o "Estoy interesado".')){
       setGate(null);
+      window.scrollTo(0,0);
       render();
     }
   } else if (action === 'cambiar-cliente'){
@@ -2009,6 +2018,7 @@ document.addEventListener('click', async function(ev){
       ui.cuotasData = null;
       ui.cuotasError = '';
       ui.view = 'home';
+      window.scrollTo(0,0);
       render();
     }
   } else if (action === 'interesado-proyecto'){
@@ -2016,16 +2026,20 @@ document.addEventListener('click', async function(ev){
     ui.interesadoEtapaSel = null;
     ui.interesadoManzanaSel = null;
     ui.interesadoStep = 'cargando';
+    window.scrollTo(0,0);
     render();
-    setTimeout(function(){ ui.interesadoStep = 'bienvenida'; render(); }, 1700);
+    setTimeout(function(){ ui.interesadoStep = 'bienvenida'; window.scrollTo(0,0); render(); }, 1700);
   } else if (action === 'interesado-cambiar-proyecto'){
     ui.interesadoStep = 'elegir';
+    window.scrollTo(0,0);
     render();
   } else if (action === 'interesado-ver-mapa'){
     ui.interesadoStep = 'mapa';
+    window.scrollTo(0,0);
     render();
   } else if (action === 'interesado-volver-bienvenida'){
     ui.interesadoStep = 'bienvenida';
+    window.scrollTo(0,0);
     render();
   } else if (action === 'interesado-etapa'){
     ui.interesadoEtapaSel = t.getAttribute('data-value');
