@@ -417,6 +417,18 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-dot-ok{background:rgba(46,160,90,0.6);}
 .lote-dot-neutral{background:rgba(120,120,120,0.55);}
 .lote-dot-warn{background:rgba(248,177,50,0.7);}
+.cuotas-calc{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:14px;}
+.cuotas-calc-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin-bottom:14px;}
+.cuotas-calc-tab{flex:1;border:none;background:none;padding:9px 6px;border-radius:8px;font-weight:700;font-size:0.85rem;color:var(--ink-soft);}
+.cuotas-calc-tab.active{background:var(--teal);color:#fff;}
+.cuotas-calc-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cuotas-calc-slider-row input[type=range]{flex:1;accent-color:var(--teal);}
+.cuotas-calc-meses-label{font-size:0.82rem;font-weight:700;color:var(--ink-soft);white-space:nowrap;}
+.cuotas-calc-result{text-align:center;padding:10px 0;}
+.cuotas-calc-label{font-size:0.78rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
+.cuotas-calc-amount{font-size:1.6rem;font-weight:800;color:var(--teal);margin:2px 0;}
+.cuotas-calc-sub{font-size:0.78rem;color:var(--ink-faint);}
+.cuotas-calc-disclaimer{font-size:0.7rem;color:var(--ink-faint);text-align:center;margin:8px 0 0;}
 .streetview-wrap{position:relative;width:100%;padding-top:56%;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
@@ -693,6 +705,8 @@ var ui = {
   interesadoEtapaSel: null,
   interesadoManzanaSel: null,
   interesadoLoteSel: null,
+  loteCalcModo: 'cuotas',
+  loteCalcMeses: 24,
   interesadoStep: 'elegir',
   cuotasBusy: false,
   cuotasError: '',
@@ -1495,6 +1509,7 @@ var VHS_SITIOS_WEB = {
   castilla: 'https://castilla.vivehogar.com.pe'
 };
 var VHS_WHATSAPP = '51934042610';
+var SEPARACION_LOTE = 500;
 
 function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
@@ -1636,6 +1651,34 @@ function renderInteresadoMapa(){
             html += '<p style="font-size:0.78rem;color:var(--ink-faint);">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
           }
           if (lote.e === 'DISPONIBLE'){
+            var calcModo = ui.loteCalcModo || 'cuotas';
+            var calcMeses = ui.loteCalcMeses || 24;
+            var saldoFinanciar = Math.max(0, lote.pv - SEPARACION_LOTE);
+            var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
+            html += '<div class="cuotas-calc">';
+            html += '<div class="cuotas-calc-tabs">'+
+              '<button type="button" class="cuotas-calc-tab'+(calcModo==='contado'?' active':'')+'" data-action="lote-calc-modo" data-value="contado">Al contado</button>'+
+              '<button type="button" class="cuotas-calc-tab'+(calcModo==='cuotas'?' active':'')+'" data-action="lote-calc-modo" data-value="cuotas">En cuotas</button>'+
+            '</div>';
+            if (calcModo === 'cuotas'){
+              html += '<div class="cuotas-calc-slider-row">'+
+                '<input type="range" id="lote-calc-meses" min="6" max="36" step="6" value="'+calcMeses+'" />'+
+                '<span class="cuotas-calc-meses-label">'+calcMeses+' meses</span>'+
+              '</div>';
+              html += '<div class="cuotas-calc-result">'+
+                '<div class="cuotas-calc-label">Cuota mensual</div>'+
+                '<div class="cuotas-calc-amount">'+fmtMoney(cuotaMensual)+'</div>'+
+                '<div class="cuotas-calc-sub">sobre '+fmtMoney(saldoFinanciar)+' financiados · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+              '</div>';
+            } else {
+              html += '<div class="cuotas-calc-result">'+
+                '<div class="cuotas-calc-label">Saldo en un solo pago</div>'+
+                '<div class="cuotas-calc-amount">'+fmtMoney(saldoFinanciar)+'</div>'+
+                '<div class="cuotas-calc-sub">Precio '+fmtMoney(lote.pv)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+              '</div>';
+            }
+            html += '<p class="cuotas-calc-disclaimer">Simulación referencial, sin intereses. Sujeta a confirmación con tu asesora.</p>';
+            html += '</div>';
             var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana ('+fmtMoney(lote.pv)+'). ¿Podemos coordinar una cita con una asesora?');
             html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
               '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
@@ -2015,6 +2058,9 @@ document.addEventListener('click', async function(ev){
         if (det) det.scrollIntoView({behavior:'smooth', block:'end'});
       }, 50);
     }
+  } else if (action === 'lote-calc-modo'){
+    ui.loteCalcModo = t.getAttribute('data-value');
+    render();
   }
 });
 
@@ -2027,6 +2073,16 @@ document.addEventListener('input', function(ev){
   } else if (ev.target.id === 'ec-etapa-filter'){
     lastFocusedInputId = 'ec-etapa-filter';
     ui.fEtapa = ev.target.value.trim();
+    render();
+  } else if (ev.target.id === 'lote-calc-meses'){
+    var label = document.querySelector('.cuotas-calc-meses-label');
+    if (label) label.textContent = ev.target.value + ' meses';
+  }
+});
+
+document.addEventListener('change', function(ev){
+  if (ev.target.id === 'lote-calc-meses'){
+    ui.loteCalcMeses = parseInt(ev.target.value, 10) || 24;
     render();
   }
 });
