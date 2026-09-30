@@ -375,7 +375,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .gate-v2-logo-text .n1{color:var(--paprika);font-weight:800;font-size:2.3rem;}
 .gate-v2-logo-text .n2{color:var(--teal);font-weight:800;font-size:2.3rem;margin-left:2px;}
 .gate-v2-logo-text small{color:#8a3a7a;font-size:1rem;letter-spacing:0.04em;text-transform:uppercase;margin-top:1px;}
-.gate-v2-headline{max-width:460px;width:100%;margin:0 auto;background:rgba(8,20,32,0.38);border-radius:20px;padding:18px 16px;backdrop-filter:blur(2px);}
+.gate-v2-headline{max-width:400px;width:fit-content;margin:0 auto;background:rgba(8,20,32,0.38);border-radius:14px;padding:4px 14px;backdrop-filter:blur(2px);}
 .gate-v2-headline h2{color:#fff;font-size:2.3rem;text-align:center;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
 .gate-v2-headline p{color:#fff;font-size:1.2rem;text-align:center;margin:0;text-shadow:0 2px 8px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.85);}
 .gate-v2-bottom{max-width:460px;width:100%;margin:0 auto;}
@@ -1634,6 +1634,13 @@ function renderInteresadoMapa(){
           html += '<div class="lote-row-precio" style="font-size:1.3rem;">'+fmtMoney(lote.pv)+'</div>';
           if (lote.d){
             html += '<p style="font-size:0.78rem;color:var(--ink-faint);">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
+          }
+          if (lote.e === 'DISPONIBLE'){
+            var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana ('+fmtMoney(lote.pv)+'). ¿Podemos coordinar una cita con una asesora?');
+            html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
+              '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
+              '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg.replace('coordinar%20una%20cita%20con%20una%20asesora','saber%20c%C3%B3mo%20reservarlo')+'" target="_blank" rel="noopener">💳 Cómo reservar este lote</a>'+
+            '</div>';
           }
         }
         html += '</div>';
