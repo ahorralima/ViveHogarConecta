@@ -375,7 +375,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .gate-v2-logo-text .n1{color:var(--paprika);font-weight:800;font-size:2.3rem;}
 .gate-v2-logo-text .n2{color:var(--teal);font-weight:800;font-size:2.3rem;margin-left:2px;}
 .gate-v2-logo-text small{color:#8a3a7a;font-size:1rem;letter-spacing:0.04em;text-transform:uppercase;margin-top:1px;}
-.gate-v2-headline{max-width:460px;width:100%;margin:0 auto;}
+.gate-v2-headline{max-width:460px;width:100%;margin:0 auto;background:rgba(8,20,32,0.38);border-radius:20px;padding:18px 16px;backdrop-filter:blur(2px);}
 .gate-v2-headline h2{color:#fff;font-size:2.3rem;text-align:center;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.65),0 1px 3px rgba(0,0,0,0.8);}
 .gate-v2-headline p{color:#fff;font-size:1.2rem;text-align:center;margin:0;text-shadow:0 2px 8px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.85);}
 .gate-v2-bottom{max-width:460px;width:100%;margin:0 auto;}
@@ -2003,7 +2003,9 @@ document.addEventListener('click', async function(ev){
       setTimeout(function(){
         var dets = document.querySelectorAll('.mapa-vhs-detail');
         var det = dets[dets.length-1];
-        if (det) det.scrollIntoView({behavior:'smooth', block:'start'});
+        // block:'end' en vez de 'start': deja el mapa visible arriba, junto
+        // con la tarjeta de precio, en vez de empujar el mapa fuera de pantalla.
+        if (det) det.scrollIntoView({behavior:'smooth', block:'end'});
       }, 50);
     }
   }
