@@ -16,6 +16,7 @@
 <meta name="theme-color" content="#397EAD">
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style id="app-style">
 :root{
   --bg:#FFFFFF;
@@ -1681,6 +1682,7 @@ function renderInteresadoMapa(){
             html += '</div>';
             var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana ('+fmtMoney(lote.pv)+'). ¿Podemos coordinar una cita con una asesora?');
             html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
+              '<button type="button" class="btn btn-secondary btn-block" data-action="descargar-cotizacion" data-value="'+esc(lote.m)+'|'+esc(String(lote.l))+'">📄 Descargar cotización (PDF)</button>'+
               '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
               '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg.replace('coordinar%20una%20cita%20con%20una%20asesora','saber%20c%C3%B3mo%20reservarlo')+'" target="_blank" rel="noopener">💳 Cómo reservar este lote</a>'+
             '</div>';
@@ -2061,8 +2063,63 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'lote-calc-modo'){
     ui.loteCalcModo = t.getAttribute('data-value');
     render();
+  } else if (action === 'descargar-cotizacion'){
+    var cotParts = t.getAttribute('data-value').split('|');
+    generarCotizacionPDF(cotParts[0], cotParts[1]);
   }
 });
+
+function generarCotizacionPDF(mz, loteNum){
+  var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === mz && String(l.l) === loteNum; })[0];
+  if (!lote || !window.jspdf) { toast('No se pudo generar el PDF. Intenta de nuevo.'); return; }
+  var modo = ui.loteCalcModo || 'cuotas';
+  var meses = ui.loteCalcMeses || 24;
+  var saldo = Math.max(0, lote.pv - SEPARACION_LOTE);
+  var cuota = Math.round(saldo / meses);
+
+  var doc = new window.jspdf.jsPDF();
+  var y = 20;
+  doc.setFontSize(18); doc.setTextColor(57,126,173);
+  doc.text('Vive Hogar Sullana', 14, y);
+  y += 7; doc.setFontSize(12); doc.setTextColor(120,120,120);
+  doc.text('Cotización referencial - Etapa 5', 14, y);
+  y += 12; doc.setDrawColor(220,220,220); doc.line(14, y, 196, y);
+
+  y += 10; doc.setFontSize(13); doc.setTextColor(20,20,20);
+  doc.text('Manzana '+mz+' · Lote '+loteNum, 14, y);
+  y += 8; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
+  doc.text('Vista: '+(lote.v||'-'), 14, y);
+  y += 6; doc.text('Área de terreno: '+parseFloat(lote.a).toFixed(2)+' m²', 14, y);
+  y += 6; doc.text('Estado: '+(lote.e==='DISPONIBLE'?'Disponible':lote.e), 14, y);
+
+  y += 12; doc.setFontSize(13); doc.setTextColor(20,20,20);
+  doc.text('Precio del lote: '+fmtMoney(lote.pv), 14, y);
+  y += 10; doc.setFontSize(12); doc.setTextColor(57,126,173);
+  doc.text(modo === 'contado' ? 'Plan: Al contado' : 'Plan: En cuotas ('+meses+' meses)', 14, y);
+  y += 8; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
+  doc.text('Separación referencial: '+fmtMoney(SEPARACION_LOTE), 14, y);
+  y += 6;
+  if (modo === 'contado'){
+    doc.text('Saldo en un solo pago: '+fmtMoney(saldo), 14, y);
+  } else {
+    doc.text('Saldo a financiar: '+fmtMoney(saldo), 14, y);
+    y += 6; doc.setFontSize(14); doc.setTextColor(20,20,20);
+    doc.text('Cuota mensual: '+fmtMoney(cuota), 14, y);
+  }
+
+  y += 14; doc.setDrawColor(220,220,220); doc.line(14, y, 196, y);
+  y += 8; doc.setFontSize(8.5); doc.setTextColor(140,140,140);
+  var disclaimer = 'Simulación referencial, sin intereses. No constituye una separación ni una venta. '+
+    'Precios y disponibilidad sujetos a confirmación con una asesora de Vive Hogar Sullana. '+
+    'Generado el '+new Date().toLocaleDateString('es-PE')+'.';
+  var lines = doc.splitTextToSize(disclaimer, 182);
+  doc.text(lines, 14, y);
+  y += lines.length*4 + 6;
+  doc.setTextColor(57,126,173); doc.setFontSize(10);
+  doc.text('WhatsApp: +'+VHS_WHATSAPP, 14, y);
+
+  doc.save('Cotizacion_'+mz+'_Lote'+loteNum+'.pdf');
+}
 
 var lastFocusedInputId = null;
 document.addEventListener('input', function(ev){
