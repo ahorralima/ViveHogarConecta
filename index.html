@@ -426,7 +426,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-detail-tile span{font-size:0.72rem;color:var(--ink-faint);}
 .lote-detail-tile strong{font-size:0.95rem;color:var(--ink);}
 .lote-hint-banner{background:var(--paprika);color:#fff;font-weight:700;font-size:0.82rem;border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:center;}
-.lote-hotspot.lote-recreacion{background:rgba(46,160,90,0.08);border:1px dashed rgba(46,160,90,0.4);cursor:default;pointer-events:none;}
+.lote-hotspot.lote-recreacion{background:repeating-linear-gradient(135deg,rgba(63,168,99,0.75),rgba(63,168,99,0.75) 8px,rgba(82,184,117,0.75) 8px,rgba(82,184,117,0.75) 16px);border:2px solid rgba(35,110,65,0.85);border-radius:6px;cursor:default;pointer-events:none;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35);}
+.lote-recreacion-icon{font-size:1.3rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));}
+.mapa-zoom-outer{position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--border);touch-action:none;background:#e9e9e9;}
+.mapa-zoom-inner{transform-origin:0 0;}
+.mapa-zoom-controls{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:8px;z-index:30;}
+.mapa-zoom-btn{width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1.25rem;font-weight:700;color:var(--ink);box-shadow:0 4px 10px -2px rgba(0,0,0,0.3);line-height:1;}
+.mapa-zoom-btn:active{transform:scale(0.93);}
 .lote-legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:0.75rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-legend span{display:flex;align-items:center;gap:5px;}
 .lote-dot{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,0.3);}
@@ -1605,6 +1611,7 @@ var VHS_SITIOS_WEB = {
 };
 var VHS_WHATSAPP = '51934042610';
 var SEPARACION_LOTE = 500;
+var VHS_BFH_SULLANA = 47850;
 
 function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
@@ -1680,10 +1687,12 @@ function renderMapaEtapa5Html(){
     '<span><i class="lote-dot lote-dot-neutral"></i> Vendido</span>'+
     '<span><i class="lote-dot lote-dot-warn"></i> Separado / bloqueado</span>'+
   '</div>';
-  html += '<div class="mapa-vhs-wrap mapa-lotes-wrap">'+
+  html += '<div class="mapa-zoom-outer" id="etapa5-zoom">'+
+    '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
+    '<div class="mapa-vhs-wrap mapa-lotes-wrap">'+
       '<img class="mapa-vhs-img" src="'+MAPA_ETAPA5_LOTES_DATAURI+'" alt="Plano de la Etapa 5 de Vive Hogar Sullana" />'+
       ETAPA5_RECREACION_PLANO.map(function(r){
-        return '<div class="lote-hotspot lote-recreacion" style="top:'+r.t+'%;left:'+r.le+'%;width:'+r.w+'%;height:'+r.h+'%;" title="Área de recreación común"></div>';
+        return '<div class="lote-hotspot lote-recreacion" style="top:'+r.t+'%;left:'+r.le+'%;width:'+r.w+'%;height:'+r.h+'%;" title="Área de recreación común"><span class="lote-recreacion-icon">🌳</span></div>';
       }).join('')+
       ETAPA5_LOTES_PLANO.map(function(l){
         var key = l.m+'|'+l.l;
@@ -1693,7 +1702,14 @@ function renderMapaEtapa5Html(){
           'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
           'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'</div>';
       }).join('')+
-    '</div>';
+    '</div>'+
+    '</div>'+
+    '<div class="mapa-zoom-controls">'+
+      '<button type="button" class="mapa-zoom-btn" data-action="etapa5-zoom" data-value="in" title="Acercar">+</button>'+
+      '<button type="button" class="mapa-zoom-btn" data-action="etapa5-zoom" data-value="out" title="Alejar">−</button>'+
+      '<button type="button" class="mapa-zoom-btn" data-action="etapa5-zoom" data-value="reset" title="Restablecer">⟲</button>'+
+    '</div>'+
+  '</div>';
 
   if (ui.interesadoLoteSel){
     var selParts = ui.interesadoLoteSel.split('|');
@@ -1717,12 +1733,17 @@ function renderMapaEtapa5Html(){
           '<div class="lote-detail-tile"><span>Área</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
         '</div>'+
       '</div>';
+      var bfh = VHS_BFH_SULLANA;
+      var inicialCliente = Math.max(0, lote.pv - bfh);
       html += '<div class="lote-detail-section">'+
-        '<div class="lote-detail-section-title">✅ Estado y precio</div>'+
+        '<div class="lote-detail-section-title">✅ Estado y forma de pago</div>'+
         '<div class="lote-detail-grid">'+
           '<div class="lote-detail-tile"><span>Estado</span><strong class="cuota-chip cuota-chip-'+estadoInfo.cls+'" style="margin-top:3px;">'+estadoInfo.txt+'</strong></div>'+
-          '<div class="lote-detail-tile"><span>Precio</span><strong>'+fmtMoney(lote.pv)+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Bono Familiar Habitacional</span><strong>'+fmtMoney(bfh)+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Precio total del lote</span><strong>'+fmtMoney(lote.pv)+'</strong></div>'+
         '</div>'+
+        '<p style="font-size:0.74rem;color:var(--ink-faint);margin-top:8px;">El Bono Familiar Habitacional lo descuenta el Estado directamente del precio — el cliente solo paga la inicial.</p>'+
       '</div>';
       if (lote.d){
         html += '<p style="font-size:0.78rem;color:var(--ink-faint);padding:0 16px 14px;">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
@@ -1742,7 +1763,7 @@ function renderMapaEtapa5Html(){
       if (lote.e === 'DISPONIBLE'){
         var calcModo = ui.loteCalcModo || 'cuotas';
         var calcMeses = ui.loteCalcMeses || 24;
-        var saldoFinanciar = Math.max(0, lote.pv - SEPARACION_LOTE);
+        var saldoFinanciar = Math.max(0, inicialCliente - SEPARACION_LOTE);
         var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
         html += '<div class="cuotas-calc">';
         html += '<div class="cuotas-calc-tabs">'+
@@ -1757,18 +1778,18 @@ function renderMapaEtapa5Html(){
           html += '<div class="cuotas-calc-result">'+
             '<div class="cuotas-calc-label">Cuota mensual</div>'+
             '<div class="cuotas-calc-amount">'+fmtMoney(cuotaMensual)+'</div>'+
-            '<div class="cuotas-calc-sub">sobre '+fmtMoney(saldoFinanciar)+' financiados · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+            '<div class="cuotas-calc-sub">sobre '+fmtMoney(saldoFinanciar)+' financiados · inicial '+fmtMoney(inicialCliente)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
           '</div>';
         } else {
           html += '<div class="cuotas-calc-result">'+
             '<div class="cuotas-calc-label">Saldo en un solo pago</div>'+
             '<div class="cuotas-calc-amount">'+fmtMoney(saldoFinanciar)+'</div>'+
-            '<div class="cuotas-calc-sub">Precio '+fmtMoney(lote.pv)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+            '<div class="cuotas-calc-sub">Inicial '+fmtMoney(inicialCliente)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
           '</div>';
         }
         html += '<p class="cuotas-calc-disclaimer">Simulación referencial, sin intereses. Sujeta a confirmación con tu asesora.</p>';
         html += '</div>';
-        var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana ('+fmtMoney(lote.pv)+'). ¿Podemos coordinar una cita con una asesora?');
+        var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana (inicial '+fmtMoney(inicialCliente)+' + Bono '+fmtMoney(bfh)+'). ¿Podemos coordinar una cita con una asesora?');
         html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
           '<button type="button" class="btn btn-secondary btn-block" data-action="descargar-cotizacion" data-value="'+esc(lote.m)+'|'+esc(String(lote.l))+'">📄 Descargar cotización (PDF)</button>'+
           '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
@@ -1917,6 +1938,7 @@ function renderApp(){
   }
   if (appGate === 'interesado'){
     document.getElementById('app').innerHTML = renderInteresado();
+    initEtapa5ZoomDrag();
     return;
   }
   var body = '';
@@ -1932,6 +1954,7 @@ function renderApp(){
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
   var app = document.getElementById('app');
   app.innerHTML = html;
+  initEtapa5ZoomDrag();
 
   if (ui.view === 'home' && lastFocusedInputId){
     var input = document.getElementById(lastFocusedInputId);
@@ -2218,15 +2241,102 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'descargar-cotizacion'){
     var cotParts = t.getAttribute('data-value').split('|');
     generarCotizacionPDF(cotParts[0], cotParts[1]);
+  } else if (action === 'etapa5-zoom'){
+    var dir = t.getAttribute('data-value');
+    var z = ui.etapa5Zoom || {scale:1,x:0,y:0};
+    if (dir === 'reset'){
+      z = {scale:1,x:0,y:0};
+    } else {
+      var outer = document.getElementById('etapa5-zoom');
+      var cw = outer ? outer.clientWidth : 300;
+      var ch = outer ? outer.clientHeight : 300;
+      var factor = dir === 'in' ? 1.5 : (1/1.5);
+      var newScale = Math.min(4, Math.max(1, z.scale * factor));
+      var cx = cw/2, cy = ch/2;
+      var newX = cx - ((cx - z.x) * (newScale/z.scale));
+      var newY = cy - ((cy - z.y) * (newScale/z.scale));
+      z = clampZoom({scale:newScale, x:newX, y:newY}, cw, ch);
+    }
+    ui.etapa5Zoom = z;
+    applyEtapa5Zoom();
   }
 });
+
+function clampZoom(z, cw, ch){
+  var maxX = 0, minX = Math.min(0, cw - cw*z.scale);
+  var maxY = 0, minY = Math.min(0, ch - ch*z.scale);
+  return {scale:z.scale, x:Math.min(maxX, Math.max(minX, z.x)), y:Math.min(maxY, Math.max(minY, z.y))};
+}
+
+function applyEtapa5Zoom(){
+  var inner = document.getElementById('etapa5-zoom-inner');
+  if (!inner) return;
+  var z = ui.etapa5Zoom || {scale:1,x:0,y:0};
+  inner.style.transform = 'translate('+z.x+'px,'+z.y+'px) scale('+z.scale+')';
+}
+
+function initEtapa5ZoomDrag(){
+  var outer = document.getElementById('etapa5-zoom');
+  if (!outer || outer.getAttribute('data-zoom-bound')) return;
+  outer.setAttribute('data-zoom-bound', '1');
+  applyEtapa5Zoom();
+  var pointers = {};
+  var dragging = false;
+  var lastDist = 0;
+
+  outer.addEventListener('pointerdown', function(ev){
+    pointers[ev.pointerId] = {x:ev.clientX, y:ev.clientY};
+    outer.setPointerCapture(ev.pointerId);
+    dragging = true;
+  });
+  outer.addEventListener('pointermove', function(ev){
+    if (!pointers[ev.pointerId]) return;
+    pointers[ev.pointerId] = {x:ev.clientX, y:ev.clientY};
+    var ids = Object.keys(pointers);
+    var z = ui.etapa5Zoom || {scale:1,x:0,y:0};
+    var cw = outer.clientWidth, ch = outer.clientHeight;
+    if (ids.length === 2){
+      var p1 = pointers[ids[0]], p2 = pointers[ids[1]];
+      var dist = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+      var mid = {x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2};
+      var rect = outer.getBoundingClientRect();
+      var midLocal = {x:mid.x-rect.left, y:mid.y-rect.top};
+      if (lastDist){
+        var scaleFactor = dist / lastDist;
+        var newScale = Math.min(4, Math.max(1, z.scale * scaleFactor));
+        var effFactor = newScale / z.scale;
+        var newX = midLocal.x - ((midLocal.x - z.x) * effFactor);
+        var newY = midLocal.y - ((midLocal.y - z.y) * effFactor);
+        ui.etapa5Zoom = clampZoom({scale:newScale, x:newX, y:newY}, cw, ch);
+        applyEtapa5Zoom();
+      }
+      lastDist = dist;
+    } else if (ids.length === 1 && dragging){
+      var dx = ev.movementX || 0, dy = ev.movementY || 0;
+      if (dx || dy){
+        ui.etapa5Zoom = clampZoom({scale:z.scale, x:z.x+dx, y:z.y+dy}, cw, ch);
+        applyEtapa5Zoom();
+      }
+    }
+  });
+  function endPointer(ev){
+    delete pointers[ev.pointerId];
+    if (Object.keys(pointers).length < 2) lastDist = 0;
+    if (Object.keys(pointers).length === 0) dragging = false;
+  }
+  outer.addEventListener('pointerup', endPointer);
+  outer.addEventListener('pointercancel', endPointer);
+  outer.addEventListener('pointerleave', endPointer);
+}
 
 function generarCotizacionPDF(mz, loteNum){
   var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === mz && String(l.l) === loteNum; })[0];
   if (!lote || !window.jspdf) { toast('No se pudo generar el PDF. Intenta de nuevo.'); return; }
   var modo = ui.loteCalcModo || 'cuotas';
   var meses = ui.loteCalcMeses || 24;
-  var saldo = Math.max(0, lote.pv - SEPARACION_LOTE);
+  var bfh = VHS_BFH_SULLANA;
+  var inicialCliente = Math.max(0, lote.pv - bfh);
+  var saldo = Math.max(0, inicialCliente - SEPARACION_LOTE);
   var cuota = Math.round(saldo / meses);
 
   var doc = new window.jspdf.jsPDF();
@@ -2245,7 +2355,11 @@ function generarCotizacionPDF(mz, loteNum){
   y += 6; doc.text('Estado: '+(lote.e==='DISPONIBLE'?'Disponible':lote.e), 14, y);
 
   y += 12; doc.setFontSize(13); doc.setTextColor(20,20,20);
-  doc.text('Precio del lote: '+fmtMoney(lote.pv), 14, y);
+  doc.text('Precio total del lote: '+fmtMoney(lote.pv), 14, y);
+  y += 7; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
+  doc.text('Bono Familiar Habitacional: '+fmtMoney(bfh), 14, y);
+  y += 6; doc.setFontSize(13); doc.setTextColor(20,20,20);
+  doc.text('Inicial del cliente: '+fmtMoney(inicialCliente), 14, y);
   y += 10; doc.setFontSize(12); doc.setTextColor(57,126,173);
   doc.text(modo === 'contado' ? 'Plan: Al contado' : 'Plan: En cuotas ('+meses+' meses)', 14, y);
   y += 8; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
