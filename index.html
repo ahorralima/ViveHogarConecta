@@ -491,6 +491,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .video-thumb.active{border-color:var(--teal);}
 .video-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(0.75);}
 .video-thumb-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:0.9rem;text-shadow:0 1px 4px rgba(0,0,0,0.6);}
+.entorno-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.entorno-chip{background:var(--surface-2);color:var(--ink-soft);font-size:0.8rem;font-weight:600;padding:7px 12px;border-radius:999px;white-space:nowrap;}
 .streetview-wrap{position:relative;width:100%;padding-top:56%;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
@@ -1861,6 +1863,39 @@ var VHS_CONFIANZA = {
   trayectoria: null,     // ej: 'Desde 2018'
   viviendasTxt: null     // ej: '+1,200 viviendas vendidas' (usar el término exacto que corresponda)
 };
+
+// Entorno de Vive Hogar Sullana. "referencias" son puntos de
+// contexto confirmados visualmente en el mapa, sin distancia/tiempo
+// porque no están medidos. Las 4 categorías quedan preparadas pero
+// ocultas hasta tener información real que confirmar — cada una
+// acepta una lista de {label} cuando exista el dato.
+var VHS_ENTORNO = {
+  viaPrincipal: 'Panamericana Norte', // confirmado: visible junto al pin en el mapa que ya usa la app
+  referencias: [
+    {icon:'🏌️', label:'Villa California Country Club'} // confirmado cerca del pin, sin distancia medida
+  ],
+  educacion: null,    // ej: [{label:'Colegio X'}]
+  comercio: null,     // ej: [{label:'Mercado X'}]
+  salud: null,        // ej: [{label:'Posta de salud X'}]
+  transporte: null    // ej: [{label:'Paradero combi Y'}]
+};
+
+function renderEntornoChips(){
+  var e = VHS_ENTORNO;
+  var chips = [];
+  if (e.viaPrincipal) chips.push('🛣️ Cerca de la '+esc(e.viaPrincipal));
+  (e.referencias||[]).forEach(function(r){ chips.push(esc(r.icon)+' '+esc(r.label)); });
+  var catIcons = {educacion:'🏫', comercio:'🛒', salud:'🏥', transporte:'🚌'};
+  Object.keys(catIcons).forEach(function(cat){
+    var items = e[cat];
+    if (items && items.length){
+      items.forEach(function(it){ chips.push(catIcons[cat]+' '+esc(it.label)); });
+    }
+  });
+  if (!chips.length) return '';
+  return '<div class="entorno-chips">'+chips.map(function(c){ return '<span class="entorno-chip">'+c+'</span>'; }).join('')+'</div>';
+}
+
 var SEPARACION_LOTE = 500;
 var VHS_BFH_SULLANA = 47850;
 
@@ -2320,9 +2355,10 @@ function renderInteresadoMapa(){
 
     html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View.</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Descubre qué encontrarás alrededor de Vive Hogar Sullana.</p>'+
       '<p class="ubicacion-tag">📍 '+esc(PROYECTOS[1].ciudad === 'Piura' ? 'Piura' : PROYECTOS[1].ciudad+', Piura')+'</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
+      renderEntornoChips()+
       '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&q='+encodeURIComponent(PROYECTOS[1].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
