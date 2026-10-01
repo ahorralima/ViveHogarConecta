@@ -441,6 +441,12 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-dot-neutral{background:rgba(120,120,120,0.55);}
 .lote-dot-warn{background:rgba(248,177,50,0.7);}
 .lote-dot-sel{background:var(--paprika);}
+.lote-filtros{background:var(--surface-2);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;}
+.lote-filtros-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.lote-filtros-label{font-size:0.76rem;font-weight:700;color:var(--ink-faint);flex:none;width:68px;}
+.lote-filtros-count{font-size:0.8rem;font-weight:700;color:var(--teal);}
+.lote-hotspot-dim{opacity:0.22;}
+.lote-hotspot.active.lote-hotspot-dim{opacity:1;}
 .cuotas-calc{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:14px;scroll-margin-top:16px;}
 .cuotas-calc-title{font-weight:800;font-size:0.95rem;color:var(--ink);margin-bottom:12px;}
 .cuotas-calc-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin-bottom:14px;}
@@ -816,6 +822,9 @@ var ui = {
   interesadoDesdeMiCasa: false,
   loteCalcModo: 'cuotas',
   loteCalcMeses: 24,
+  etapa5FVista: '',
+  etapa5FAreaMin: 0,
+  etapa5FPrecioMax: 0,
   interesadoStep: 'elegir',
   cuotasBusy: false,
   cuotasError: '',
@@ -1777,6 +1786,36 @@ function renderMapaEtapa5Html(){
     '<span><i class="lote-dot lote-dot-warn"></i> Separado / bloqueado</span>'+
     '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
   '</div>';
+
+  var fVista = ui.etapa5FVista, fAreaMin = ui.etapa5FAreaMin, fPrecioMax = ui.etapa5FPrecioMax;
+  var filtrosActivos = !!(fVista || fAreaMin || fPrecioMax);
+  function loteCoincide(l){
+    if (l.e !== 'DISPONIBLE') return false;
+    if (fVista && l.v !== fVista) return false;
+    if (fAreaMin && parseFloat(l.a) < fAreaMin) return false;
+    if (fPrecioMax && l.pv > fPrecioMax) return false;
+    return true;
+  }
+  var coincidencias = filtrosActivos ? ETAPA5_LOTES_PLANO.filter(loteCoincide).length : 0;
+  html += '<div class="lote-filtros">'+
+    '<div class="lote-filtros-row"><span class="lote-filtros-label">Vista</span><div class="chip-row">'+
+      [['','Todas'],['Esquina','Esquina'],['Parque','Parque'],['Lateral Parque','Lat. parque'],['Pasaje','Pasaje']].map(function(o){
+        return '<button type="button" class="chip'+(fVista===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="vista" data-value="'+esc(o[0])+'">'+esc(o[1])+'</button>';
+      }).join('')+
+    '</div></div>'+
+    '<div class="lote-filtros-row"><span class="lote-filtros-label">Área mín.</span><div class="chip-row">'+
+      [[0,'Cualquiera'],[70,'70+ m²'],[80,'80+ m²'],[90,'90+ m²']].map(function(o){
+        return '<button type="button" class="chip'+(fAreaMin===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="areaMin" data-value="'+o[0]+'">'+esc(o[1])+'</button>';
+      }).join('')+
+    '</div></div>'+
+    '<div class="lote-filtros-row"><span class="lote-filtros-label">Precio máx.</span><div class="chip-row">'+
+      [[0,'Cualquiera'],[80000,'Hasta S/80,000'],[90000,'Hasta S/90,000'],[100000,'Hasta S/100,000']].map(function(o){
+        return '<button type="button" class="chip'+(fPrecioMax===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="precioMax" data-value="'+o[0]+'">'+esc(o[1])+'</button>';
+      }).join('')+
+    '</div></div>'+
+    (filtrosActivos ? '<div class="lote-filtros-count">'+coincidencias+' lote'+(coincidencias===1?'':'s')+' disponible'+(coincidencias===1?'':'s')+' coincide'+(coincidencias===1?'':'n')+'</div>' : '')+
+  '</div>';
+
   html += '<div class="mapa-zoom-outer" id="etapa5-zoom">'+
     '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
     '<div class="mapa-vhs-wrap mapa-lotes-wrap">'+
@@ -1788,7 +1827,9 @@ function renderMapaEtapa5Html(){
         var key = l.m+'|'+l.l;
         var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : (l.e === 'SEPARADO' || l.e === 'BLOQUEADO') ? 'lote-warn' : 'lote-neutral';
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
-        return '<div role="button" tabindex="0" class="lote-hotspot '+cls+mine+(ui.interesadoLoteSel===key?' active':'')+'" '+
+        var isSel = ui.interesadoLoteSel === key;
+        var dim = (!isSel && ui.interesadoLoteSel) || (!isSel && filtrosActivos && !loteCoincide(l));
+        return '<div role="button" tabindex="0" class="lote-hotspot '+cls+mine+(isSel?' active':'')+(dim?' lote-hotspot-dim':'')+'" '+
           'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
           'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'<span class="lote-hotspot-num">'+esc(String(l.l))+'</span></div>';
       }).join('')+
@@ -2344,6 +2385,13 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'interesado-lote'){
     var loteVal = t.getAttribute('data-value');
     ui.interesadoLoteSel = (ui.interesadoLoteSel === loteVal) ? null : loteVal;
+    render();
+  } else if (action === 'etapa5-filtro'){
+    var fKey = t.getAttribute('data-key');
+    var fVal = t.getAttribute('data-value');
+    if (fKey === 'vista') ui.etapa5FVista = fVal;
+    else if (fKey === 'areaMin') ui.etapa5FAreaMin = parseFloat(fVal) || 0;
+    else if (fKey === 'precioMax') ui.etapa5FPrecioMax = parseFloat(fVal) || 0;
     render();
   } else if (action === 'lote-calc-modo'){
     ui.loteCalcModo = t.getAttribute('data-value');
