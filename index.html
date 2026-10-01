@@ -518,6 +518,18 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .pago-cuenta{display:flex;justify-content:space-between;align-items:center;font-size:0.9rem;padding:3px 0;}
 .pago-cuenta span{color:var(--ink-faint);}
 .pago-cuenta strong{color:var(--ink);font-variant-numeric:tabular-nums;}
+.confianza-barra{display:flex;flex-direction:column;gap:5px;padding:12px 16px;margin-bottom:16px;border:1px dashed var(--border);border-radius:12px;}
+.confianza-barra-title{font-size:0.74rem;font-weight:700;color:var(--ink-faint);margin-bottom:3px;}
+.confianza-barra-linea{font-size:0.86rem;color:var(--ink-soft);}
+.confianza-bloque{padding:12px 0;border-bottom:1px solid var(--border);}
+.confianza-bloque:last-of-type{border-bottom:none;}
+.confianza-bloque-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:var(--ink-faint);margin-bottom:4px;}
+.confianza-bloque-valor{font-size:0.95rem;font-weight:700;color:var(--ink);}
+.confianza-bloque-sub{font-size:0.82rem;color:var(--ink-soft);margin-top:2px;font-variant-numeric:tabular-nums;}
+.confianza-evidencia-grid{display:flex;gap:10px;overflow-x:auto;}
+.confianza-evidencia-item{flex:none;width:160px;}
+.confianza-evidencia-item img{width:100%;height:110px;object-fit:cover;border-radius:10px;display:block;border:1px solid var(--border);}
+.confianza-evidencia-item span{display:block;font-size:0.72rem;font-weight:700;color:var(--accent);margin-top:5px;text-align:center;}
 .mivivienda-rows{margin-top:4px;}
 .mivivienda-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:0.88rem;}
 .mivivienda-row span{color:var(--ink-faint);}
@@ -1812,6 +1824,20 @@ var VHS_SITIOS_WEB = {
   castilla: 'https://castilla.vivehogar.com.pe'
 };
 var VHS_WHATSAPP = '51934042610';
+
+// Datos de la sección de confianza (Vive Hogar Sullana). Cada campo
+// queda en null hasta que Jesús confirme internamente la razón
+// social exacta, el RUC, la relación con la constructora, la fecha
+// oficial de inicio y el tipo de cifra de viviendas (vendidas vs.
+// entregadas vs. construidas) — no se muestra nada no confirmado.
+// Para publicarlo, solo hay que completar el valor correspondiente.
+var VHS_CONFIANZA = {
+  promotora: null,      // ej: 'Promotora Sullana S.A.C.'
+  ruc: null,             // ej: '20609194198'
+  constructora: null,    // ej: 'Ingenium Ingeniería y Construcción S.A.C.'
+  trayectoria: null,     // ej: 'Desde 2018'
+  viviendasTxt: null     // ej: '+1,200 viviendas vendidas' (usar el término exacto que corresponda)
+};
 var SEPARACION_LOTE = 500;
 var VHS_BFH_SULLANA = 47850;
 
@@ -2129,6 +2155,64 @@ function renderMapaCastilla11Html(){
   return html;
 }
 
+// Barra corta: solo aparece si hay al menos un dato confirmado en
+// VHS_CONFIANZA. Mientras todo esté pendiente, no se muestra nada.
+function renderBarraConfianza(){
+  var c = VHS_CONFIANZA;
+  var lineas = [];
+  if (c.promotora) lineas.push('🏗️ '+esc(c.promotora));
+  if (c.trayectoria) lineas.push('📅 '+esc(c.trayectoria));
+  if (c.viviendasTxt) lineas.push('🏠 '+esc(c.viviendasTxt));
+  if (!lineas.length) return '';
+  return '<div class="confianza-barra">'+
+    '<div class="confianza-barra-title">¿Quién está detrás de Vive Hogar Sullana?</div>'+
+    lineas.map(function(l){ return '<div class="confianza-barra-linea">'+l+'</div>'; }).join('')+
+  '</div>';
+}
+
+// Panel completo: cada bloque se muestra solo si su dato está
+// confirmado. "Evidencia real" y "Contacto oficial" no dependen de
+// ningún dato pendiente, así que siempre aparecen.
+function renderPanelConfianza(){
+  var c = VHS_CONFIANZA;
+  var bloques = '';
+  if (c.promotora){
+    bloques += '<div class="confianza-bloque">'+
+      '<div class="confianza-bloque-label">Promotora</div>'+
+      '<div class="confianza-bloque-valor">'+esc(c.promotora)+'</div>'+
+      (c.ruc ? '<div class="confianza-bloque-sub">RUC '+esc(c.ruc)+'</div>'+
+        '<a class="btn-link-inline" href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/jcrS00Alias" target="_blank" rel="noopener">Verificar empresa →</a>' : '')+
+    '</div>';
+  }
+  if (c.constructora){
+    bloques += '<div class="confianza-bloque">'+
+      '<div class="confianza-bloque-label">Constructora</div>'+
+      '<div class="confianza-bloque-valor">'+esc(c.constructora)+'</div>'+
+    '</div>';
+  }
+  if (c.trayectoria || c.viviendasTxt){
+    bloques += '<div class="confianza-bloque">'+
+      '<div class="confianza-bloque-label">Trayectoria</div>'+
+      (c.trayectoria ? '<div class="confianza-bloque-valor">'+esc(c.trayectoria)+'</div>' : '')+
+      (c.viviendasTxt ? '<div class="confianza-bloque-valor">'+esc(c.viviendasTxt)+'</div>' : '')+
+    '</div>';
+  }
+  bloques += '<div class="confianza-bloque">'+
+    '<div class="confianza-bloque-label">Evidencia real</div>'+
+    '<div class="confianza-evidencia-grid">'+
+      '<div class="confianza-evidencia-item"><img src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas — foto real" loading="lazy" /><span>Foto real — sala de ventas</span></div>'+
+      '<div class="confianza-evidencia-item"><img src="'+MAQUETA_SULLANA_DATAURI+'" alt="Maqueta física — foto real" loading="lazy" /><span>Foto real — maqueta física</span></div>'+
+    '</div>'+
+  '</div>';
+  bloques += '<a class="btn btn-primary btn-block" style="margin-top:4px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero más información sobre Vive Hogar Sullana')+'" target="_blank" rel="noopener">💬 Contacto oficial por WhatsApp</a>';
+
+  return '<div class="panel panel-flat">'+
+    '<h4>¿Quién está construyendo tu futuro hogar?</h4>'+
+    '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Conoce quién está detrás del proyecto y verifica la información antes de separar tu lote.</p>'+
+    bloques+
+  '</div>';
+}
+
 function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
@@ -2149,6 +2233,8 @@ function renderInteresadoMapa(){
     '</div>'+
     '<a class="cta-secondary-pill" href="#mapa-proyecto-panel">Consultar precios y disponibilidad →</a>'+
     '</div>';
+
+  if (proy === 'sullana') html += renderBarraConfianza();
 
   if (proy === 'sullana'){
     html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
@@ -2207,6 +2293,8 @@ function renderInteresadoMapa(){
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&q='+encodeURIComponent(PROYECTOS[0].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
     '</div>';
   }
+
+  if (proy === 'sullana') html += renderPanelConfianza();
 
   var asesorMsg = 'Hola, quiero información sobre '+nombreProy;
   if (proy === 'sullana' && String(ui.interesadoEtapaSel) === '5' && ui.interesadoLoteSel){
