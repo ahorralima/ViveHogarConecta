@@ -493,6 +493,12 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .video-thumb-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:0.9rem;text-shadow:0 1px 4px rgba(0,0,0,0.6);}
 .entorno-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .entorno-chip{background:var(--surface-2);color:var(--ink-soft);font-size:0.8rem;font-weight:600;padding:7px 12px;border-radius:999px;white-space:nowrap;}
+.faq-list{display:flex;flex-direction:column;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-item:last-child{border-bottom:none;}
+.faq-question{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;background:none;border:none;text-align:left;padding:14px 2px;font-size:0.92rem;font-weight:700;color:var(--ink);cursor:pointer;}
+.faq-icon{flex:none;font-size:1.1rem;color:var(--teal);font-weight:700;}
+.faq-answer{padding:0 2px 16px;font-size:0.88rem;color:var(--ink-soft);line-height:1.6;}
 .streetview-wrap{position:relative;width:100%;padding-top:56%;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
@@ -897,6 +903,7 @@ var ui = {
   etapa5FAreaMin: 0,
   etapa5FPrecioMax: 0,
   videoActivo: 0,
+  faqAbiertas: {},
   showAsesoraForm: false,
   asesoraPinInput: '',
   asesoraError: '',
@@ -1899,6 +1906,37 @@ function renderEntornoChips(){
 var SEPARACION_LOTE = 500;
 var VHS_BFH_SULLANA = 47850;
 
+// FAQ de Vive Hogar Sullana: solo preguntas con respuesta verificada
+// contra lo que ya existe en la app (ver análisis de la conversación).
+// Nada de fechas, plazos ni requisitos inventados.
+var VHS_FAQ_SULLANA = [
+  {q:'¿Qué estoy comprando exactamente?', a:'Cada lote incluye una vivienda de 25 m² sobre 62.5 m² de terreno, con luz, agua y desagüe instalados, y título de propiedad a tu nombre.'},
+  {q:'¿Cuánto necesito para empezar?', a:'Necesitas cubrir la inicial del lote que elijas — el Bono Familiar Habitacional ('+fmtMoney(VHS_BFH_SULLANA)+') se descuenta directo del precio. El monto exacto varía según el lote; lo ves apenas lo seleccionas en el mapa.'},
+  {q:'¿Cómo funcionan las cuotas?', a:'Son cuotas fijas que no varían con las tasas de interés del mercado. Puedes simular tu cuota mensual directamente en la ficha de cada lote, eligiendo el número de meses.'},
+  {q:'¿Las imágenes del proyecto son reales o renders?', a:'Usamos ambas, siempre etiquetadas: 📷 "Foto real" para lo que ya existe hoy (sala de ventas, maqueta), y 🎨 "Así se proyecta" para los renders 3D de cómo se verá el proyecto terminado.'},
+  {q:'¿Qué pasa si el lote que quiero ya no está disponible?', a:'Puedes explorar el mapa y elegir cualquier otro lote marcado como disponible — los filtros por vista, área o precio te ayudan a encontrar uno parecido rápido.'},
+  {q:'¿Cómo separo un lote?', a:'El primer paso es la separación de '+fmtMoney(SEPARACION_LOTE)+'. Escríbenos por WhatsApp con el lote que te interesa y un asesor te guía con el resto del proceso.'},
+  {q:'¿Puedo visitar el proyecto?', a:'Sí — contamos con sala de ventas y una maqueta física del proyecto. Coordina tu visita escribiendo a un asesor por WhatsApp.'}
+];
+
+function renderFaqAccordion(items, asesorHref){
+  var html = '<div class="faq-list">';
+  items.forEach(function(item, i){
+    var abierta = !!ui.faqAbiertas[i];
+    html += '<div class="faq-item">'+
+      '<button type="button" class="faq-question" data-action="faq-toggle" data-value="'+i+'">'+
+        '<span>'+esc(item.q)+'</span><span class="faq-icon">'+(abierta?'−':'+')+'</span>'+
+      '</button>'+
+      (abierta ? '<div class="faq-answer">'+esc(item.a)+'</div>' : '')+
+    '</div>';
+  });
+  html += '</div>';
+  if (asesorHref){
+    html += '<a class="btn btn-primary btn-block" style="margin-top:14px;" href="'+asesorHref+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
+  }
+  return html;
+}
+
 function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
@@ -2381,9 +2419,6 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
-  if (proy === 'sullana') html += renderVideosProyecto();
-  if (proy === 'sullana') html += renderPanelConfianza();
-
   var asesorMsg = 'Hola, quiero información sobre '+nombreProy;
   if (proy === 'sullana' && String(ui.interesadoEtapaSel) === '5' && ui.interesadoLoteSel){
     var asesorLoteParts = ui.interesadoLoteSel.split('|');
@@ -2393,6 +2428,16 @@ function renderInteresadoMapa(){
   } else if (ui.interesadoManzanaSel){
     asesorMsg += ' (Manzana '+ui.interesadoManzanaSel+')';
   }
+  var asesorHref = 'https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg);
+
+  if (proy === 'sullana') html += renderVideosProyecto();
+  if (proy === 'sullana') html += renderPanelConfianza();
+  if (proy === 'sullana'){
+    html += '<div class="panel panel-flat"><h4>Preguntas frecuentes</h4>'+
+      renderFaqAccordion(VHS_FAQ_SULLANA, asesorHref)+
+    '</div>';
+  }
+
   html += '</div>';
   html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
@@ -2749,6 +2794,10 @@ document.addEventListener('click', async function(ev){
         toast('¡Bienvenida, '+toTitleCase(selNombre)+'!');
       }
     }
+  } else if (action === 'faq-toggle'){
+    var faqIdx = t.getAttribute('data-value');
+    ui.faqAbiertas[faqIdx] = !ui.faqAbiertas[faqIdx];
+    render();
   } else if (action === 'video-elegir'){
     ui.videoActivo = parseInt(t.getAttribute('data-value'),10) || 0;
     render();
