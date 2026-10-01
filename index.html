@@ -410,15 +410,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-hotspot.lote-ok{background:rgba(46,160,90,0.32);}
 .lote-hotspot.lote-neutral{background:rgba(120,120,120,0.28);}
 .lote-hotspot.lote-warn{background:rgba(248,177,50,0.38);}
-.lote-hotspot.active{background:rgba(57,126,173,0.55);border:2px solid var(--paprika);z-index:2;}
+.lote-hotspot.active{background:rgba(57,127,72,0.5);border:3px solid var(--teal);z-index:3;animation:loteSelectPulse 0.45s ease-out;}
+@keyframes loteSelectPulse{0%{transform:scale(0.8);}60%{transform:scale(1.1);}100%{transform:scale(1);}}
 .lote-hotspot-mine{outline:3px solid #F8B132;outline-offset:1px;box-shadow:0 0 0 2px #fff,0 0 10px 2px rgba(248,177,50,0.9);z-index:3;}
 .lote-hotspot-mine-label{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:#F8B132;color:#222;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);}
 .lote-row-mine{border-color:#F8B132!important;background:rgba(248,177,50,0.08)!important;}
 .cuota-chip-mine{background:rgba(248,177,50,0.25);color:#7a5200;}
 .lote-detail-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 10px 24px -10px rgba(0,0,0,0.25);}
-.lote-detail-card-head{padding:16px 16px 12px;border-bottom:1px solid var(--border);}
-.lote-detail-card-title{font-weight:800;font-size:1.05rem;color:var(--paprika);}
-.lote-detail-card-sub{font-weight:700;font-size:0.95rem;color:var(--ink);margin-top:2px;}
 .lote-detail-section{padding:12px 16px;border-bottom:1px solid var(--border);}
 .lote-detail-section-title{font-weight:700;font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -439,7 +437,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-dot-ok{background:rgba(46,160,90,0.6);}
 .lote-dot-neutral{background:rgba(120,120,120,0.55);}
 .lote-dot-warn{background:rgba(248,177,50,0.7);}
-.cuotas-calc{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:14px;}
+.cuotas-calc{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:14px;scroll-margin-top:16px;}
+.cuotas-calc-title{font-weight:800;font-size:0.95rem;color:var(--ink);margin-bottom:12px;}
 .cuotas-calc-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin-bottom:14px;}
 .cuotas-calc-tab{flex:1;border:none;background:none;padding:9px 6px;border-radius:8px;font-weight:700;font-size:0.85rem;color:var(--ink-soft);}
 .cuotas-calc-tab.active{background:var(--teal);color:#fff;}
@@ -449,8 +448,20 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cuotas-calc-result{text-align:center;padding:10px 0;}
 .cuotas-calc-label{font-size:0.78rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
 .cuotas-calc-amount{font-size:1.6rem;font-weight:800;color:var(--teal);margin:2px 0;}
-.cuotas-calc-sub{font-size:0.78rem;color:var(--ink-faint);}
+.cuotas-calc-amount-lg{font-size:2.6rem;line-height:1.1;}
+.cuotas-calc-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;text-align:left;}
+.cuotas-calc-breakdown div{background:var(--surface);border-radius:10px;padding:8px 10px;}
+.cuotas-calc-breakdown span{display:block;font-size:0.7rem;color:var(--ink-faint);}
+.cuotas-calc-breakdown strong{font-size:0.88rem;color:var(--ink);}
 .cuotas-calc-disclaimer{font-size:0.7rem;color:var(--ink-faint);text-align:center;margin:8px 0 0;}
+.lote-summary-strip{background:var(--surface-2);padding:14px 16px;border-bottom:1px solid var(--border);}
+.lote-summary-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-faint);font-weight:700;}
+.lote-summary-top{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;}
+.lote-summary-id{font-weight:800;font-size:1.05rem;color:var(--ink);}
+.lote-summary-sub{font-size:0.82rem;color:var(--ink-soft);margin-top:2px;}
+.lote-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.lote-summary-grid span{display:block;font-size:0.72rem;color:var(--ink-faint);}
+.lote-summary-grid strong{font-size:1rem;color:var(--ink);}
 .renders-gallery{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
 .renders-gallery-item{flex:none;width:240px;scroll-snap-align:start;}
 .renders-gallery-item img{width:100%;height:160px;object-fit:cover;border-radius:12px;display:block;border:1px solid var(--border);}
@@ -476,8 +487,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .map-hint-banner{display:flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:0.84rem;border-radius:10px;padding:10px 14px;margin-bottom:12px;}
 @keyframes mapaHotspotPulse{0%{box-shadow:0 0 0 0 rgba(57,126,173,0.45);}70%{box-shadow:0 0 0 10px rgba(57,126,173,0);}100%{box-shadow:0 0 0 0 rgba(57,126,173,0);}}
 .mapa-vhs-hotspot:not(.active){animation:mapaHotspotPulse 2.6s ease-out infinite;}
-.cta-secondary-link{display:block;text-align:center;margin-top:10px;font-size:0.86rem;font-weight:700;color:var(--paprika);text-decoration:none;}
-.asesor-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;font-weight:800;font-size:0.95rem;text-decoration:none;box-shadow:0 -4px 16px -4px rgba(0,0,0,0.3);}
+.cta-secondary-pill{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;background:var(--surface-2);color:var(--paprika);font-weight:800;font-size:0.88rem;border-radius:10px;padding:12px 16px;text-decoration:none;}
+.asesor-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));font-weight:700;font-size:0.88rem;text-decoration:none;box-shadow:0 -4px 16px -4px rgba(0,0,0,0.3);}
 .asesor-bar:active{opacity:0.92;}
 .interesado-elegir-logo-text{font-weight:800;font-size:2.1rem;}
 .interesado-elegir-logo-text .n1{color:var(--paprika);}
@@ -498,12 +509,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .proyecto-pick-name-accent{color:var(--purple);}
 .proyecto-pick-name .n1{color:var(--paprika);}
 .proyecto-pick-name .n2{color:var(--teal);}
-.proyecto-pick-stats{list-style:none;margin:10px 0 0;padding:0;font-size:1.15rem;color:var(--purple);font-weight:700;text-align:left;display:inline-block;}
-.proyecto-pick-stats li{padding-left:20px;position:relative;line-height:1.75;}
-.proyecto-pick-stats li::before{content:'•';position:absolute;left:3px;color:var(--purple);}
 .proyecto-pick-accent-celeste{color:#1E9BD7;}
-.proyecto-pick-stats-celeste{color:#1E9BD7;}
-.proyecto-pick-stats-celeste li::before{color:#1E9BD7;}
+.proyecto-pick-location{font-size:0.8rem;font-weight:700;color:var(--ink-faint);text-align:center;margin-top:8px;}
+.proyecto-pick-price{font-size:1.4rem;font-weight:800;color:var(--purple);text-align:center;margin-top:4px;}
+.proyecto-pick-price-celeste{color:#1E9BD7;}
+.proyecto-pick-stats-sub{font-size:0.82rem;color:var(--ink-soft);text-align:center;margin-top:4px;line-height:1.5;}
 .interesado-elegir-footer{margin-top:28px;text-align:center;}
 .interesado-elegir-footer p{color:var(--ink-faint);font-size:0.88rem;margin-bottom:10px;}
 
@@ -1637,20 +1647,16 @@ function renderInteresadoElegir(){
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" /></div>'+
       '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent proyecto-pick-accent-celeste">Castilla</span></span></div>'+
-      '<ul class="proyecto-pick-stats proyecto-pick-stats-celeste">'+
-        '<li>7,000 casas en total</li>'+
-        '<li>Desde S/ 20,500</li>'+
-        '<li>+3,000 entregadas</li>'+
-      '</ul>'+
+      '<div class="proyecto-pick-location">📍 Castilla, Piura</div>'+
+      '<div class="proyecto-pick-price proyecto-pick-price-celeste">Desde S/ 20,500</div>'+
+      '<div class="proyecto-pick-stats-sub">+3,000 viviendas entregadas · 7,000 viviendas proyectadas</div>'+
     '</button>'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" /></div>'+
       '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Sullana</span></span></div>'+
-      '<ul class="proyecto-pick-stats">'+
-        '<li>5,220 casas en total</li>'+
-        '<li>Desde S/ 20,500</li>'+
-        '<li>+1,200 vendidas</li>'+
-      '</ul>'+
+      '<div class="proyecto-pick-location">📍 Sullana, Piura</div>'+
+      '<div class="proyecto-pick-price">Desde S/ 20,500</div>'+
+      '<div class="proyecto-pick-stats-sub">+1,200 viviendas vendidas · 5,220 viviendas proyectadas</div>'+
     '</button>'+
   '</div>';
   html += '<div class="interesado-elegir-footer">'+
@@ -1734,9 +1740,18 @@ function renderMapaEtapa5Html(){
         : lote.e === 'DEVUELTO' ? {cls:'warn', txt:'Devuelto'}
         : {cls:'neutral', txt:esc(lote.e||'')};
       html += '<div class="lote-detail-card" style="margin-top:12px;">';
-      html += '<div class="lote-detail-card-head">'+
-        '<div class="lote-detail-card-title">Vive Hogar Sullana</div>'+
-        '<div class="lote-detail-card-sub">Etapa 5, Mz '+esc(lote.m)+', Lt '+esc(String(lote.l).padStart(2,'0'))+'</div>'+
+      html += '<div class="lote-summary-strip">'+
+        '<div class="lote-summary-label">Lote seleccionado</div>'+
+        '<div class="lote-summary-top">'+
+          '<span class="cuota-chip cuota-chip-'+estadoInfo.cls+'">'+estadoInfo.txt+'</span>'+
+          '<span class="lote-summary-id">Mz. '+esc(lote.m)+' · Lt. '+esc(String(lote.l).padStart(2,'0'))+'</span>'+
+        '</div>'+
+        '<div class="lote-summary-sub">Etapa 5 · Vista '+(lote.v ? 'a '+esc(lote.v.toLowerCase()) : '—')+'</div>'+
+        '<div class="lote-summary-grid">'+
+          '<div><span>Área del terreno</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
+          '<div><span>Precio total</span><strong>'+fmtMoney(lote.pv)+'</strong></div>'+
+        '</div>'+
+        (lote.e==='DISPONIBLE' ? '<a class="btn btn-primary btn-block" href="#cuotas-calc-anchor" style="margin-top:10px;">Simular cuotas ↓</a>' : '')+
       '</div>';
       html += '<div class="lote-detail-section">'+
         '<div class="lote-detail-section-title">✅ Información</div>'+
@@ -1777,7 +1792,8 @@ function renderMapaEtapa5Html(){
         var calcMeses = ui.loteCalcMeses || 24;
         var saldoFinanciar = Math.max(0, inicialCliente - SEPARACION_LOTE);
         var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
-        html += '<div class="cuotas-calc">';
+        html += '<div class="cuotas-calc" id="cuotas-calc-anchor">';
+        html += '<div class="cuotas-calc-title">Simula tu cuota mensual</div>';
         html += '<div class="cuotas-calc-tabs">'+
           '<button type="button" class="cuotas-calc-tab'+(calcModo==='contado'?' active':'')+'" data-action="lote-calc-modo" data-value="contado">Al contado</button>'+
           '<button type="button" class="cuotas-calc-tab'+(calcModo==='cuotas'?' active':'')+'" data-action="lote-calc-modo" data-value="cuotas">En cuotas</button>'+
@@ -1788,15 +1804,21 @@ function renderMapaEtapa5Html(){
             '<span class="cuotas-calc-meses-label">'+calcMeses+' meses</span>'+
           '</div>';
           html += '<div class="cuotas-calc-result">'+
-            '<div class="cuotas-calc-label">Cuota mensual</div>'+
-            '<div class="cuotas-calc-amount">'+fmtMoney(cuotaMensual)+'</div>'+
-            '<div class="cuotas-calc-sub">sobre '+fmtMoney(saldoFinanciar)+' financiados · inicial '+fmtMoney(inicialCliente)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+            '<div class="cuotas-calc-label">Tu cuota mensual referencial</div>'+
+            '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(cuotaMensual)+'</div>'+
+            '<div class="cuotas-calc-breakdown">'+
+              '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Monto financiado</span><strong>'+fmtMoney(saldoFinanciar)+'</strong></div>'+
+            '</div>'+
           '</div>';
         } else {
           html += '<div class="cuotas-calc-result">'+
             '<div class="cuotas-calc-label">Saldo en un solo pago</div>'+
-            '<div class="cuotas-calc-amount">'+fmtMoney(saldoFinanciar)+'</div>'+
-            '<div class="cuotas-calc-sub">Inicial '+fmtMoney(inicialCliente)+' · separación '+fmtMoney(SEPARACION_LOTE)+'</div>'+
+            '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(saldoFinanciar)+'</div>'+
+            '<div class="cuotas-calc-breakdown">'+
+              '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Separación ya pagada</span><strong>'+fmtMoney(SEPARACION_LOTE)+'</strong></div>'+
+            '</div>'+
           '</div>';
         }
         html += '<p class="cuotas-calc-disclaimer">Simulación referencial, sin intereses. Sujeta a confirmación con tu asesora.</p>';
@@ -1851,7 +1873,7 @@ function renderMapaCastilla11Html(){
 function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
-  var html = '<div class="interesado-screen" style="padding-bottom:76px;">';
+  var html = '<div class="interesado-screen" style="padding-bottom:64px;">';
   html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button>';
   html += '<div class="interesado-elegir-header interesado-elegir-header-lg" style="margin-top:12px;">'+
     '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
@@ -1866,7 +1888,7 @@ function renderInteresadoMapa(){
       '<div class="esencial-item"><span class="esencial-icon">💰</span><span>Cuotas desde <strong>S/ 450</strong> al mes</span></div>'+
       '<div class="esencial-item"><span class="esencial-icon">📄</span><span>Título de propiedad a tu nombre</span></div>'+
     '</div>'+
-    '<a class="cta-secondary-link" href="#mapa-proyecto-panel">Ver precios y disponibilidad ↓</a>'+
+    '<a class="cta-secondary-pill" href="#mapa-proyecto-panel">Consultar precios y disponibilidad →</a>'+
     '</div>';
 
   if (proy === 'sullana'){
@@ -1901,9 +1923,11 @@ function renderInteresadoMapa(){
     html += '</div>';
 
     html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Ubicación general del proyecto en Google Maps. Toca "Abrir en Google Maps" y arrastra el muñequito amarillo (Street View) para ver fotos reales de la calle.</p>'+
+      '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View. Ubicado en '+esc(PROYECTOS[1].ciudad)+'.</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Abrir en Google Maps (Street View)</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&q='+encodeURIComponent(PROYECTOS[1].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
     '</div>';
   } else {
@@ -1914,16 +1938,27 @@ function renderInteresadoMapa(){
     html += '</div>';
 
     html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Ubicación general del proyecto en Google Maps. Toca "Abrir en Google Maps" y arrastra el muñequito amarillo (Street View) para ver fotos reales de la calle.</p>'+
+      '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View. Ubicado en '+esc(PROYECTOS[0].ciudad)+'.</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps/@'+PROYECTOS[0].lat+','+PROYECTOS[0].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Abrir en Google Maps (Street View)</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[0].lat+','+PROYECTOS[0].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&q='+encodeURIComponent(PROYECTOS[0].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
     '</div>';
   }
 
-  html += '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':'')+(ui.interesadoManzanaSel?' (Manzana '+ui.interesadoManzanaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
+  var asesorMsg = 'Hola, quiero información sobre '+nombreProy;
+  if (proy === 'sullana' && String(ui.interesadoEtapaSel) === '5' && ui.interesadoLoteSel){
+    var asesorLoteParts = ui.interesadoLoteSel.split('|');
+    asesorMsg = 'Hola, estoy interesado en el lote Mz. '+asesorLoteParts[0]+', Lt. '+String(asesorLoteParts[1]).padStart(2,'0')+' de Vive Hogar Sullana (Etapa 5).';
+  } else if (ui.interesadoEtapaSel){
+    asesorMsg += ' (Etapa '+ui.interesadoEtapaSel+')';
+  } else if (ui.interesadoManzanaSel){
+    asesorMsg += ' (Manzana '+ui.interesadoManzanaSel+')';
+  }
+  html += '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
   html += '</div>';
-  html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
+  html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
 }
 
