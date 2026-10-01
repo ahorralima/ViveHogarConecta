@@ -508,6 +508,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .quick-access-label{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-faint);font-weight:700;margin:4px 0 8px;}
 .results-count{font-size:0.82rem;color:var(--ink-faint);margin-bottom:10px;}
 .auth-switch-line{text-align:center;font-size:0.85rem;color:var(--ink-soft);margin-top:16px;}
+.asesora-panel{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
+.asesora-link{background:none;border:none;color:var(--ink-faint);font-size:0.8rem;text-decoration:underline;padding:0;cursor:pointer;}
+.asesora-form{background:var(--surface-2);border-radius:12px;padding:14px;}
+.asesora-form label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink-soft);margin-bottom:4px;}
+.asesora-activa{font-size:0.82rem;color:var(--ink-soft);text-align:center;}
 .mivivienda-rows{margin-top:4px;}
 .mivivienda-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:0.88rem;}
 .mivivienda-row span{color:var(--ink-faint);}
@@ -791,6 +796,31 @@ function saveClienteGestora(nombre, telefono){
   } catch(e){}
 }
 
+// Modo asesora: código compartido (no es login individual, ver Fase 3
+// pendiente) que desbloquea "Marcar en atención" / "Liberar" en Etapa 5.
+var asesoraPin = null;
+try { asesoraPin = localStorage.getItem('ec_asesora_pin_v1') || null; } catch(e) { asesoraPin = null; }
+var asesoraIdActual = null;
+try { asesoraIdActual = localStorage.getItem('ec_asesora_id_v1') || null; } catch(e) { asesoraIdActual = null; }
+var asesoraNombreActual = null;
+try { asesoraNombreActual = localStorage.getItem('ec_asesora_nombre_v1') || null; } catch(e) { asesoraNombreActual = null; }
+function saveAsesoraSesion(pin, id, nombre){
+  asesoraPin = pin; asesoraIdActual = id; asesoraNombreActual = nombre;
+  try {
+    localStorage.setItem('ec_asesora_pin_v1', pin || '');
+    localStorage.setItem('ec_asesora_id_v1', id || '');
+    localStorage.setItem('ec_asesora_nombre_v1', nombre || '');
+  } catch(e){}
+}
+function salirModoAsesora(){
+  asesoraPin = null; asesoraIdActual = null; asesoraNombreActual = null;
+  try {
+    localStorage.removeItem('ec_asesora_pin_v1');
+    localStorage.removeItem('ec_asesora_id_v1');
+    localStorage.removeItem('ec_asesora_nombre_v1');
+  } catch(e){}
+}
+
 var ui = {
   view: 'home',
   selectedId: null,
@@ -825,6 +855,11 @@ var ui = {
   etapa5FVista: '',
   etapa5FAreaMin: 0,
   etapa5FPrecioMax: 0,
+  showAsesoraForm: false,
+  asesoraPinInput: '',
+  asesoraError: '',
+  asesoraBusy: false,
+  asesorasLista: null,
   interesadoStep: 'elegir',
   cuotasBusy: false,
   cuotasError: '',
@@ -1682,6 +1717,15 @@ function etapa5EstadoLegacy(e){
     : String(e || "").toUpperCase();
 }
 
+function mapaEtapa5Row(r){
+  return {
+    id: r.id, m: r.manzana, l: r.lote, a: r.area, v: r.vista,
+    pl: r.precio_lista, d: r.descuento, pv: r.precio_venta,
+    t: r.pos_top, le: r.pos_left, w: r.pos_width, h: r.pos_height,
+    e: etapa5EstadoLegacy(r.estado)
+  };
+}
+
 function asegurarEtapa5Lotes(){
   if (etapa5LotesEstado !== "pendiente") return;
   etapa5LotesEstado = "cargando";
@@ -1689,18 +1733,32 @@ function asegurarEtapa5Lotes(){
     if (res.error || !res.data || !res.data.length){
       etapa5LotesEstado = "error";
     } else {
-      ETAPA5_LOTES_PLANO = res.data.map(function(r){
-        return {
-          m: r.manzana, l: r.lote, a: r.area, v: r.vista,
-          pl: r.precio_lista, d: r.descuento, pv: r.precio_venta,
-          t: r.pos_top, le: r.pos_left, w: r.pos_width, h: r.pos_height,
-          e: etapa5EstadoLegacy(r.estado)
-        };
-      });
+      ETAPA5_LOTES_PLANO = res.data.map(mapaEtapa5Row);
       etapa5LotesEstado = "listo";
     }
     render();
   });
+}
+
+// Mientras la Etapa 5 está abierta, revisa cada 10s si algo cambió
+// (otra asesora marcó/liberó un lote) y refresca solo si hay cambios.
+var etapa5PollTimer = null;
+function etapa5IniciarPolling(){
+  if (etapa5PollTimer) return;
+  etapa5PollTimer = setInterval(function(){
+    if (!document.getElementById('etapa5-zoom')){
+      clearInterval(etapa5PollTimer);
+      etapa5PollTimer = null;
+      return;
+    }
+    sb.rpc("ec_lotes_etapa", { p_proyecto: "sullana", p_etapa: "5" }).then(function(res){
+      if (res.error || !res.data) return;
+      var nuevo = res.data.map(mapaEtapa5Row);
+      var cambio = JSON.stringify(nuevo) !== JSON.stringify(ETAPA5_LOTES_PLANO);
+      ETAPA5_LOTES_PLANO = nuevo;
+      if (cambio) render();
+    });
+  }, 10000);
 }
 var ETAPA5_RECREACION_PLANO = [{"m":"I14","t":56.942,"le":27.893,"w":8.605,"h":18.352,"a":847.88},{"m":"I16","t":37.961,"le":47.923,"w":11.424,"h":12.374,"a":847.8}];
 
@@ -1932,6 +1990,15 @@ function renderMapaEtapa5Html(){
       if (lote.d){
         html += '<p style="font-size:0.78rem;color:var(--ink-faint);padding:0 16px 14px;">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
       }
+      if (asesoraPin && asesoraIdActual && (lote.e === 'DISPONIBLE' || lote.e === 'EN_ATENCION')){
+        html += '<div class="lote-detail-section">'+
+          '<div class="lote-detail-section-title">👩‍💼 Modo asesora — '+esc(asesoraNombreActual||'')+'</div>'+
+          (lote.e === 'DISPONIBLE'
+            ? '<button type="button" class="btn btn-primary btn-block" data-action="asesora-marcar" data-value="'+lote.id+'"'+(ui.asesoraBusy?' disabled':'')+'>📍 Marcar en atención</button>'
+            : '<button type="button" class="btn btn-secondary btn-block" data-action="asesora-liberar" data-value="'+lote.id+'"'+(ui.asesoraBusy?' disabled':'')+'>✅ Liberar lote</button>')+
+          (ui.asesoraError ? '<p style="color:var(--danger);font-size:0.78rem;margin-top:6px;">'+esc(ui.asesoraError)+'</p>' : '')+
+        '</div>';
+      }
       var vistaRenders = rendersParaVista(lote.v);
       if (vistaRenders.length){
         html += '<div class="lote-detail-section">'+
@@ -1990,6 +2057,28 @@ function renderMapaEtapa5Html(){
     }
     html += '</div>';
   }
+
+  html += '<div class="asesora-panel">';
+  if (!asesoraPin || !asesoraIdActual){
+    if (!ui.showAsesoraForm){
+      html += '<button type="button" class="asesora-link" data-action="asesora-mostrar-form">¿Eres asesora? Entra aquí</button>';
+    } else {
+      html += '<div class="asesora-form">';
+      html += '<label>Código de acceso</label>';
+      html += '<input class="text-input" type="password" inputmode="numeric" id="asesora-pin-input" placeholder="••••" value="'+esc(ui.asesoraPinInput||'')+'" />';
+      html += '<label style="margin-top:8px;">¿Quién eres?</label>';
+      html += '<select class="text-input" id="asesora-nombre-select">'+
+        (ui.asesorasLista||[]).map(function(a){ return '<option value="'+a.id+'">'+esc(a.nombre)+'</option>'; }).join('')+
+      '</select>';
+      if (ui.asesoraError) html += '<p style="color:var(--danger);font-size:0.78rem;margin-top:6px;">'+esc(ui.asesoraError)+'</p>';
+      html += '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="asesora-entrar"'+(ui.asesoraBusy?' disabled':'')+'>'+(ui.asesoraBusy?'Entrando…':'Entrar')+'</button>';
+      html += '</div>';
+    }
+  } else {
+    html += '<div class="asesora-activa">👩‍💼 Modo asesora: <strong>'+esc(asesoraNombreActual)+'</strong> · <button type="button" class="btn-link-inline" data-action="asesora-salir">Salir</button></div>';
+  }
+  html += '</div>';
+
   html += '</div>';
   return html;
 }
@@ -2433,6 +2522,62 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'etapa5-reintentar'){
     etapa5LotesEstado = 'pendiente';
     render();
+  } else if (action === 'asesora-mostrar-form'){
+    ui.showAsesoraForm = true;
+    ui.asesoraError = '';
+    render();
+    if (!ui.asesorasLista){
+      var resAs = await sb.rpc('ec_asesoras_activas', { p_proyecto: 'sullana' });
+      if (!resAs.error && resAs.data){
+        ui.asesorasLista = resAs.data;
+        render();
+      }
+    }
+  } else if (action === 'asesora-entrar'){
+    var pinInput = document.getElementById('asesora-pin-input');
+    var nombreSelect = document.getElementById('asesora-nombre-select');
+    var pinVal = pinInput ? pinInput.value.trim() : '';
+    if (!pinVal){
+      ui.asesoraError = 'Ingresa el código.';
+      render();
+    } else if (!nombreSelect || !nombreSelect.value){
+      ui.asesoraError = 'No hay asesoras para elegir.';
+      render();
+    } else {
+      ui.asesoraBusy = true; ui.asesoraError = ''; render();
+      var resPin = await sb.rpc('ec_lote_liberar', { p_lote_id: -1, p_pin: pinVal });
+      ui.asesoraBusy = false;
+      if (resPin.error){
+        ui.asesoraError = 'Código incorrecto.';
+        render();
+      } else {
+        var selId = nombreSelect.value;
+        var selNombre = nombreSelect.options[nombreSelect.selectedIndex].textContent;
+        saveAsesoraSesion(pinVal, selId, selNombre);
+        ui.showAsesoraForm = false;
+        ui.asesoraPinInput = '';
+        render();
+        toast('¡Bienvenida, '+toTitleCase(selNombre)+'!');
+      }
+    }
+  } else if (action === 'asesora-salir'){
+    salirModoAsesora();
+    render();
+  } else if (action === 'asesora-marcar' || action === 'asesora-liberar'){
+    var loteId = t.getAttribute('data-value');
+    ui.asesoraBusy = true; ui.asesoraError = ''; render();
+    var resAccion = action === 'asesora-marcar'
+      ? await sb.rpc('ec_lote_marcar_atencion', { p_lote_id: loteId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin })
+      : await sb.rpc('ec_lote_liberar', { p_lote_id: loteId, p_pin: asesoraPin });
+    ui.asesoraBusy = false;
+    if (resAccion.error || !resAccion.data){
+      ui.asesoraError = resAccion.error ? 'Código incorrecto o sesión vencida.' : 'Ese lote ya no estaba disponible para esta acción — alguien se te adelantó.';
+      render();
+    } else {
+      var loteLocal = ETAPA5_LOTES_PLANO.filter(function(l){ return String(l.id) === String(loteId); })[0];
+      if (loteLocal) loteLocal.e = action === 'asesora-marcar' ? 'EN_ATENCION' : 'DISPONIBLE';
+      render();
+    }
   } else if (action === 'etapa5-filtro'){
     var fKey = t.getAttribute('data-key');
     var fVal = t.getAttribute('data-value');
@@ -2535,7 +2680,9 @@ function applyEtapa5Zoom(){
 
 function initEtapa5ZoomDrag(){
   var outer = document.getElementById('etapa5-zoom');
-  if (!outer || outer.getAttribute('data-zoom-bound')) return;
+  if (!outer) return;
+  etapa5IniciarPolling();
+  if (outer.getAttribute('data-zoom-bound')) return;
   outer.setAttribute('data-zoom-bound', '1');
   var fitImg = outer.querySelector('.mapa-vhs-img');
   function doInitialFit(){
