@@ -465,11 +465,25 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .interesado-elegir-header{display:flex;align-items:center;gap:14px;margin:6px 0 0;}
 .interesado-elegir-header img{width:72px;height:auto;flex:none;}
-.interesado-elegir-header-lg img{width:118px;}
+.interesado-elegir-header-lg img{width:90px;}
+.interesado-elegir-title-sub{display:block;font-size:0.92rem;font-weight:600;color:var(--ink-soft);margin-bottom:2px;}
+.panel-flat{box-shadow:0 1px 3px rgba(15,30,50,0.05);border-color:rgba(216,228,238,0.65);}
+.esencial-list{display:flex;flex-direction:column;gap:11px;margin-top:4px;}
+.esencial-item{display:flex;align-items:flex-start;gap:10px;font-size:0.92rem;color:var(--ink-soft);line-height:1.4;}
+.esencial-icon{font-size:1.15rem;flex:none;line-height:1.35;}
+.esencial-sub{display:block;font-size:0.8rem;color:var(--ink-faint);}
+.esencial-item strong{color:var(--ink);font-weight:800;}
+.map-hint-banner{display:flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:0.84rem;border-radius:10px;padding:10px 14px;margin-bottom:12px;}
+@keyframes mapaHotspotPulse{0%{box-shadow:0 0 0 0 rgba(57,126,173,0.45);}70%{box-shadow:0 0 0 10px rgba(57,126,173,0);}100%{box-shadow:0 0 0 0 rgba(57,126,173,0);}}
+.mapa-vhs-hotspot:not(.active){animation:mapaHotspotPulse 2.6s ease-out infinite;}
+.cta-secondary-link{display:block;text-align:center;margin-top:10px;font-size:0.86rem;font-weight:700;color:var(--paprika);text-decoration:none;}
+.asesor-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;font-weight:800;font-size:0.95rem;text-decoration:none;box-shadow:0 -4px 16px -4px rgba(0,0,0,0.3);}
+.asesor-bar:active{opacity:0.92;}
 .interesado-elegir-logo-text{font-weight:800;font-size:2.1rem;}
 .interesado-elegir-logo-text .n1{color:var(--paprika);}
 .interesado-elegir-logo-text .n2{color:var(--teal);}
 .interesado-elegir-title{font-size:1.55rem;font-weight:800;color:var(--paprika);line-height:1.2;margin:0;}
+.interesado-elegir-title.interesado-elegir-title-split{font-size:1.32rem;}
 .interesado-elegir-sub{color:var(--ink-soft);font-size:1.15rem;margin:0 0 14px;}
 .proyecto-pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;}
 .proyecto-pick-card{background:none;border:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:0;overflow:visible;transition:transform 0.15s;width:100%;}
@@ -506,8 +520,6 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
 .fab:active{transform:scale(0.94);}
-.fab-asesor{position:fixed;left:18px;bottom:88px;z-index:60;background:var(--whatsapp);color:#fff;display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:30px;font-weight:700;font-size:0.86rem;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;white-space:nowrap;}
-.fab-asesor:active{transform:scale(0.96);}
 </style>
 </head>
 <body>
@@ -1665,7 +1677,7 @@ function renderInteresadoBienvenida(){
   var html = '<div class="interesado-bienvenida-wrap">';
   html += '<img class="interesado-bienvenida-photo" src="'+fotoProy+'" alt="" />';
   html += '<div class="interesado-bienvenida-scrim"></div>';
-  html += '<button type="button" class="back-btn back-btn-on-dark" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  html += '<button type="button" class="back-btn back-btn-on-dark" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button>';
   html += '<div class="interesado-bienvenida">';
   html += '<div style="max-width:200px;margin:22px auto 14px;background:#fff;border-radius:16px;padding:8px 14px;box-shadow:0 10px 28px -8px rgba(0,0,0,0.45);"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:100%;display:block;" /></div>';
   html += '<h2 style="text-align:center;color:#fff;">Bienvenido a '+esc(nombreProy)+'</h2>';
@@ -1839,24 +1851,27 @@ function renderMapaCastilla11Html(){
 function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
-  var html = '<div class="interesado-screen">';
-  html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  var html = '<div class="interesado-screen" style="padding-bottom:76px;">';
+  html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button>';
   html += '<div class="interesado-elegir-header interesado-elegir-header-lg" style="margin-top:12px;">'+
     '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
-    '<h2 class="interesado-elegir-title">¡Bienvenido a '+esc(nombreProy)+'!</h2>'+
+    '<h2 class="interesado-elegir-title interesado-elegir-title-split"><span class="interesado-elegir-title-sub">¡Bienvenido a</span>'+esc(nombreProy)+'!</h2>'+
   '</div>';
 
-  html += '<div class="panel"><h4>Lo esencial</h4>'+
-    '<ul style="margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.7;">'+
-      '<li>Vivienda de 25 m² sobre 62.5 m² de terreno, con luz, agua y desagüe.</li>'+
-      '<li>Bono Familiar Habitacional que se descuenta directo del precio.</li>'+
-      '<li>Cuota fija desde S/ 450 al mes (no varía con tasas de interés).</li>'+
-      '<li>Título de propiedad a tu nombre.</li>'+
-    '</ul></div>';
+  html += '<div class="panel panel-flat"><h4>Lo esencial</h4>'+
+    '<div class="esencial-list">'+
+      '<div class="esencial-item"><span class="esencial-icon">🏠</span><span><strong>25 m²</strong> de vivienda<span class="esencial-sub">sobre <strong>62.5 m²</strong> de terreno</span></span></div>'+
+      '<div class="esencial-item"><span class="esencial-icon">💧</span><span>Luz, agua y desagüe incluidos</span></div>'+
+      '<div class="esencial-item"><span class="esencial-icon">🏦</span><span>Bono Familiar Habitacional aplicado al precio</span></div>'+
+      '<div class="esencial-item"><span class="esencial-icon">💰</span><span>Cuotas desde <strong>S/ 450</strong> al mes</span></div>'+
+      '<div class="esencial-item"><span class="esencial-icon">📄</span><span>Título de propiedad a tu nombre</span></div>'+
+    '</div>'+
+    '<a class="cta-secondary-link" href="#mapa-proyecto-panel">Ver precios y disponibilidad ↓</a>'+
+    '</div>';
 
   if (proy === 'sullana'){
-    html += '<div class="panel"><h4>Mapa del proyecto</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Toca una zona del plano real para ver el precio de esa etapa.</p>'+
+    html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
+      '<div class="map-hint-banner">👆 Toca una zona para consultar precios y disponibilidad</div>'+
       '<div class="mapa-vhs-wrap">'+
         '<img class="mapa-vhs-img" src="'+MAPA_VHS_DATAURI+'" alt="Plano de Vive Hogar Sullana" />'+
         ETAPAS_SULLANA_MAPA.map(function(e){
@@ -1885,20 +1900,20 @@ function renderInteresadoMapa(){
     }
     html += '</div>';
 
-    html += '<div class="panel"><h4>Cómo llegar</h4>'+
+    html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Ubicación general del proyecto en Google Maps. Toca "Abrir en Google Maps" y arrastra el muñequito amarillo (Street View) para ver fotos reales de la calle.</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Abrir en Google Maps (Street View)</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&q='+encodeURIComponent(PROYECTOS[1].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
     '</div>';
   } else {
-    html += '<div class="panel"><h4>Mapa del proyecto</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Toca una manzana del plano real para ver los lotes y precios.</p>'+
+    html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
+      '<div class="map-hint-banner">👆 Toca una manzana para consultar precios y disponibilidad</div>'+
       '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:12px;">Piloto: por ahora solo tenemos el detalle de la <strong>Etapa 11</strong>. Las demás etapas de Castilla, muy pronto.</p>';
     html += renderMapaCastilla11Html();
     html += '</div>';
 
-    html += '<div class="panel"><h4>Cómo llegar</h4>'+
+    html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Ubicación general del proyecto en Google Maps. Toca "Abrir en Google Maps" y arrastra el muñequito amarillo (Street View) para ver fotos reales de la calle.</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps/@'+PROYECTOS[0].lat+','+PROYECTOS[0].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Abrir en Google Maps (Street View)</a>'+
@@ -1906,9 +1921,9 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
-  html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':'')+(ui.interesadoManzanaSel?' (Manzana '+ui.interesadoManzanaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
+  html += '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':'')+(ui.interesadoManzanaSel?' (Manzana '+ui.interesadoManzanaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
   html += '</div>';
-  html += '<a class="fab-asesor" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
+  html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
 }
 
