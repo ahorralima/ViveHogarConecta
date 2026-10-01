@@ -459,6 +459,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .interesado-elegir-header{display:flex;align-items:center;gap:14px;margin:6px 0 0;}
 .interesado-elegir-header img{width:72px;height:auto;flex:none;}
+.interesado-elegir-header-lg img{width:118px;}
 .interesado-elegir-logo-text{font-weight:800;font-size:2.1rem;}
 .interesado-elegir-logo-text .n1{color:var(--paprika);}
 .interesado-elegir-logo-text .n2{color:var(--teal);}
@@ -499,6 +500,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
 .fab:active{transform:scale(0.94);}
+.fab-asesor{position:fixed;left:18px;bottom:88px;z-index:60;background:var(--whatsapp);color:#fff;display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:30px;font-weight:700;font-size:0.86rem;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;white-space:nowrap;}
+.fab-asesor:active{transform:scale(0.96);}
 </style>
 </head>
 <body>
@@ -1817,7 +1820,7 @@ function renderInteresadoMapa(){
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
-  html += '<div class="interesado-elegir-header" style="margin-top:12px;">'+
+  html += '<div class="interesado-elegir-header interesado-elegir-header-lg" style="margin-top:12px;">'+
     '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
     '<h2 class="interesado-elegir-title">¡Bienvenido a '+esc(nombreProy)+'!</h2>'+
   '</div>';
@@ -1830,28 +1833,7 @@ function renderInteresadoMapa(){
       '<li>Título de propiedad a tu nombre.</li>'+
     '</ul></div>';
 
-  html += '<div class="panel"><h4>Así se verá tu futuro hogar</h4>'+
-    '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Renders 3D reales del proyecto, elaborados por nuestro equipo de arquitectura.</p>'+
-    '<div class="renders-gallery">'+
-      RENDERS_FUTURO.map(function(r){
-        return '<div class="renders-gallery-item"><img src="'+r.src+'" alt="'+esc(r.label)+'" loading="lazy" /><span>'+esc(r.label)+'</span></div>';
-      }).join('')+
-    '</div></div>';
-
-  html += '<div class="panel"><h4>Videos del proyecto</h4>'+
-    VIDEOS_PROYECTO.map(function(v){
-      return '<div class="video-embed"><span>'+esc(v.label)+'</span>'+
-        '<div class="video-embed-wrap"><iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.label)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'+
-      '</div>';
-    }).join('')+
-  '</div>';
-
   if (proy === 'sullana'){
-    html += '<div class="panel"><h4>Así se ve el proyecto</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Maqueta real del proyecto, en nuestra sala de ventas.</p>'+
-      '<img src="'+MAQUETA_SULLANA_DATAURI+'" alt="Maqueta real de Vive Hogar Sullana" style="width:100%;border-radius:12px;display:block;" />'+
-      '</div>';
-
     html += '<div class="panel"><h4>Mapa del proyecto</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Toca una zona del plano real para ver el precio de esa etapa.</p>'+
       '<div class="mapa-vhs-wrap">'+
@@ -1905,7 +1887,7 @@ function renderInteresadoMapa(){
 
   html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':'')+(ui.interesadoManzanaSel?' (Manzana '+ui.interesadoManzanaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
   html += '</div>';
-  html += '<a class="fab" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener" aria-label="Contactar asesor" title="Contacta a un asesor de ventas">💬</a>';
+  html += '<a class="fab-asesor" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
 }
 
