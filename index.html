@@ -415,6 +415,17 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-hotspot-mine-label{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:#F8B132;color:#222;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);}
 .lote-row-mine{border-color:#F8B132!important;background:rgba(248,177,50,0.08)!important;}
 .cuota-chip-mine{background:rgba(248,177,50,0.25);color:#7a5200;}
+.lote-detail-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 10px 24px -10px rgba(0,0,0,0.25);}
+.lote-detail-card-head{padding:16px 16px 12px;border-bottom:1px solid var(--border);}
+.lote-detail-card-title{font-weight:800;font-size:1.05rem;color:var(--paprika);}
+.lote-detail-card-sub{font-weight:700;font-size:0.95rem;color:var(--ink);margin-top:2px;}
+.lote-detail-section{padding:12px 16px;border-bottom:1px solid var(--border);}
+.lote-detail-section-title{font-weight:700;font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;}
+.lote-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.lote-detail-tile{background:var(--surface-2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;}
+.lote-detail-tile span{font-size:0.72rem;color:var(--ink-faint);}
+.lote-detail-tile strong{font-size:0.95rem;color:var(--ink);}
+.lote-hint-banner{background:var(--paprika);color:#fff;font-weight:700;font-size:0.82rem;border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:center;}
 .lote-hotspot.lote-recreacion{background:rgba(46,160,90,0.08);border:1px dashed rgba(46,160,90,0.4);cursor:default;pointer-events:none;}
 .lote-legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:0.75rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-legend span{display:flex;align-items:center;gap:5px;}
@@ -1638,7 +1649,7 @@ function renderInteresadoBienvenida(){
 function renderMapaEtapa5Html(){
   var html = '<div class="mapa-vhs-detail">';
   html += '<h4 style="margin-bottom:6px;">Etapa 5 — elige tu casa</h4>';
-  html += '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:10px;">Toca directamente el lote que te interesa en el plano real.</p>';
+  html += '<div class="lote-hint-banner">👉 Dale clic a un lote y conoce sus características y disponibilidad</div>';
   html += '<div class="lote-legend">'+
     '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
     '<span><i class="lote-dot lote-dot-neutral"></i> Vendido</span>'+
@@ -1669,16 +1680,27 @@ function renderMapaEtapa5Html(){
         : lote.e === 'BLOQUEADO' ? {cls:'warn', txt:'Bloqueado'}
         : lote.e === 'DEVUELTO' ? {cls:'warn', txt:'Devuelto'}
         : {cls:'neutral', txt:esc(lote.e||'')};
-      html += '<div class="mapa-vhs-detail" style="margin-top:12px;">';
-      html += '<h4 style="margin-bottom:10px;">Manzana '+esc(lote.m)+' · Lote '+esc(String(lote.l))+' '+
-        '<span class="cuota-chip cuota-chip-'+estadoInfo.cls+'">'+estadoInfo.txt+'</span></h4>';
-      html += '<ul style="margin:0 0 12px;padding-left:18px;color:var(--ink-soft);font-size:0.9rem;line-height:1.8;">'+
-        '<li>Vista: '+esc(lote.v||'')+'</li>'+
-        '<li>Área de terreno: '+parseFloat(lote.a).toFixed(2)+' m²</li>'+
-      '</ul>';
-      html += '<div class="lote-row-precio" style="font-size:1.3rem;">'+fmtMoney(lote.pv)+'</div>';
+      html += '<div class="lote-detail-card" style="margin-top:12px;">';
+      html += '<div class="lote-detail-card-head">'+
+        '<div class="lote-detail-card-title">Vive Hogar Sullana</div>'+
+        '<div class="lote-detail-card-sub">Etapa 5, Mz '+esc(lote.m)+', Lt '+esc(String(lote.l).padStart(2,'0'))+'</div>'+
+      '</div>';
+      html += '<div class="lote-detail-section">'+
+        '<div class="lote-detail-section-title">✅ Información</div>'+
+        '<div class="lote-detail-grid">'+
+          '<div class="lote-detail-tile"><span>Vista</span><strong>'+esc(lote.v||'—')+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Área</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
+        '</div>'+
+      '</div>';
+      html += '<div class="lote-detail-section">'+
+        '<div class="lote-detail-section-title">✅ Estado y precio</div>'+
+        '<div class="lote-detail-grid">'+
+          '<div class="lote-detail-tile"><span>Estado</span><strong class="cuota-chip cuota-chip-'+estadoInfo.cls+'" style="margin-top:3px;">'+estadoInfo.txt+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Precio</span><strong>'+fmtMoney(lote.pv)+'</strong></div>'+
+        '</div>'+
+      '</div>';
       if (lote.d){
-        html += '<p style="font-size:0.78rem;color:var(--ink-faint);">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
+        html += '<p style="font-size:0.78rem;color:var(--ink-faint);padding:0 16px 14px;">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
       }
       if (lote.e === 'DISPONIBLE'){
         var calcModo = ui.loteCalcModo || 'cuotas';
