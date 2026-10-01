@@ -485,6 +485,12 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .video-embed-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;}
 .video-embed-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 .video-embed span{display:block;font-size:0.8rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.video-embed-label{font-size:0.82rem;font-weight:700;color:var(--ink);margin-top:8px;}
+.video-thumbs{display:flex;gap:8px;margin-top:8px;}
+.video-thumb{position:relative;flex:1;min-width:0;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:none;aspect-ratio:16/9;}
+.video-thumb.active{border-color:var(--teal);}
+.video-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(0.75);}
+.video-thumb-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:0.9rem;text-shadow:0 1px 4px rgba(0,0,0,0.6);}
 .streetview-wrap{position:relative;width:100%;padding-top:56%;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
@@ -888,6 +894,7 @@ var ui = {
   etapa5FVista: '',
   etapa5FAreaMin: 0,
   etapa5FPrecioMax: 0,
+  videoActivo: 0,
   showAsesoraForm: false,
   asesoraPinInput: '',
   asesoraError: '',
@@ -2189,6 +2196,34 @@ function renderBarraConfianza(){
 // Panel completo: cada bloque se muestra solo si su dato está
 // confirmado. "Evidencia real" y "Contacto oficial" no dependen de
 // ningún dato pendiente, así que siempre aparecen.
+// Compacto a propósito: un reproductor principal + una fila de
+// miniaturas para cambiar de video, en vez de 3 reproductores
+// apilados. Los 3 son recorridos 3D, así que llevan la misma
+// etiqueta que los renders, con el texto específico de video.
+function renderVideosProyecto(){
+  var idx = ui.videoActivo || 0;
+  if (idx < 0 || idx >= VIDEOS_PROYECTO.length) idx = 0;
+  var activo = VIDEOS_PROYECTO[idx];
+  var html = '<div class="panel panel-flat">';
+  html += '<h4>Así se proyecta Vive Hogar Sullana</h4>';
+  html += '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">¿Cómo se sentiría recorrer el proyecto? Recorridos en 3D de nuestro equipo de arquitectura.</p>';
+  html += '<div class="video-embed-wrap">'+
+    '<iframe src="https://www.youtube-nocookie.com/embed/'+esc(activo.id)+'" title="'+esc(activo.label)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>'+
+    '<span class="media-badge media-badge-render">🎨 VIDEO · RECORRIDO 3D</span>'+
+  '</div>';
+  html += '<div class="video-embed-label">'+esc(activo.label)+'</div>';
+  html += '<div class="video-thumbs">'+
+    VIDEOS_PROYECTO.map(function(v, i){
+      return '<button type="button" class="video-thumb'+(i===idx?' active':'')+'" data-action="video-elegir" data-value="'+i+'">'+
+        '<img src="https://img.youtube.com/vi/'+esc(v.id)+'/mqdefault.jpg" alt="'+esc(v.label)+'" loading="lazy" />'+
+        '<span class="video-thumb-play">▶</span>'+
+      '</button>';
+    }).join('')+
+  '</div>';
+  html += '</div>';
+  return html;
+}
+
 function renderPanelConfianza(){
   var c = VHS_CONFIANZA;
   var bloques = '';
@@ -2310,6 +2345,7 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
+  if (proy === 'sullana') html += renderVideosProyecto();
   if (proy === 'sullana') html += renderPanelConfianza();
 
   var asesorMsg = 'Hola, quiero información sobre '+nombreProy;
@@ -2677,6 +2713,9 @@ document.addEventListener('click', async function(ev){
         toast('¡Bienvenida, '+toTitleCase(selNombre)+'!');
       }
     }
+  } else if (action === 'video-elegir'){
+    ui.videoActivo = parseInt(t.getAttribute('data-value'),10) || 0;
+    render();
   } else if (action === 'asesora-salir'){
     salirModoAsesora();
     render();
