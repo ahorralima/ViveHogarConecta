@@ -428,8 +428,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-hint-small{font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-hotspot.lote-recreacion{background:repeating-linear-gradient(135deg,rgba(63,168,99,0.75),rgba(63,168,99,0.75) 8px,rgba(82,184,117,0.75) 8px,rgba(82,184,117,0.75) 16px);border:2px solid rgba(35,110,65,0.85);border-radius:6px;cursor:default;pointer-events:none;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35);}
 .lote-recreacion-icon{font-size:1.3rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));}
-.mapa-zoom-outer{position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--border);touch-action:none;background:#e9e9e9;}
+.mapa-zoom-outer{position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--border);touch-action:none;background:#e9e9e9;height:56vh;min-height:360px;}
 .mapa-zoom-inner{transform-origin:0 0;}
+.mapa-zoom-outer.zoom-far .lote-hotspot-num{display:none;}
 .mapa-zoom-controls{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:8px;z-index:30;}
 .mapa-zoom-btn{width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1.25rem;font-weight:700;color:var(--ink);box-shadow:0 4px 10px -2px rgba(0,0,0,0.3);line-height:1;}
 .mapa-zoom-btn:active{transform:scale(0.93);}
@@ -2354,7 +2355,7 @@ document.addEventListener('click', async function(ev){
     var dir = t.getAttribute('data-value');
     var z = ui.etapa5Zoom || {scale:1,x:0,y:0};
     if (dir === 'reset'){
-      z = {scale:1,x:0,y:0};
+      z = computeEtapa5FitZoom(document.getElementById('etapa5-zoom'));
     } else {
       var outer = document.getElementById('etapa5-zoom');
       var cw = outer ? outer.clientWidth : 300;
@@ -2377,18 +2378,85 @@ function clampZoom(z, cw, ch){
   return {scale:z.scale, x:Math.min(maxX, Math.max(minX, z.x)), y:Math.min(maxY, Math.max(minY, z.y))};
 }
 
+var etapa5FitScaleCache = null;
+function etapa5Bbox(){
+  var items = ETAPA5_LOTES_PLANO.concat(ETAPA5_RECREACION_PLANO);
+  var minTop=100, maxBottom=0, minLeft=100, maxRight=0;
+  items.forEach(function(it){
+    minTop = Math.min(minTop, it.t);
+    maxBottom = Math.max(maxBottom, it.t + it.h);
+    minLeft = Math.min(minLeft, it.le);
+    maxRight = Math.max(maxRight, it.le + it.w);
+  });
+  return {top:minTop, left:minLeft, width:maxRight-minLeft, height:maxBottom-minTop};
+}
+
+// "Zoom to fit": calcula el encuadre inicial para que los lotes de la
+// Etapa 5 llenen el visor en móvil (alto y ancho), en vez de mostrar
+// todo el plano con sus márgenes vacíos, diminuto en pantalla chica.
+// Usa encuadre tipo "cover": si el bloque de lotes es más ancho que
+// alto (como en este plano), puede recortar un poco los costados —
+// el usuario los revela arrastrando — en vez de dejar franjas vacías.
+function computeEtapa5FitZoom(outer){
+  var inner = document.getElementById('etapa5-zoom-inner');
+  if (!outer || !inner) return {scale:1,x:0,y:0};
+  var prevTransform = inner.style.transform;
+  var prevHeight = outer.style.height;
+  inner.style.transform = 'none';
+  outer.style.height = '';
+  var cw = outer.clientWidth;
+  var iw = inner.offsetWidth, ih = inner.offsetHeight;
+  inner.style.transform = prevTransform;
+  outer.style.height = prevHeight;
+  if (!iw || !ih || !cw) return {scale:1,x:0,y:0};
+  var ch = Math.max(380, Math.min(560, cw*1.15));
+  outer.style.height = ch+'px';
+  var bbox = etapa5Bbox();
+  var bboxLeftPx = (bbox.left/100) * iw;
+  var bboxTopPx = (bbox.top/100) * ih;
+  var bboxWidthPx = (bbox.width/100) * iw;
+  var bboxHeightPx = (bbox.height/100) * ih;
+  var padding = 1.04;
+  var scale = Math.max(cw/(bboxWidthPx*padding), ch/(bboxHeightPx*padding));
+  scale = Math.min(4, Math.max(1, scale));
+  etapa5FitScaleCache = scale;
+  var contentW = bboxWidthPx*scale, contentH = bboxHeightPx*scale;
+  var x = -(bboxLeftPx*scale) + Math.max(0,(cw-contentW))/2;
+  var y = -(bboxTopPx*scale) + Math.max(0,(ch-contentH))/2;
+  return clampZoom({scale:scale, x:x, y:y}, cw, ch);
+}
+
 function applyEtapa5Zoom(){
   var inner = document.getElementById('etapa5-zoom-inner');
+  var outer = document.getElementById('etapa5-zoom');
   if (!inner) return;
   var z = ui.etapa5Zoom || {scale:1,x:0,y:0};
   inner.style.transform = 'translate('+z.x+'px,'+z.y+'px) scale('+z.scale+')';
+  if (outer){
+    var farThreshold = (etapa5FitScaleCache || z.scale) * 0.6;
+    outer.classList.toggle('zoom-far', z.scale < farThreshold);
+  }
 }
 
 function initEtapa5ZoomDrag(){
   var outer = document.getElementById('etapa5-zoom');
   if (!outer || outer.getAttribute('data-zoom-bound')) return;
   outer.setAttribute('data-zoom-bound', '1');
-  applyEtapa5Zoom();
+  var fitImg = outer.querySelector('.mapa-vhs-img');
+  function doInitialFit(){
+    if (!ui.etapa5Zoom){
+      ui.etapa5Zoom = computeEtapa5FitZoom(outer);
+    }
+    applyEtapa5Zoom();
+  }
+  // La imagen puede no estar decodificada todavía (recién insertada vía
+  // innerHTML) justo cuando corre esto, y leer su alto antes de eso da
+  // 0/2px y arruina el cálculo de "zoom to fit". Esperamos su 'load'.
+  if (!fitImg || fitImg.complete){
+    doInitialFit();
+  } else {
+    fitImg.addEventListener('load', doInitialFit, {once:true});
+  }
   var pointers = {};
   var dragging = false;
   var lastDist = 0;
