@@ -406,7 +406,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-row-precio{margin-left:auto;font-weight:800;font-size:0.95rem;}
 .cuota-chip-neutral2{background:rgba(120,120,120,0.12);color:var(--ink-faint);}
 .mapa-lotes-wrap{touch-action:pan-y;}
-.lote-hotspot{position:absolute;border:1px solid rgba(0,0,0,0.35);cursor:pointer;box-sizing:border-box;}
+.lote-hotspot{position:absolute;border:1px solid rgba(0,0,0,0.35);cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.lote-hotspot-num{font-size:0.5rem;font-weight:800;color:#1a1a1a;text-shadow:0 1px 1px rgba(255,255,255,0.85);pointer-events:none;line-height:1;}
 .lote-hotspot.lote-ok{background:rgba(46,160,90,0.32);}
 .lote-hotspot.lote-neutral{background:rgba(120,120,120,0.28);}
 .lote-hotspot.lote-warn{background:rgba(248,177,50,0.38);}
@@ -1780,7 +1781,7 @@ function renderMapaEtapa5Html(){
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
         return '<div role="button" tabindex="0" class="lote-hotspot '+cls+mine+(ui.interesadoLoteSel===key?' active':'')+'" '+
           'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
-          'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'</div>';
+          'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'<span class="lote-hotspot-num">'+esc(String(l.l))+'</span></div>';
       }).join('')+
     '</div>'+
     '</div>'+
@@ -2319,10 +2320,6 @@ document.addEventListener('click', async function(ev){
     ui.interesadoManzanaSel = null;
     ui.interesadoLoteSel = null;
     render();
-    setTimeout(function(){
-      var det = document.querySelector('.mapa-vhs-detail');
-      if (det) det.scrollIntoView({behavior:'smooth', block:'start'});
-    }, 50);
   } else if (action === 'interesado-manzana'){
     var mzVal = t.getAttribute('data-value');
     ui.interesadoManzanaSel = (ui.interesadoManzanaSel === mzVal) ? null : mzVal;
@@ -2338,15 +2335,6 @@ document.addEventListener('click', async function(ev){
     var loteVal = t.getAttribute('data-value');
     ui.interesadoLoteSel = (ui.interesadoLoteSel === loteVal) ? null : loteVal;
     render();
-    if (ui.interesadoLoteSel){
-      setTimeout(function(){
-        var dets = document.querySelectorAll('.mapa-vhs-detail');
-        var det = dets[dets.length-1];
-        // block:'end' en vez de 'start': deja el mapa visible arriba, junto
-        // con la tarjeta de precio, en vez de empujar el mapa fuera de pantalla.
-        if (det) det.scrollIntoView({behavior:'smooth', block:'end'});
-      }, 50);
-    }
   } else if (action === 'lote-calc-modo'){
     ui.loteCalcModo = t.getAttribute('data-value');
     render();
