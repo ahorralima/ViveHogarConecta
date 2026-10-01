@@ -900,8 +900,6 @@ var ui = {
   loteCalcModo: 'cuotas',
   loteCalcMeses: 24,
   etapa5FVista: '',
-  etapa5FAreaMin: 0,
-  etapa5FPrecioMax: 0,
   videoActivo: 0,
   faqAbiertas: {},
   showAsesoraForm: false,
@@ -1914,7 +1912,7 @@ var VHS_FAQ_SULLANA = [
   {q:'¿Cuánto necesito para empezar?', a:'Necesitas cubrir la inicial del lote que elijas — el Bono Familiar Habitacional ('+fmtMoney(VHS_BFH_SULLANA)+') se descuenta directo del precio. El monto exacto varía según el lote; lo ves apenas lo seleccionas en el mapa.'},
   {q:'¿Cómo funcionan las cuotas?', a:'Son cuotas fijas que no varían con las tasas de interés del mercado. Puedes simular tu cuota mensual directamente en la ficha de cada lote, eligiendo el número de meses.'},
   {q:'¿Las imágenes del proyecto son reales o renders?', a:'Usamos ambas, siempre etiquetadas: 📷 "Foto real" para lo que ya existe hoy (sala de ventas, maqueta), y 🎨 "Así se proyecta" para los renders 3D de cómo se verá el proyecto terminado.'},
-  {q:'¿Qué pasa si el lote que quiero ya no está disponible?', a:'Puedes explorar el mapa y elegir cualquier otro lote marcado como disponible — los filtros por vista, área o precio te ayudan a encontrar uno parecido rápido.'},
+  {q:'¿Qué pasa si el lote que quiero ya no está disponible?', a:'Puedes explorar el mapa y elegir cualquier otro lote marcado como disponible — el filtro por vista (esquina, parque, pasaje) te ayuda a encontrar uno parecido rápido.'},
   {q:'¿Cómo separo un lote?', a:'El primer paso es la separación de '+fmtMoney(SEPARACION_LOTE)+'. Escríbenos por WhatsApp con el lote que te interesa y un asesor te guía con el resto del proceso.'},
   {q:'¿Puedo visitar el proyecto?', a:'Sí — contamos con sala de ventas y una maqueta física del proyecto. Coordina tu visita escribiendo a un asesor por WhatsApp.'}
 ];
@@ -2022,13 +2020,11 @@ function renderMapaEtapa5Html(){
     '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
   '</div>';
 
-  var fVista = ui.etapa5FVista, fAreaMin = ui.etapa5FAreaMin, fPrecioMax = ui.etapa5FPrecioMax;
-  var filtrosActivos = !!(fVista || fAreaMin || fPrecioMax);
+  var fVista = ui.etapa5FVista;
+  var filtrosActivos = !!fVista;
   function loteCoincide(l){
     if (l.e !== 'DISPONIBLE') return false;
     if (fVista && l.v !== fVista) return false;
-    if (fAreaMin && parseFloat(l.a) < fAreaMin) return false;
-    if (fPrecioMax && l.pv > fPrecioMax) return false;
     return true;
   }
   var coincidencias = filtrosActivos ? ETAPA5_LOTES_PLANO.filter(loteCoincide).length : 0;
@@ -2036,16 +2032,6 @@ function renderMapaEtapa5Html(){
     '<div class="lote-filtros-row"><span class="lote-filtros-label">Vista</span><div class="chip-row">'+
       [['','Todas'],['Esquina','Esquina'],['Parque','Parque'],['Lateral Parque','Lat. parque'],['Pasaje','Pasaje']].map(function(o){
         return '<button type="button" class="chip'+(fVista===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="vista" data-value="'+esc(o[0])+'">'+esc(o[1])+'</button>';
-      }).join('')+
-    '</div></div>'+
-    '<div class="lote-filtros-row"><span class="lote-filtros-label">Área mín.</span><div class="chip-row">'+
-      [[0,'Cualquiera'],[70,'70+ m²'],[80,'80+ m²'],[90,'90+ m²']].map(function(o){
-        return '<button type="button" class="chip'+(fAreaMin===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="areaMin" data-value="'+o[0]+'">'+esc(o[1])+'</button>';
-      }).join('')+
-    '</div></div>'+
-    '<div class="lote-filtros-row"><span class="lote-filtros-label">Precio máx.</span><div class="chip-row">'+
-      [[0,'Cualquiera'],[80000,'Hasta S/80,000'],[90000,'Hasta S/90,000'],[100000,'Hasta S/100,000']].map(function(o){
-        return '<button type="button" class="chip'+(fPrecioMax===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="precioMax" data-value="'+o[0]+'">'+esc(o[1])+'</button>';
       }).join('')+
     '</div></div>'+
     (filtrosActivos ? '<div class="lote-filtros-count">'+coincidencias+' lote'+(coincidencias===1?'':'s')+' disponible'+(coincidencias===1?'':'s')+' coincide'+(coincidencias===1?'':'n')+'</div>' : '')+
@@ -2823,8 +2809,6 @@ document.addEventListener('click', async function(ev){
     var fKey = t.getAttribute('data-key');
     var fVal = t.getAttribute('data-value');
     if (fKey === 'vista') ui.etapa5FVista = fVal;
-    else if (fKey === 'areaMin') ui.etapa5FAreaMin = parseFloat(fVal) || 0;
-    else if (fKey === 'precioMax') ui.etapa5FPrecioMax = parseFloat(fVal) || 0;
     render();
   } else if (action === 'lote-calc-modo'){
     ui.loteCalcModo = t.getAttribute('data-value');
