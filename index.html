@@ -479,6 +479,30 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .interesado-elegir-header-lg img{width:90px;}
 .interesado-elegir-title-sub{display:block;font-size:0.92rem;font-weight:600;color:var(--ink-soft);margin-bottom:2px;}
 .panel-flat{box-shadow:0 1px 3px rgba(15,30,50,0.05);border-color:rgba(216,228,238,0.65);}
+.benefit-row{display:flex;align-items:center;gap:12px;padding:10px 0;}
+.benefit-row+.benefit-row{border-top:1px solid var(--border);}
+.benefit-icon{width:44px;height:44px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex:none;}
+.benefit-row strong{display:block;font-size:0.92rem;color:var(--ink);}
+.benefit-sub{display:block;font-size:0.8rem;color:var(--ink-soft);margin-top:2px;}
+.mivivienda-card{margin-bottom:14px;}
+.mivivienda-top{display:flex;align-items:center;justify-content:space-between;}
+.mivivienda-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-faint);font-weight:700;}
+.mivivienda-proyecto{font-weight:800;font-size:1.15rem;color:var(--ink);margin-top:6px;}
+.mivivienda-sub{font-size:0.85rem;color:var(--ink-soft);margin-top:2px;}
+.quick-access-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.quick-access-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:left;}
+.quick-access-tile:active{transform:scale(0.98);}
+.quick-access-tile strong{font-size:0.9rem;color:var(--ink);}
+.quick-access-tile span:not(.qa-icon){font-size:0.76rem;color:var(--ink-faint);}
+.qa-icon{font-size:1.4rem;margin-bottom:2px;}
+.mivivienda-rows{margin-top:4px;}
+.mivivienda-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:0.88rem;}
+.mivivienda-row span{color:var(--ink-faint);}
+.mivivienda-row strong{color:var(--ink);font-weight:700;}
+.construction-box{display:flex;gap:12px;align-items:flex-start;}
+.construction-box-icon{font-size:1.6rem;flex:none;}
+.construction-box strong{display:block;font-size:0.9rem;color:var(--ink);}
+.construction-box p{font-size:0.82rem;color:var(--ink-soft);margin-top:4px;}
 .esencial-list{display:flex;flex-direction:column;gap:11px;margin-top:4px;}
 .esencial-item{display:flex;align-items:flex-start;gap:10px;font-size:0.92rem;color:var(--ink-soft);line-height:1.4;}
 .esencial-icon{font-size:1.15rem;flex:none;line-height:1.35;}
@@ -994,17 +1018,30 @@ function renderHome(){
 
   if (!identity && !ui.showEtapaPrompt){
     html += '<div class="onboard-banner">'+
-      '<div class="txt"><strong>Ofrece o encuentra servicios sin salir del proyecto.</strong> Crea tu cuenta para publicar y dejar reseñas.</div>'+
+      '<div class="txt"><strong>Todo lo que necesitas, cerca de casa.</strong> Encuentra profesionales y emprendimientos de tu comunidad.</div>'+
       '<button type="button" class="btn btn-teal btn-sm" data-action="nav" data-value="perfil">Empezar</button>'+
     '</div>';
   }
 
   if (clienteNombreVerificado && clienteDniVerificado){
-    html += '<div class="onboard-banner" style="background:rgba(46,95,138,0.08);border-color:rgba(46,95,138,0.25);">'+
-      '<div class="txt"><strong>¿Cómo va tu crédito?</strong> Revisa tus cuotas, tu próximo pago y tu historial.'+
-        '<div style="font-size:0.78rem;color:var(--ink-faint);margin-top:4px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
+    var hProyNombre = (localPref && String(localPref.proyectoId) === '1') ? 'Vive Hogar Castilla' : 'Vive Hogar Sullana';
+    var hSubParts = [];
+    if (localPref && localPref.etapa) hSubParts.push('Etapa '+esc(localPref.etapa));
+    if (clienteBloqueVerificado) hSubParts.push('Mz. '+esc(clienteBloqueVerificado));
+    if (clienteLoteVerificado) hSubParts.push('Lote '+esc(clienteLoteVerificado));
+    html += '<div class="panel panel-flat mivivienda-card">'+
+      '<div class="mivivienda-top">'+
+        '<span class="mivivienda-label">MI VIVIENDA</span>'+
+        '<span class="cuota-chip cuota-chip-ok">Cliente verificado</span>'+
       '</div>'+
-      '<button type="button" class="btn btn-secondary btn-sm" data-action="nav" data-value="cuotas">Ver mis cuotas</button>'+
+      '<div class="mivivienda-proyecto">'+esc(hProyNombre)+'</div>'+
+      (hSubParts.length ? '<div class="mivivienda-sub">'+hSubParts.join(' · ')+'</div>' : '')+
+      '<div style="font-size:0.76rem;color:var(--ink-faint);margin-top:6px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
+      '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px;" data-action="nav" data-value="micasa">Ver mi vivienda →</button>'+
+    '</div>';
+    html += '<div class="quick-access-grid">'+
+      '<button type="button" class="quick-access-tile" data-action="nav" data-value="cuotas"><span class="qa-icon">💰</span><strong>Mis cuotas</strong><span>Consulta tus pagos</span></button>'+
+      '<button type="button" class="quick-access-tile" data-action="nav" data-value="publicar"><span class="qa-icon">🛠️</span><strong>Publicar servicio</strong><span>Ofrece algo a tus vecinos</span></button>'+
     '</div>';
   }
 
@@ -1232,8 +1269,13 @@ function renderMios(){
   '</div>';
 
   if (!mine.length){
-    html += '<div class="empty-state"><div class="icon">'+iconSvg('toolbox',40)+'</div><h3>Todavía no publicaste nada</h3><p>Ofrece tu primer servicio a la comunidad.</p>'+
-      '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="publicar">Publicar servicio</button></div>';
+    html += '<div class="panel panel-flat">'+
+      '<div class="benefit-row" style="padding-top:0;">'+
+        '<span class="benefit-icon">🏪</span>'+
+        '<div><strong>Tu negocio en Vive Hogar</strong><span class="benefit-sub">Publica tus servicios y llega a más vecinos.</span></div>'+
+      '</div>'+
+      '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px;" data-action="nav" data-value="publicar">Publicar mi servicio +</button>'+
+    '</div>';
     return html;
   }
 
@@ -1262,14 +1304,15 @@ function renderMiCasa(){
   var proyNombre = (localPref && String(localPref.proyectoId) === '1') ? 'Vive Hogar Castilla' : 'Vive Hogar Sullana';
   var esSullana = !(localPref && String(localPref.proyectoId) === '1');
   var etapaNum = (localPref && localPref.etapa) ? String(localPref.etapa) : '';
-  html += '<div class="panel">'+
-    '<h4 style="margin-bottom:10px;">Tu vivienda</h4>'+
-    '<ul style="margin:0 0 4px;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.9;">'+
-      '<li>Proyecto: <strong>'+esc(proyNombre)+'</strong></li>'+
-      (etapaNum ? '<li>Etapa: <strong>'+esc(etapaNum)+'</strong></li>' : '')+
-      (clienteBloqueVerificado ? '<li>Manzana: <strong>'+esc(clienteBloqueVerificado)+'</strong></li>' : '')+
-      (clienteLoteVerificado ? '<li>Lote: <strong>'+esc(clienteLoteVerificado)+'</strong></li>' : '')+
-    '</ul>'+
+  html += '<div class="panel panel-flat">'+
+    '<div class="benefit-row" style="padding-top:0;">'+
+      '<span class="benefit-icon">🏠</span>'+
+      '<div><strong>Mi vivienda</strong><span class="benefit-sub">'+esc(proyNombre)+'</span></div>'+
+    '</div>'+
+    '<div class="mivivienda-rows">'+
+      (etapaNum ? '<div class="mivivienda-row"><span>Etapa</span><strong>'+esc(etapaNum)+'</strong></div>' : '')+
+      '<div class="mivivienda-row"><span>Manzana y lote</span><strong>'+(clienteBloqueVerificado || clienteLoteVerificado ? esc((clienteBloqueVerificado||'')+(clienteLoteVerificado?' · Lote '+clienteLoteVerificado:'')) : 'Pendiente de registro')+'</strong></div>'+
+    '</div>'+
   '</div>';
 
   if (esSullana && etapaNum === '5'){
@@ -1277,7 +1320,11 @@ function renderMiCasa(){
   } else if (!esSullana && etapaNum === '11'){
     html += '<div class="panel"><h4 style="margin-bottom:10px;">Mapa de tu manzana</h4>'+renderMapaCastilla11Html()+'</div>';
   } else {
-    html += '<div class="panel"><p style="color:var(--ink-faint);font-size:0.9rem;">El mapa detallado lote por lote de tu etapa todavía está en preparación. Muy pronto vas a poder ver aquí tu casa marcada en el plano real.</p></div>';
+    html += '<div class="panel panel-flat"><div class="construction-box">'+
+      '<span class="construction-box-icon">🚧</span>'+
+      '<div><strong>Mapa personalizado en preparación</strong>'+
+      '<p>Próximamente vas a poder visualizar tu vivienda resaltada en el plano real de tu etapa.</p></div>'+
+    '</div></div>';
   }
 
   if (clienteGestoraNombre && clienteGestoraTelefono){
@@ -1372,29 +1419,38 @@ function renderClienteVerificacion(){
   var e = ui.clienteErrors || {};
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<h2 style="margin-top:12px;">Verifica que eres cliente</h2>';
-  html += '<p style="color:var(--ink-soft);margin-top:6px;max-width:56ch;">Ingresa tus datos tal como figuran en tu contrato, para confirmar que tienes una vivienda en Vive Hogar.</p>';
+  html += '<h2 style="margin-top:12px;">Bienvenido a tu espacio Vive Hogar</h2>';
+  html += '<p style="color:var(--ink-soft);margin-top:6px;max-width:56ch;">Accede a la información de tu vivienda, consulta tus cuotas y mantente al día con tu proyecto.</p>';
 
-  html += '<div class="panel"><h4>¿Para qué sirve verificarte?</h4>'+
-    '<ul style="margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.8;">'+
-      '<li>Revisa tus cuotas, tu próximo pago y tu historial completo.</li>'+
-      '<li>Publica y responde en el marketplace de servicios de tu proyecto.</li>'+
-      '<li>Accede a información exclusiva para clientes con vivienda en Vive Hogar.</li>'+
-    '</ul></div>';
+  html += '<div class="panel panel-flat">'+
+    '<div class="benefit-row">'+
+      '<span class="benefit-icon">🏠</span>'+
+      '<div><strong>Mi vivienda</strong><span class="benefit-sub">Consulta los datos de tu casa y etapa.</span></div>'+
+    '</div>'+
+    '<div class="benefit-row">'+
+      '<span class="benefit-icon">💰</span>'+
+      '<div><strong>Mis cuotas</strong><span class="benefit-sub">Revisa tus pagos y próximos vencimientos.</span></div>'+
+    '</div>'+
+    '<div class="benefit-row">'+
+      '<span class="benefit-icon">🤝</span>'+
+      '<div><strong>Comunidad Vive Hogar</strong><span class="benefit-sub">Conecta con tus vecinos y servicios.</span></div>'+
+    '</div>'+
+  '</div>';
 
-  html += '<div class="panel"><h4>Tus datos</h4>'+
+  html += '<div class="panel panel-flat"><h4>Tus datos</h4>'+
     '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:14px;">Usa el mismo nombre y DNI con el que firmaste tu contrato — así los encontramos en nuestros registros.</p>'+
     '<form data-form="cliente-verificar">'+
-      '<div class="form-field"><label>Nombre completo</label><input class="text-input" type="text" name="nombre" required minlength="4" placeholder="Como aparece en tu DNI" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
-      '<div class="form-field"><label>DNI</label><input class="text-input" type="text" name="dni" required inputmode="numeric" placeholder="12345678" />'+(e.dni?'<span class="err">'+esc(e.dni)+'</span>':'')+'</div>'+
+      '<div class="form-field"><label>Nombre y apellidos según contrato</label><input class="text-input" type="text" name="nombre" required minlength="4" placeholder="Como aparece en tu DNI" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
+      '<div class="form-field"><label>DNI (8 dígitos)</label><input class="text-input" type="text" name="dni" required inputmode="numeric" placeholder="12345678" />'+(e.dni?'<span class="err">'+esc(e.dni)+'</span>':'')+'</div>'+
       (e.general ? '<div class="form-err-general">'+esc(e.general)+'</div>' : '')+
-      '<button type="submit" class="btn btn-primary btn-block" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Verificando…':'Verificar')+'</button>'+
+      '<button type="submit" class="btn btn-primary btn-block" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Buscando…':'Buscar mi vivienda')+'</button>'+
+      '<p style="font-size:0.72rem;color:var(--ink-faint);text-align:center;margin-top:10px;">Tus datos se utilizarán para validar tu titularidad y proteger tu información.</p>'+
     '</form>'+
   '</div>';
 
-  html += '<div class="panel"><h4>¿No encuentras tus datos?</h4>'+
+  html += '<div class="panel panel-flat"><h4>¿No encuentras tus datos?</h4>'+
     '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Escríbenos por WhatsApp y te ayudamos a revisar tu contrato.</p>'+
-    '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no puedo verificar mis datos de cliente en la app')+'" target="_blank" rel="noopener">💬 Escríbenos por WhatsApp</a>'+
+    '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no puedo verificar mis datos de cliente en la app')+'" target="_blank" rel="noopener">💬 ¿Necesitas ayuda? Contáctanos</a>'+
   '</div>';
 
   html += '</div>';
@@ -1507,7 +1563,13 @@ function renderCuotas(){
   }
   var rows = ui.cuotasData || [];
   if (!rows.length){
-    html += '<div class="panel"><p style="color:var(--ink-soft);">No encontramos cuotas registradas para tu cuenta.</p></div>';
+    html += '<div class="panel panel-flat" style="text-align:center;padding:28px 20px;">'+
+      '<div style="width:52px;height:52px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 14px;">💰</div>'+
+      '<h3 style="margin-bottom:6px;">Tu información de pagos</h3>'+
+      '<p style="color:var(--ink-soft);font-size:0.9rem;">Todavía no hay cuotas vinculadas a tu perfil.</p>'+
+      '<p style="color:var(--ink-faint);font-size:0.82rem;margin-top:4px;">Si ya realizaste pagos, podemos ayudarte a asociar tu historial.</p>'+
+      '<a class="btn btn-primary btn-block" style="margin-top:14px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no veo mis cuotas registradas en la app y ya hice pagos. ¿Me ayudan a asociar mi historial?')+'" target="_blank" rel="noopener">Solicitar ayuda</a>'+
+    '</div>';
     return html;
   }
 
