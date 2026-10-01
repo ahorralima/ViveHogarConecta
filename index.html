@@ -411,7 +411,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-hotspot.lote-ok{background:rgba(46,160,90,0.32);}
 .lote-hotspot.lote-neutral{background:rgba(120,120,120,0.28);}
 .lote-hotspot.lote-warn{background:rgba(248,177,50,0.38);}
-.lote-hotspot.active{background:rgba(57,127,72,0.5);border:3px solid var(--teal);z-index:3;animation:loteSelectPulse 0.45s ease-out;}
+.lote-hotspot.active{background:rgba(57,126,173,0.55);border:3px solid var(--paprika);z-index:3;animation:loteSelectPulse 0.45s ease-out;}
 @keyframes loteSelectPulse{0%{transform:scale(0.8);}60%{transform:scale(1.1);}100%{transform:scale(1);}}
 .lote-hotspot-mine{outline:3px solid #F8B132;outline-offset:1px;box-shadow:0 0 0 2px #fff,0 0 10px 2px rgba(248,177,50,0.9);z-index:3;}
 .lote-hotspot-mine-label{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:#F8B132;color:#222;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);}
@@ -424,7 +424,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-detail-tile{background:var(--surface-2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;}
 .lote-detail-tile span{font-size:0.72rem;color:var(--ink-faint);}
 .lote-detail-tile strong{font-size:0.95rem;color:var(--ink);}
-.lote-hint-banner{background:var(--paprika);color:#fff;font-weight:700;font-size:0.82rem;border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:center;}
+.etapa5-header-sub{font-size:0.86rem;color:var(--ink-soft);margin-bottom:10px;}
+.lote-hint-small{font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-hotspot.lote-recreacion{background:repeating-linear-gradient(135deg,rgba(63,168,99,0.75),rgba(63,168,99,0.75) 8px,rgba(82,184,117,0.75) 8px,rgba(82,184,117,0.75) 16px);border:2px solid rgba(35,110,65,0.85);border-radius:6px;cursor:default;pointer-events:none;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35);}
 .lote-recreacion-icon{font-size:1.3rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));}
 .mapa-zoom-outer{position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--border);touch-action:none;background:#e9e9e9;}
@@ -438,6 +439,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-dot-ok{background:rgba(46,160,90,0.6);}
 .lote-dot-neutral{background:rgba(120,120,120,0.55);}
 .lote-dot-warn{background:rgba(248,177,50,0.7);}
+.lote-dot-sel{background:var(--paprika);}
 .cuotas-calc{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:14px;scroll-margin-top:16px;}
 .cuotas-calc-title{font-weight:800;font-size:0.95rem;color:var(--ink);margin-bottom:12px;}
 .cuotas-calc-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin-bottom:14px;}
@@ -510,6 +512,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .esencial-sub{display:block;font-size:0.8rem;color:var(--ink-faint);}
 .esencial-item strong{color:var(--ink);font-weight:800;}
 .map-hint-banner{display:flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:0.84rem;border-radius:10px;padding:10px 14px;margin-bottom:12px;}
+.ubicacion-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);color:var(--ink-soft);font-weight:700;font-size:0.8rem;border-radius:999px;padding:5px 12px;margin-bottom:12px;}
 @keyframes mapaHotspotPulse{0%{box-shadow:0 0 0 0 rgba(57,126,173,0.45);}70%{box-shadow:0 0 0 10px rgba(57,126,173,0);}100%{box-shadow:0 0 0 0 rgba(57,126,173,0);}}
 .mapa-vhs-hotspot:not(.active){animation:mapaHotspotPulse 2.6s ease-out infinite;}
 .cta-secondary-pill{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;background:var(--surface-2);color:var(--paprika);font-weight:800;font-size:0.88rem;border-radius:10px;padding:12px 16px;text-decoration:none;}
@@ -1761,12 +1764,15 @@ function renderInteresadoBienvenida(){
 
 function renderMapaEtapa5Html(){
   var html = '<div class="mapa-vhs-detail">';
-  html += '<h4 style="margin-bottom:6px;">Etapa 5 — elige tu casa</h4>';
-  html += '<div class="lote-hint-banner">👉 Dale clic a un lote y conoce sus características y disponibilidad</div>';
+  var etapa5Disponibles = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE'; }).length;
+  html += '<h4 style="margin-bottom:2px;">Etapa 5</h4>';
+  html += '<div class="etapa5-header-sub">Elige tu casa · '+etapa5Disponibles+' lotes disponibles</div>';
+  html += '<p class="lote-hint-small">👆 Toca un lote para ver sus características</p>';
   html += '<div class="lote-legend">'+
     '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
     '<span><i class="lote-dot lote-dot-neutral"></i> Vendido</span>'+
     '<span><i class="lote-dot lote-dot-warn"></i> Separado / bloqueado</span>'+
+    '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
   '</div>';
   html += '<div class="mapa-zoom-outer" id="etapa5-zoom">'+
     '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
@@ -1956,7 +1962,7 @@ function renderInteresadoMapa(){
 
   if (proy === 'sullana'){
     html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
-      '<div class="map-hint-banner">👆 Toca una zona para consultar precios y disponibilidad</div>'+
+      '<div class="map-hint-banner">👆 Selecciona una etapa para explorar los lotes disponibles</div>'+
       '<div class="mapa-vhs-wrap">'+
         '<img class="mapa-vhs-img" src="'+MAPA_VHS_DATAURI+'" alt="Plano de Vive Hogar Sullana" />'+
         ETAPAS_SULLANA_MAPA.map(function(e){
@@ -1987,7 +1993,8 @@ function renderInteresadoMapa(){
 
     html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View. Ubicado en '+esc(PROYECTOS[1].ciudad)+'.</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View.</p>'+
+      '<p class="ubicacion-tag">📍 '+esc(PROYECTOS[1].ciudad === 'Piura' ? 'Piura' : PROYECTOS[1].ciudad+', Piura')+'</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
@@ -1995,14 +2002,15 @@ function renderInteresadoMapa(){
     '</div>';
   } else {
     html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
-      '<div class="map-hint-banner">👆 Toca una manzana para consultar precios y disponibilidad</div>'+
+      '<div class="map-hint-banner">👆 Selecciona una manzana para explorar los lotes disponibles</div>'+
       '<p style="font-size:0.78rem;color:var(--paprika);margin-bottom:12px;">Piloto: por ahora solo tenemos el detalle de la <strong>Etapa 11</strong>. Las demás etapas de Castilla, muy pronto.</p>';
     html += renderMapaCastilla11Html();
     html += '</div>';
 
     html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:12px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View. Ubicado en '+esc(PROYECTOS[0].ciudad)+'.</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View.</p>'+
+      '<p class="ubicacion-tag">📍 '+esc(PROYECTOS[0].ciudad === 'Piura' ? 'Piura' : PROYECTOS[0].ciudad+', Piura')+'</p>'+
       '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[0].lat+','+PROYECTOS[0].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
@@ -2019,7 +2027,6 @@ function renderInteresadoMapa(){
   } else if (ui.interesadoManzanaSel){
     asesorMsg += ' (Manzana '+ui.interesadoManzanaSel+')';
   }
-  html += '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
   html += '</div>';
   html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
