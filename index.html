@@ -442,11 +442,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .streetview-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
 
 .interesado-elegir-header{display:flex;align-items:center;gap:14px;margin:6px 0 0;}
-.interesado-elegir-header img{width:130px;height:auto;}
+.interesado-elegir-header img{width:72px;height:auto;flex:none;}
 .interesado-elegir-logo-text{font-weight:800;font-size:2.1rem;}
 .interesado-elegir-logo-text .n1{color:var(--paprika);}
 .interesado-elegir-logo-text .n2{color:var(--teal);}
-.interesado-elegir-title{font-size:2.3rem;font-weight:800;color:var(--paprika);line-height:1.15;margin:8px 0 6px;}
+.interesado-elegir-title{font-size:1.55rem;font-weight:800;color:var(--paprika);line-height:1.2;margin:0;}
 .interesado-elegir-sub{color:var(--ink-soft);font-size:1.15rem;margin:0 0 14px;}
 .proyecto-pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;}
 .proyecto-pick-card{background:none;border:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:0;overflow:visible;transition:transform 0.15s;width:100%;}
@@ -1573,8 +1573,10 @@ var SEPARACION_LOTE = 500;
 function renderInteresadoElegir(){
   var html = '<div class="interesado-screen">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<div class="interesado-elegir-header"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" /></div>';
-  html += '<h2 class="interesado-elegir-title">¡Qué bueno que estés interesado!</h2>';
+  html += '<div class="interesado-elegir-header">'+
+    '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
+    '<h2 class="interesado-elegir-title">¡Qué bueno que estés interesado!</h2>'+
+  '</div>';
   html += '<p class="interesado-elegir-sub">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
@@ -1758,8 +1760,11 @@ function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
   var html = '<div class="interesado-screen">';
-  html += '<button type="button" class="back-btn" data-action="interesado-volver-bienvenida">← Volver</button>';
-  html += '<h2 style="margin-top:12px;">Mapa de '+esc(nombreProy)+'</h2>';
+  html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Elegir otro proyecto</button>';
+  html += '<div class="interesado-elegir-header" style="margin-top:12px;">'+
+    '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
+    '<h2 class="interesado-elegir-title">¡Bienvenido a '+esc(nombreProy)+'!</h2>'+
+  '</div>';
 
   html += '<div class="panel"><h4>Lo esencial</h4>'+
     '<ul style="margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:0.92rem;line-height:1.7;">'+
@@ -1836,6 +1841,7 @@ function renderInteresadoMapa(){
 
   html += '<a class="btn btn-primary btn-block" style="margin-top:8px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy+(ui.interesadoEtapaSel?' (Etapa '+ui.interesadoEtapaSel+')':'')+(ui.interesadoManzanaSel?' (Manzana '+ui.interesadoManzanaSel+')':''))+'" target="_blank" rel="noopener">💬 Quiero que me contacten</a>';
   html += '</div>';
+  html += '<a class="fab" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, quiero información sobre '+nombreProy)+'" target="_blank" rel="noopener" aria-label="Contactar asesor" title="Contacta a un asesor de ventas">💬</a>';
   return html;
 }
 
@@ -2114,7 +2120,7 @@ document.addEventListener('click', async function(ev){
     ui.interesadoStep = 'cargando';
     window.scrollTo(0,0);
     render();
-    setTimeout(function(){ ui.interesadoStep = 'bienvenida'; window.scrollTo(0,0); render(); }, 1700);
+    setTimeout(function(){ ui.interesadoStep = 'mapa'; window.scrollTo(0,0); render(); }, 1700);
   } else if (action === 'interesado-cambiar-proyecto'){
     ui.interesadoStep = 'elegir';
     window.scrollTo(0,0);
