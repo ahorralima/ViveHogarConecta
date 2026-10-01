@@ -498,6 +498,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .quick-access-tile strong{font-size:0.9rem;color:var(--ink);}
 .quick-access-tile span:not(.qa-icon){font-size:0.76rem;color:var(--ink-faint);}
 .qa-icon{font-size:1.4rem;margin-bottom:2px;}
+.quick-access-label{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-faint);font-weight:700;margin:4px 0 8px;}
+.results-count{font-size:0.82rem;color:var(--ink-faint);margin-bottom:10px;}
+.auth-switch-line{text-align:center;font-size:0.85rem;color:var(--ink-soft);margin-top:16px;}
 .mivivienda-rows{margin-top:4px;}
 .mivivienda-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:0.88rem;}
 .mivivienda-row span{color:var(--ink-faint);}
@@ -980,7 +983,7 @@ function renderTabbar(){
     {id:'home', icon:'home', label:'Inicio'},
     {id:'micasa', icon:'plan', label:'Ver mi casa'},
     {id:'mios', icon:'folder', label:'Mis servicios'},
-    {id:'perfil', icon:'user', label:'Perfil'}
+    {id:'perfil', icon:'user', label:'Mi cuenta'}
   ];
   return '<nav class="tabbar">'+tabs.map(function(t){
     return '<button type="button" class="tab-btn'+(ui.view===t.id?' active':'')+'" data-action="nav" data-value="'+t.id+'">'+
@@ -1020,13 +1023,6 @@ function renderHome(){
     html += etapaPromptHtml();
   }
 
-  if (!identity && !ui.showEtapaPrompt){
-    html += '<div class="onboard-banner">'+
-      '<div class="txt"><strong>Todo lo que necesitas, cerca de casa.</strong> Encuentra profesionales y emprendimientos de tu comunidad.</div>'+
-      '<button type="button" class="btn btn-teal btn-sm" data-action="nav" data-value="perfil">Empezar</button>'+
-    '</div>';
-  }
-
   if (clienteNombreVerificado && clienteDniVerificado){
     var hProyNombre = (localPref && String(localPref.proyectoId) === '1') ? 'Vive Hogar Castilla' : 'Vive Hogar Sullana';
     var hSubParts = [];
@@ -1043,10 +1039,18 @@ function renderHome(){
       '<div style="font-size:0.76rem;color:var(--ink-faint);margin-top:6px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
       '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px;" data-action="nav" data-value="micasa">Ver mi vivienda →</button>'+
     '</div>';
+    html += '<div class="quick-access-label">Accesos rápidos</div>';
     html += '<div class="quick-access-grid">'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="cuotas"><span class="qa-icon">💰</span><strong>Mis cuotas</strong><span>Consulta tus pagos</span></button>'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="publicar"><span class="qa-icon">🛠️</span><strong>Publicar servicio</strong><span>Ofrece algo a tus vecinos</span></button>'+
     '</div>';
+  }
+
+  if (!ui.showEtapaPrompt){
+    html += '<div class="section-heading" style="margin-top:4px;"><h2>Servicios de tu comunidad</h2></div>';
+    if (!identity){
+      html += '<p style="font-size:0.84rem;color:var(--ink-soft);margin:-6px 0 12px;">Encuentra profesionales y emprendimientos de tu comunidad. <button type="button" class="btn-link-inline" data-action="nav" data-value="perfil">Publica el tuyo →</button></p>';
+    }
   }
 
   if (!ui.showEtapaPrompt && (ui.fProyecto !== 'all' || ui.fEtapa)){
@@ -1090,7 +1094,7 @@ function renderHome(){
     '</div>';
   }
 
-  html += '<div class="section-heading"><h2>Servicios</h2><span class="count">'+list.length+' resultado'+(list.length===1?'':'s')+'</span></div>';
+  html += '<div class="results-count">'+list.length+' resultado'+(list.length===1?'':'s')+'</div>';
 
   if (!list.length){
     html += '<div class="empty-state"><div class="icon">'+svgSearch(40)+'</div><h3>No encontramos servicios</h3><p>Prueba con otra categoría o palabra de búsqueda.</p></div>';
@@ -1182,22 +1186,19 @@ function authForm(){
   var e = ui.authErrors || {};
   var busyAttr = ui.authBusy ? ' disabled' : '';
   var html = '<div class="identity-card">';
-  html += '<div class="proyecto-switch" style="margin-bottom:16px;">'+
-      '<button type="button" data-action="set-authmode" data-value="registro" class="'+(mode==='registro'?'active':'')+'">Crear cuenta</button>'+
-      '<button type="button" data-action="set-authmode" data-value="login" class="'+(mode==='login'?'active':'')+'">Iniciar sesión</button>'+
-    '</div>';
 
   if (mode === 'login'){
-    html += '<h3 style="margin-bottom:4px;">Inicia sesión</h3>'+
-      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Usa el WhatsApp y la contraseña con la que creaste tu cuenta.</p>'+
+    html += '<h3 style="margin-bottom:4px;">Iniciar sesión</h3>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Accede a tu cuenta de Vive Hogar Conecta.</p>'+
       '<form data-form="login">'+
         '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" placeholder="987654321" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
         '<div class="form-field"><label>Contraseña</label><input class="text-input" type="password" name="password" placeholder="Tu contraseña" />'+(e.password?'<span class="err">'+esc(e.password)+'</span>':'')+'</div>'+
         '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Entrando…':'Iniciar sesión')+'</button>'+
-      '</form>';
+      '</form>'+
+      '<p class="auth-switch-line">¿Aún no tienes una cuenta? <button type="button" class="btn-link-inline" data-action="set-authmode" data-value="registro">Crear una cuenta</button></p>';
   } else {
     html += '<h3 style="margin-bottom:4px;">Crea tu cuenta</h3>'+
-      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Con nombre, apellido y contraseña, para que otros vecinos sepan quién ofrece o reseña cada servicio, y solo tú puedas editar lo tuyo.</p>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Únete a Vive Hogar Conecta y conecta con tu comunidad.</p>'+
       '<form data-form="registro">'+
         '<div class="form-row"><div class="form-field"><label>Nombre</label><input class="text-input" type="text" name="nombre" placeholder="María" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
         '<div class="form-field"><label>Apellido</label><input class="text-input" type="text" name="apellido" placeholder="López" />'+(e.apellido?'<span class="err">'+esc(e.apellido)+'</span>':'')+'</div></div>'+
@@ -1210,7 +1211,8 @@ function authForm(){
         '<div class="form-row"><div class="form-field"><label>Contraseña</label><input class="text-input" type="password" name="password" placeholder="Mínimo 6 caracteres" />'+(e.password?'<span class="err">'+esc(e.password)+'</span>':'')+'</div>'+
         '<div class="form-field"><label>Confirmar contraseña</label><input class="text-input" type="password" name="password2" placeholder="Repite tu contraseña" />'+(e.password2?'<span class="err">'+esc(e.password2)+'</span>':'')+'</div></div>'+
         '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Creando cuenta…':'Crear cuenta')+'</button>'+
-      '</form>';
+      '</form>'+
+      '<p class="auth-switch-line">¿Ya tienes una cuenta? <button type="button" class="btn-link-inline" data-action="set-authmode" data-value="login">Iniciar sesión</button></p>';
   }
   html += '<p style="font-size:0.72rem;color:var(--ink-faint);margin-top:14px;display:flex;align-items:flex-start;gap:6px;"><span style="margin-top:1px;">'+iconSvg('lock',14)+'</span><span>Tu cuenta y contraseña quedan protegidas por Supabase, la misma base de datos que usa Ahorra Lima — no un candado casero.</span></p>';
   html += '</div>';
@@ -1244,7 +1246,7 @@ function renderPublicar(){
   '</div>';
   html += '<div class="form-field"><label>Proyecto</label><select name="proyectoId">'+
     PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+((editing?editing.proyectoId:identity.proyectoId)===p.id?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
-  '</select><span class="hint">Se publicará como '+esc(fullName(identity))+' · Etapa '+esc(identity.etapa)+' · WhatsApp '+esc(identity.telefono)+' — cambia estos datos desde Perfil si hace falta.</span></div>';
+  '</select><span class="hint">Se publicará como '+esc(fullName(identity))+' · Etapa '+esc(identity.etapa)+' · WhatsApp '+esc(identity.telefono)+' — cambia estos datos desde Mi cuenta si hace falta.</span></div>';
   html += '<button type="submit" class="btn btn-primary btn-block">'+(editing?'Guardar cambios':'Publicar servicio')+'</button>';
   if (editing) html += '<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px;" data-action="nav" data-value="mios">Cancelar</button>';
   html += '</form>';
@@ -1257,8 +1259,8 @@ function renderMios(){
     (identity ? '<button type="button" class="btn btn-primary btn-sm" data-action="nav" data-value="publicar">+ Publicar servicio</button>' : '')+
   '</div>';
   if (!identity){
-    html += '<div class="empty-state"><div class="icon">'+iconSvg('folder',40)+'</div><h3>Aún no tienes cuenta</h3><p>Crea tu cuenta en Perfil para empezar a publicar.</p>'+
-      '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="perfil">Ir a Perfil</button></div>';
+    html += '<div class="empty-state"><div class="icon">'+iconSvg('folder',40)+'</div><h3>Aún no tienes cuenta</h3><p>Crea tu cuenta en Mi cuenta para empezar a publicar.</p>'+
+      '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="nav" data-value="perfil">Ir a Mi cuenta</button></div>';
     return html;
   }
   var mine = STATE.servicios.filter(function(s){ return s.autorId === identity.id; });
@@ -1342,7 +1344,7 @@ function renderMiCasa(){
 }
 
 function renderPerfil(){
-  var html = '<h2 style="margin-bottom:14px;">Perfil</h2>';
+  var html = '<h2 style="margin-bottom:14px;">Mi cuenta</h2>';
   html += '<p style="margin-bottom:18px;"><button type="button" class="btn-link-danger" style="color:var(--paprika);" data-action="gate-reset">← Volver a "Soy cliente / Estoy interesado"</button></p>';
   if (!identity){
     return html + authForm();
