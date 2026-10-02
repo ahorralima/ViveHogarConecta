@@ -4,4 +4,4 @@ Marketplace comunitario para que los residentes de Vive Hogar Castilla y Sullana
 
 Sitio en vivo: https://ahorralima.github.io/ViveHogarConecta/
 
-Proyecto piloto de Ingenium. Frontend estático (sin build) + [Supabase](https://supabase.com) para cuentas, servicios y reseñas.
+Proyecto de la marca Vive Hogar. Frontend estático (sin build) + [Supabase](https://supabase.com) para cuentas, servicios y reseñas.
