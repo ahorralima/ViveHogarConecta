@@ -574,6 +574,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .auth-switch-line{text-align:center;font-size:0.85rem;color:var(--ink-soft);margin-top:16px;}
 .asesora-panel{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
 .asesora-link{background:none;border:none;color:var(--ink-faint);font-size:0.8rem;text-decoration:underline;padding:0;cursor:pointer;}
+.sep-info{font-size:0.85rem;margin-bottom:10px;line-height:1.5;}
+.sep-ok{color:var(--teal);font-size:0.82rem;font-weight:700;margin-top:8px;}
 .asesora-title{font-size:0.7rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
 .asesora-form{background:var(--surface-2);border-radius:12px;padding:14px;}
 .asesora-form label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink-soft);margin-bottom:4px;}
@@ -956,6 +958,11 @@ var ui = {
   asesoraError: '',
   asesoraBusy: false,
   asesorasLista: null,
+  sepFormLote: null,
+  sepNombre: '',
+  sepDni: '',
+  sepInfo: {},
+  sepMsg: '',
   interesadoStep: 'elegir',
   cuotasBusy: false,
   cuotasError: '',
@@ -2198,12 +2205,34 @@ function renderMapaEtapa5Html(){
       if (lote.d){
         html += '<p style="font-size:0.78rem;color:var(--ink-faint);padding:0 16px 14px;">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
       }
-      if (asesoraPin && asesoraIdActual && (lote.e === 'DISPONIBLE' || lote.e === 'EN_ATENCION')){
+      if (asesoraPin && asesoraIdActual && ['DISPONIBLE','EN_ATENCION','SEPARADO','VENDIDO'].indexOf(lote.e) !== -1){
+        var busy = ui.asesoraBusy ? ' disabled' : '';
+        var info = ui.sepInfo[lote.id];
         html += '<div class="lote-detail-section">'+
-          '<div class="lote-detail-section-title">👩‍💼 Modo asesora — '+esc(asesoraNombreActual||'')+'</div>'+
-          (lote.e === 'DISPONIBLE'
-            ? '<button type="button" class="btn btn-primary btn-block" data-action="asesora-marcar" data-value="'+lote.id+'"'+(ui.asesoraBusy?' disabled':'')+'>📍 Marcar en atención</button>'
-            : '<button type="button" class="btn btn-secondary btn-block" data-action="asesora-liberar" data-value="'+lote.id+'"'+(ui.asesoraBusy?' disabled':'')+'>✅ Liberar lote</button>')+
+          '<div class="lote-detail-section-title">👩‍💼 Modo asesora — '+esc(asesoraNombreActual||'')+'</div>';
+        if ((lote.e === 'SEPARADO' || lote.e === 'VENDIDO') && info && info.hay){
+          html += '<p class="sep-info">Cliente: <strong>'+esc(info.cliente)+'</strong><br>Separó: '+esc(info.asesora)+' · '+esc(new Date(info.desde).toLocaleDateString('es-PE'))+'</p>';
+        }
+        if (String(ui.sepFormLote) === String(lote.id) && (lote.e === 'DISPONIBLE' || lote.e === 'EN_ATENCION')){
+          html += '<div class="asesora-form">'+
+            '<label>Nombre y apellidos del cliente</label>'+
+            '<input class="text-input" type="text" id="sep-nombre" autocomplete="off" placeholder="Como figura en su DNI" value="'+esc(ui.sepNombre)+'" />'+
+            '<label style="margin-top:8px;">DNI del cliente</label>'+
+            '<input class="text-input" type="text" id="sep-dni" inputmode="numeric" autocomplete="off" placeholder="12345678" value="'+esc(ui.sepDni)+'" />'+
+            '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="sep-confirmar" data-value="'+lote.id+'"'+busy+'>'+(ui.asesoraBusy?'Guardando…':'Confirmar separación')+'</button>'+
+            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-cancelar"'+busy+'>Cancelar</button>'+
+          '</div>';
+        } else if (lote.e === 'DISPONIBLE'){
+          html += '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar lote</button>'+
+            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesora-marcar" data-value="'+lote.id+'"'+busy+'>📍 Solo marcar en atención</button>';
+        } else if (lote.e === 'EN_ATENCION'){
+          html += '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar lote</button>'+
+            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesora-liberar" data-value="'+lote.id+'"'+busy+'>✅ Liberar lote</button>';
+        } else if (lote.e === 'SEPARADO'){
+          html += '<button type="button" class="btn btn-primary btn-block" data-action="sep-comprado" data-value="'+lote.id+'"'+busy+'>✅ Lote comprado</button>'+
+            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-liberar" data-value="'+lote.id+'"'+busy+'>↩️ Liberar (no se vendió)</button>';
+        }
+        html += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
           (ui.asesoraError ? '<p style="color:var(--danger);font-size:0.78rem;margin-top:6px;">'+esc(ui.asesoraError)+'</p>' : '')+
         '</div>';
       }
@@ -2861,6 +2890,11 @@ document.addEventListener('click', async function(ev){
     var loteVal = t.getAttribute('data-value');
     ui.interesadoLoteSel = (ui.interesadoLoteSel === loteVal) ? null : loteVal;
     ui.etapa5AreaSel = null;
+    ui.sepFormLote = null; ui.asesoraError = ''; ui.sepMsg = '';
+    if (ui.interesadoLoteSel && asesoraPin && asesoraIdActual){
+      var lSel = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m+'|'+l.l === loteVal; })[0];
+      if (lSel && (lSel.e === 'SEPARADO' || lSel.e === 'VENDIDO') && !ui.sepInfo[lSel.id]) cargarSepInfo(lSel.id).then(function(){ render(); });
+    }
     if (ui.interesadoLoteSel && ui.etapa5Full && ui.etapa5Zoom){
       var pp = loteVal.split('|');
       var lt = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === pp[0] && String(l.l) === pp[1]; })[0];
@@ -2902,10 +2936,10 @@ document.addEventListener('click', async function(ev){
       render();
     } else {
       ui.asesoraBusy = true; ui.asesoraError = ''; render();
-      var resPin = await sb.rpc('ec_lote_liberar', { p_lote_id: -1, p_pin: pinVal });
+      var resPin = await sb.rpc('ec_asesora_validar', { p_asesora_id: nombreSelect.value, p_pin: pinVal });
       ui.asesoraBusy = false;
-      if (resPin.error){
-        ui.asesoraError = 'Código incorrecto.';
+      if (resPin.error || !resPin.data || !resPin.data.ok){
+        ui.asesoraError = (resPin.data && resPin.data.error === 'bloqueada') ? 'Demasiados intentos fallidos. Espera 10 minutos e intenta de nuevo.' : 'Código incorrecto.';
         render();
       } else {
         var selId = nombreSelect.value;
@@ -2929,17 +2963,39 @@ document.addEventListener('click', async function(ev){
     render();
   } else if (action === 'asesora-marcar' || action === 'asesora-liberar'){
     var loteId = t.getAttribute('data-value');
-    ui.asesoraBusy = true; ui.asesoraError = ''; render();
-    var resAccion = action === 'asesora-marcar'
-      ? await sb.rpc('ec_lote_marcar_atencion', { p_lote_id: loteId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin })
-      : await sb.rpc('ec_lote_liberar', { p_lote_id: loteId, p_pin: asesoraPin });
-    ui.asesoraBusy = false;
-    if (resAccion.error || !resAccion.data){
-      ui.asesoraError = resAccion.error ? 'Código incorrecto o sesión vencida.' : 'Ese lote ya no estaba disponible para esta acción — alguien se te adelantó.';
-      render();
-    } else {
-      var loteLocal = ETAPA5_LOTES_PLANO.filter(function(l){ return String(l.id) === String(loteId); })[0];
-      if (loteLocal) loteLocal.e = action === 'asesora-marcar' ? 'EN_ATENCION' : 'DISPONIBLE';
+    var marcar = action === 'asesora-marcar';
+    var rAt = await asesoraLlamar('ec_lote_atencion', { p_lote_id: loteId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin, p_marcar: marcar });
+    if (rAt.ok) asesoraCambioLocal(loteId, marcar ? 'EN_ATENCION' : 'DISPONIBLE', '');
+    render();
+  } else if (action === 'sep-abrir'){
+    ui.sepFormLote = t.getAttribute('data-value'); ui.sepNombre = ''; ui.sepDni = ''; ui.asesoraError = ''; ui.sepMsg = '';
+    render();
+  } else if (action === 'sep-cancelar'){
+    ui.sepFormLote = null; ui.asesoraError = '';
+    render();
+  } else if (action === 'sep-confirmar'){
+    var sepId = t.getAttribute('data-value');
+    var nIn = document.getElementById('sep-nombre'), dIn = document.getElementById('sep-dni');
+    ui.sepNombre = nIn ? nIn.value : ''; ui.sepDni = dIn ? dIn.value : '';
+    var rSep = await asesoraLlamar('ec_lote_separar', { p_lote_id: sepId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin, p_nombre: ui.sepNombre, p_dni: ui.sepDni });
+    if (rSep.ok){
+      ui.sepFormLote = null; ui.sepNombre = ''; ui.sepDni = '';
+      asesoraCambioLocal(sepId, 'SEPARADO', 'Lote separado. El cliente ya puede entrar a la app con su nombre y DNI.' + (rSep.aviso === 'nombre_distinto' ? ' Ojo: ese DNI ya estaba registrado con otro nombre; puede que no pueda entrar con este.' : ''));
+      await cargarSepInfo(sepId);
+    }
+    render();
+  } else if (action === 'sep-comprado' || action === 'sep-liberar'){
+    var cId = t.getAttribute('data-value');
+    var esCompra = action === 'sep-comprado';
+    var cInfo = ui.sepInfo[cId];
+    var quien = cInfo && cInfo.hay ? ' de ' + cInfo.cliente : '';
+    if (confirm(esCompra ? '¿Confirmas que el lote' + quien + ' fue COMPRADO?' : '¿Liberar el lote' + quien + '? Vuelve a estar disponible y el cliente pierde su acceso a la app (si se creó con esta separación).')){
+      var rC = await asesoraLlamar(esCompra ? 'ec_lote_marcar_comprado' : 'ec_lote_liberar_separado', { p_lote_id: cId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+      if (rC.ok){
+        asesoraCambioLocal(cId, esCompra ? 'VENDIDO' : 'DISPONIBLE', esCompra ? 'Lote marcado como comprado.' : 'Lote liberado: vuelve a estar disponible.');
+        delete ui.sepInfo[cId];
+        if (esCompra) await cargarSepInfo(cId);
+      }
       render();
     }
   } else if (action === 'etapa5-filtro'){
@@ -3012,6 +3068,41 @@ document.addEventListener('click', async function(ev){
     applyEtapa5Zoom();
   }
 });
+
+async function asesoraLlamar(fn, args){
+  ui.asesoraBusy = true; ui.asesoraError = ''; ui.sepMsg = ''; render();
+  var res = await sb.rpc(fn, args);
+  ui.asesoraBusy = false;
+  var d = res.data;
+  if (res.error || !d){
+    ui.asesoraError = 'No se pudo completar. Revisa tu conexión e intenta de nuevo.';
+    return {ok:false};
+  }
+  if (!d.ok){
+    var msgs = {
+      codigo: 'Código incorrecto o sesión vencida. Sal del modo asesora y vuelve a entrar.',
+      bloqueada: 'Demasiados intentos fallidos. Espera 10 minutos.',
+      nombre: 'Escribe nombre y apellidos del cliente.',
+      dni: 'El DNI debe tener entre 5 y 8 dígitos (solo números).',
+      no_disponible: 'Ese lote ya no está disponible: alguien se te adelantó.',
+      no_separado: 'Ese lote ya no está separado.',
+      no_existe: 'No se encontró el lote.'
+    };
+    ui.asesoraError = msgs[d.error] || 'No se pudo completar.';
+    return {ok:false};
+  }
+  return d;
+}
+function asesoraCambioLocal(loteId, estado, msg){
+  var l = ETAPA5_LOTES_PLANO.filter(function(x){ return String(x.id) === String(loteId); })[0];
+  if (l) l.e = estado;
+  ui.sepMsg = msg || '';
+}
+async function cargarSepInfo(loteId){
+  if (!asesoraPin || !asesoraIdActual) return;
+  var res = await sb.rpc('ec_separacion_info', { p_lote_id: loteId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+  if (!res.error && res.data && res.data.ok) ui.sepInfo[loteId] = res.data;
+}
 
 document.addEventListener('keydown', function(ev){
   if (ev.key !== 'Enter' && ev.key !== ' ') return;
