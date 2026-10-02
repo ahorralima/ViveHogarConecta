@@ -444,6 +444,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-filtros{background:var(--surface-2);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;}
 .lote-filtros-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .lote-filtros-label{font-size:0.76rem;font-weight:700;color:var(--ink-faint);flex:none;width:68px;}
+.filtro-quitar{margin-left:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:0.76rem;font-weight:700;color:var(--ink);cursor:pointer;}
+.chip.active{box-shadow:0 0 0 2px rgba(47,158,106,0.35);}
 .lote-filtros-count{font-size:0.8rem;font-weight:700;color:var(--teal);}
 .lote-hotspot-dim{opacity:0.22;}
 .lote-hotspot.active.lote-hotspot-dim{opacity:1;}
@@ -457,7 +459,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-zoom-outer.zoom-close .st-narrow{display:block;}
 .st-label.st-v{writing-mode:vertical-rl;transform:translate(-50%,-50%) rotate(180deg) scale(var(--zs,0.45));}
 .mz-block{position:absolute;background:#fff;border:1px solid #8a96a3;border-radius:4px;pointer-events:none;}
-.mz-tag{position:absolute;transform:translate(-50%,-50%) scale(var(--zs,0.45));background:rgba(255,255,255,0.94);color:#33404d;font-weight:800;font-size:8px;line-height:1.2;padding:1px 4px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.3);z-index:4;pointer-events:none;white-space:nowrap;}
+.mz-tag{position:absolute;transform:translate(-50%,-50%) scale(var(--zs,0.45));background:rgba(255,255,255,0.94);color:#33404d;font-weight:800;font-size:8px;line-height:1.2;padding:1px 4px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.3);z-index:4;pointer-events:auto;cursor:pointer;white-space:nowrap;}
 .lote-hotspot{border:1px solid #56626e;border-radius:1px;}
 .lote-hotspot.lote-ok{background:#2f9e6a;}
 .lote-hotspot.lote-neutral{background:repeating-linear-gradient(135deg,#bfc6cd 0 3px,#d8dce0 3px 6px);}
@@ -570,6 +572,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .auth-switch-line{text-align:center;font-size:0.85rem;color:var(--ink-soft);margin-top:16px;}
 .asesora-panel{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
 .asesora-link{background:none;border:none;color:var(--ink-faint);font-size:0.8rem;text-decoration:underline;padding:0;cursor:pointer;}
+.asesora-title{font-size:0.7rem;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
 .asesora-form{background:var(--surface-2);border-radius:12px;padding:14px;}
 .asesora-form label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink-soft);margin-bottom:4px;}
 .asesora-activa{font-size:0.82rem;color:var(--ink-soft);text-align:center;}
@@ -2076,11 +2079,12 @@ function renderMapaEtapa5Html(){
   var coincidencias = filtrosActivos ? ETAPA5_LOTES_PLANO.filter(loteCoincide).length : 0;
   html += '<div class="lote-filtros">'+
     '<div class="lote-filtros-row"><span class="lote-filtros-label">Vista</span><div class="chip-row">'+
-      [['','Todas'],['Esquina','Esquina'],['Parque','Parque'],['Lateral Parque','Lat. parque'],['Pasaje','Pasaje']].map(function(o){
+      [['','Todas'],['Esquina','Esquina'],['Parque','Vista al parque'],['Lateral Parque','Lateral al parque'],['Pasaje','Pasaje']].map(function(o){
         return '<button type="button" class="chip'+(fVista===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="vista" data-value="'+esc(o[0])+'">'+esc(o[1])+'</button>';
       }).join('')+
     '</div></div>'+
-    (filtrosActivos ? '<div class="lote-filtros-count">'+coincidencias+' lote'+(coincidencias===1?'':'s')+' disponible'+(coincidencias===1?'':'s')+' coincide'+(coincidencias===1?'':'n')+'</div>' : '')+
+    (filtrosActivos ? '<div class="lote-filtros-count">'+coincidencias+' lote'+(coincidencias===1?'':'s')+' disponible'+(coincidencias===1?'':'s')+' coincide'+(coincidencias===1?'':'n')+
+      ' <button type="button" class="filtro-quitar" data-action="etapa5-filtro" data-key="vista" data-value="">✕ Quitar filtro</button></div>' : '')+
   '</div>';
 
   var mzAcc = {};
@@ -2098,7 +2102,7 @@ function renderMapaEtapa5Html(){
   }).join('');
   var mzTags = mzKeys.map(function(m){
     var a = mzAcc[m];
-    return '<div class="mz-tag" style="top:'+(a.t0-0.3)+'%;left:'+((a.l0+a.l1)/2)+'%;">'+esc(m)+'</div>';
+    return '<div class="mz-tag" role="button" tabindex="0" aria-label="Acercar a la manzana '+esc(m)+'" data-action="etapa5-zoom-mz" data-value="'+esc(m)+'" style="top:'+(a.t0-0.3)+'%;left:'+((a.l0+a.l1)/2)+'%;">'+esc(m)+'</div>';
   }).join('');
   var isFull = !!ui.etapa5Full;
   if (!isFull) html += '<button type="button" class="btn btn-secondary btn-block" style="margin-bottom:10px;" data-action="etapa5-full-abrir">⛶ Ver plano en pantalla completa</button>';
@@ -2109,7 +2113,7 @@ function renderMapaEtapa5Html(){
       '<img class="mapa-vhs-img" src="'+MAPA_ETAPA5_LOTES_DATAURI+'" alt="Plano de la Etapa 5 de Vive Hogar Sullana" />'+
       mzBlocks+
       ETAPA5_RECREACION_PLANO.map(function(r){
-        return '<div role="button" tabindex="0" class="lote-hotspot lote-recreacion" style="top:'+r.t+'%;left:'+r.le+'%;width:'+r.w+'%;height:'+r.h+'%;" data-action="etapa5-area" data-value="'+esc(r.m)+'"><span class="lote-recreacion-icon">🌳</span><span class="area-label">Parque</span></div>';
+        return '<div role="button" tabindex="0" class="lote-hotspot lote-recreacion" style="top:'+r.t+'%;left:'+r.le+'%;width:'+r.w+'%;height:'+r.h+'%;" aria-label="Parque, área común, manzana '+esc(r.m)+'" data-action="etapa5-area" data-value="'+esc(r.m)+'"><span class="lote-recreacion-icon">🌳</span><span class="area-label">Parque</span></div>';
       }).join('')+
       ETAPA5_LOTES_PLANO.map(function(l){
         var key = l.m+'|'+l.l;
@@ -2117,9 +2121,10 @@ function renderMapaEtapa5Html(){
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
         var isSel = ui.interesadoLoteSel === key;
         var dim = (!isSel && ui.interesadoLoteSel) || (!isSel && filtrosActivos && !loteCoincide(l));
-        return '<div role="button" tabindex="0" class="lote-hotspot '+cls+mine+(isSel?' active':'')+(dim?' lote-hotspot-dim':'')+'" '+
+        var estTxt = l.e === 'DISPONIBLE' ? 'disponible' : l.e === 'VENDIDO' ? 'vendido' : l.e === 'SEPARADO' ? 'separado' : l.e === 'SEPARACION_EN_PROCESO' ? 'separación en proceso' : l.e === 'EN_ATENCION' ? 'en atención' : 'no disponible';
+        return '<div role="button" tabindex="0" aria-label="Manzana '+esc(l.m)+', lote '+esc(String(l.l))+', '+estTxt+'" class="lote-hotspot '+cls+mine+(isSel?' active':'')+(dim?' lote-hotspot-dim':'')+'" '+
           'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
-          'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'<span class="lote-hotspot-num">'+esc(String(l.l))+'</span></div>';
+          'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'<span class="lote-hotspot-num" aria-hidden="true">'+esc(String(l.l))+'</span></div>';
       }).join('')+
       ETAPA5_CALLES.map(function(c){
         var lx = c.le;
@@ -2256,13 +2261,13 @@ function renderMapaEtapa5Html(){
     html += '</div>';
   }
 
-  html += '<div class="asesora-panel">';
+  html += '<div class="asesora-panel"><div class="asesora-title">Acceso para asesores · uso interno</div>';
   if (!asesoraPin || !asesoraIdActual){
     if (!ui.showAsesoraForm){
-      html += '<button type="button" class="asesora-link" data-action="asesora-mostrar-form">¿Eres asesora? Entra aquí</button>';
+      html += '<button type="button" class="asesora-link" data-action="asesora-mostrar-form">Soy asesora: ingresar</button>';
     } else {
       html += '<div class="asesora-form">';
-      html += '<label>Código de acceso</label>';
+      html += '<label>Código de acceso del asesor</label>';
       html += '<input class="text-input" type="password" inputmode="numeric" id="asesora-pin-input" placeholder="••••" value="'+esc(ui.asesoraPinInput||'')+'" />';
       html += '<label style="margin-top:8px;">¿Quién eres?</label>';
       html += '<select class="text-input" id="asesora-nombre-select">'+
@@ -2957,6 +2962,22 @@ document.addEventListener('click', async function(ev){
       var tgt = irFicha ? document.querySelector('.lote-detail-card') : document.getElementById('etapa5-zoom');
       if (tgt) tgt.scrollIntoView({block:'start'});
     }, 60);
+  } else if (action === 'etapa5-zoom-mz'){
+    var mzN = t.getAttribute('data-value');
+    var mzItems = ETAPA5_LOTES_PLANO.concat(ETAPA5_RECREACION_PLANO).filter(function(l){ return l.m === mzN; });
+    var zi2 = document.getElementById('etapa5-zoom-inner'), zo2 = document.getElementById('etapa5-zoom');
+    if (mzItems.length && zi2 && zo2){
+      var t0 = Math.min.apply(null, mzItems.map(function(l){ return l.t; }));
+      var t1 = Math.max.apply(null, mzItems.map(function(l){ return l.t + l.h; }));
+      var l0 = Math.min.apply(null, mzItems.map(function(l){ return l.le; }));
+      var l1 = Math.max.apply(null, mzItems.map(function(l){ return l.le + l.w; }));
+      var bw = (l1-l0)/100*zi2.offsetWidth, bh = (t1-t0)/100*zi2.offsetHeight;
+      var cw2 = zo2.clientWidth, ch2 = zo2.clientHeight;
+      var sc = Math.min(4, Math.max(1, Math.min(cw2/(bw*1.25), ch2*0.62/(bh*1.25))));
+      var cxp = (l0+l1)/2/100*zi2.offsetWidth*sc, cyp = (t0+t1)/2/100*zi2.offsetHeight*sc;
+      ui.etapa5Zoom = clampZoom({scale:sc, x:cw2/2 - cxp, y:ch2*(ui.etapa5Full?0.4:0.5) - cyp}, cw2, ch2);
+      applyEtapa5Zoom();
+    }
   } else if (action === 'etapa5-area'){
     ui.etapa5AreaSel = t.getAttribute('data-value');
     ui.interesadoLoteSel = null;
@@ -2984,6 +3005,15 @@ document.addEventListener('click', async function(ev){
     }
     ui.etapa5Zoom = z;
     applyEtapa5Zoom();
+  }
+});
+
+document.addEventListener('keydown', function(ev){
+  if (ev.key !== 'Enter' && ev.key !== ' ') return;
+  var el = ev.target;
+  if (el && el.getAttribute && el.getAttribute('role') === 'button' && el.hasAttribute('data-action')){
+    ev.preventDefault();
+    el.click();
   }
 });
 
@@ -3097,7 +3127,7 @@ function initEtapa5ZoomDrag(){
   var lastDist = 0;
 
   outer.addEventListener('pointerdown', function(ev){
-    if (ev.target.closest('.lote-sheet, .mapa-full-close, .mapa-zoom-controls')) return;
+    if (ev.target.closest('.lote-sheet, .mapa-full-close, .mapa-zoom-controls, .mz-tag')) return;
     pointers[ev.pointerId] = {x:ev.clientX, y:ev.clientY};
     outer.setPointerCapture(ev.pointerId);
     dragging = true;
