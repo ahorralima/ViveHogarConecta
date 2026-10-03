@@ -456,12 +456,6 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-lotes-wrap{border:none;border-radius:0;}
 .mapa-lotes-wrap .mapa-vhs-img{visibility:hidden;}
 .mapa-zoom-outer.mapa-full{position:fixed;inset:0;z-index:1000;height:100dvh !important;min-height:0;border-radius:0;border:none;}
-.plano3d{position:fixed;inset:0;z-index:1000;background:#cdb28c;touch-action:none;overflow:hidden;}
-.plano3d canvas{display:block;width:100%;height:100%;touch-action:none;}
-.p3d-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#4b3f2a;}
-.p3d-legend{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);left:10px;background:rgba(255,255,255,0.94);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;font-size:0.72rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);z-index:5;}
-.p3d-legend span{display:flex;align-items:center;gap:6px;}
-.p3d-hint{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);transform:translateX(-50%);background:rgba(30,30,30,0.7);color:#fff;font-size:0.72rem;padding:6px 12px;border-radius:999px;white-space:nowrap;pointer-events:none;z-index:4;}
 .st-label{position:absolute;transform:translate(-50%,-50%) scale(var(--zs,0.45));font-size:7px;font-weight:700;letter-spacing:0.3px;color:#566272;white-space:nowrap;pointer-events:none;z-index:1;}
 .st-label.st-narrow{display:none;}
 .mapa-zoom-outer.zoom-close .st-narrow{display:block;}
@@ -2145,9 +2139,7 @@ function renderMapaEtapa5Html(){
     return '<div class="mz-tag" role="button" tabindex="0" aria-label="Acercar a la manzana '+esc(m)+'" data-action="etapa5-zoom-mz" data-value="'+esc(m)+'" style="top:'+(a.t0-0.3)+'%;left:'+((a.l0+a.l1)/2)+'%;">'+esc(m)+'</div>';
   }).join('');
   var isFull = !!ui.etapa5Full;
-  if (!isFull) html += '<div style="display:flex;gap:8px;margin-bottom:10px;">'+
-    '<button type="button" class="btn btn-secondary" style="flex:1;" data-action="etapa5-full-abrir">⛶ Pantalla completa</button>'+
-    '<button type="button" class="btn btn-secondary" style="flex:1;" data-action="etapa5-3d-abrir">🧊 Ver en 3D</button></div>';
+  if (!isFull) html += '<button type="button" class="btn btn-secondary btn-block" style="margin-bottom:10px;" data-action="etapa5-full-abrir">⛶ Ver plano en pantalla completa</button>';
   html += '<div class="mapa-zoom-outer'+(isFull?' mapa-full':'')+'" id="etapa5-zoom">'+
     (isFull ? '<button type="button" class="mapa-full-close" data-action="etapa5-full-cerrar" aria-label="Cerrar plano">✕</button>' : '')+
     '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
@@ -3069,19 +3061,6 @@ document.addEventListener('click', async function(ev){
       ui.etapa5Zoom = clampZoom({scale:sc, x:cw2/2 - cxp, y:ch2*(ui.etapa5Full?0.4:0.5) - cyp}, cw2, ch2);
       applyEtapa5Zoom();
     }
-  } else if (action === 'etapa5-3d-abrir'){
-    p3dAbrir();
-  } else if (action === 'etapa5-3d-cerrar'){
-    p3dCerrar();
-    render();
-  } else if (action === 'etapa5-3d-sheet-cerrar'){
-    ui.interesadoLoteSel = null; ui.etapa5AreaSel = null;
-    p3dRefrescarSeleccion();
-  } else if (action === 'etapa5-3d-ficha'){
-    p3dCerrar();
-    ui.etapa5AreaSel = null;
-    render();
-    setTimeout(function(){ var c = document.querySelector('.lote-detail-card'); if (c) c.scrollIntoView({block:'start'}); }, 60);
   } else if (action === 'etapa5-area'){
     ui.etapa5AreaSel = t.getAttribute('data-value');
     ui.interesadoLoteSel = null;
@@ -3111,228 +3090,6 @@ document.addEventListener('click', async function(ev){
     applyEtapa5Zoom();
   }
 });
-
-
-// ---------- Vista 3D de la Etapa 5 (se dibuja desde las coordenadas reales de los lotes) ----------
-var p3d = null;
-function p3dCargarScript(src){
-  return new Promise(function(res, rej){
-    var sc = document.createElement('script');
-    sc.src = src; sc.onload = res; sc.onerror = rej;
-    document.head.appendChild(sc);
-  });
-}
-async function p3dAsegurarThree(){
-  if (!window.THREE) await p3dCargarScript('https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js');
-  if (!THREE.OrbitControls) await p3dCargarScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js');
-}
-function p3dColorEstado(e){
-  if (e === 'DISPONIBLE') return 0x2f9e6a;
-  if (e === 'SEPARADO' || e === 'BLOQUEADO' || e === 'SEPARACION_EN_PROCESO' || e === 'EN_ATENCION') return 0xf4b63f;
-  return 0x8d949b;
-}
-function p3dEtiqueta(texto, tam, fondo, color){
-  var c = document.createElement('canvas'), g = c.getContext('2d');
-  var fs = 48; g.font = '800 '+fs+'px sans-serif';
-  var w = Math.ceil(g.measureText(texto).width) + 36, h = fs + 24;
-  c.width = w; c.height = h; g.font = '800 '+fs+'px sans-serif';
-  if (fondo){ g.fillStyle = fondo; g.beginPath(); g.roundRect ? g.roundRect(0,0,w,h,18) : g.rect(0,0,w,h); g.fill(); }
-  g.fillStyle = color; g.textBaseline = 'middle'; g.fillText(texto, 18, h/2+2);
-  var tex = new THREE.CanvasTexture(c);
-  var sp = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false}));
-  sp.scale.set(tam*w/h, tam, 1);
-  sp.renderOrder = 10;
-  return sp;
-}
-async function p3dAbrir(){
-  if (p3d || !ETAPA5_LOTES_PLANO.length) return;
-  var el = document.createElement('div');
-  el.id = 'plano3d'; el.className = 'plano3d';
-  el.innerHTML = '<div class="p3d-loading">Cargando vista 3D…</div>'+
-    '<button type="button" class="mapa-full-close" data-action="etapa5-3d-cerrar" aria-label="Cerrar vista 3D">✕</button>';
-  document.body.appendChild(el);
-  document.body.style.overflow = 'hidden';
-  p3d = {el: el};
-  try { await p3dAsegurarThree(); }
-  catch(e){ el.querySelector('.p3d-loading').textContent = 'No se pudo cargar la vista 3D. Revisa tu conexión.'; return; }
-  if (!p3d) return;
-  p3dConstruir(el);
-}
-function p3dCerrar(){
-  if (!p3d) return;
-  cancelAnimationFrame(p3d.raf);
-  window.removeEventListener('resize', p3d.onResize);
-  if (p3d.renderer){ p3d.renderer.dispose(); }
-  if (p3d.el && p3d.el.parentNode) p3d.el.parentNode.removeChild(p3d.el);
-  p3d = null;
-  document.body.style.overflow = '';
-}
-function p3dConstruir(el){
-  var A = 2191/1550;
-  var W = el.clientWidth, H = el.clientHeight;
-  var renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(W, H);
-  renderer.setClearColor(0xcdb28c);
-  el.querySelector('.p3d-loading').style.display = 'none';
-  el.insertBefore(renderer.domElement, el.firstChild);
-  var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(38, W/H, 1, 1200);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x9a8460, 0.95));
-  var sun = new THREE.DirectionalLight(0xffffff, 0.55); sun.position.set(-70, 120, 90); scene.add(sun);
-
-  var lots = ETAPA5_LOTES_PLANO, N = lots.length;
-  var unit = new THREE.BoxGeometry(1,1,1);
-  var tmp = new THREE.Object3D();
-  function inst(color, count){
-    var m = new THREE.InstancedMesh(unit, new THREE.MeshLambertMaterial({color:color}), count);
-    scene.add(m); return m;
-  }
-  function plano(color, x, z, w, d, y, hgt){
-    var m = new THREE.Mesh(unit, new THREE.MeshLambertMaterial({color:color}));
-    m.scale.set(w, hgt, d); m.position.set(x, y + hgt/2, z); scene.add(m); return m;
-  }
-  var cx = 50*A, cz = 50;
-  plano(0x50565d, cx, cz, 100*A + 5, 104, -0.2, 0.2);     // calles
-  // manzanas
-  var mz = {};
-  function mzAdd(m, t, le, w, h){
-    var a = mz[m] || (mz[m] = {t0:1e9, l0:1e9, t1:-1e9, l1:-1e9});
-    a.t0 = Math.min(a.t0, t); a.l0 = Math.min(a.l0, le); a.t1 = Math.max(a.t1, t+h); a.l1 = Math.max(a.l1, le+w);
-  }
-  lots.forEach(function(l){ mzAdd(l.m, l.t, l.le, l.w, l.h); });
-  ETAPA5_RECREACION_PLANO.forEach(function(r){ mzAdd(r.m, r.t, r.le, r.w, r.h); });
-  Object.keys(mz).forEach(function(m){
-    var a = mz[m], x0 = a.l0*A-0.7, x1 = a.l1*A+0.7, z0 = a.t0-0.9, z1 = a.t1+0.9;
-    plano(0xe6dcc8, (x0+x1)/2, (z0+z1)/2, x1-x0, z1-z0, 0, 0.15);
-    var lb = p3dEtiqueta(m, 3.4, 'rgba(25,60,50,0.92)', '#ffffff');
-    lb.position.set((x0+x1)/2, 4.2, z0 - 0.5); scene.add(lb);
-  });
-
-  // lotes: borde, jardín, casa
-  var bordes = inst(0x8a5a3c, N), jardin = inst(0x7cb95a, N), muros = inst(0xee8a2a, N), techos = inst(0x8d949b, N);
-  var puertas = inst(0xffffff, N), vent1 = inst(0x35506b, N), vent2 = inst(0x35506b, N);
-  var keys = [], col = new THREE.Color();
-  lots.forEach(function(l, i){
-    var lw = l.w*A, lh = l.h, lx = l.le*A + lw/2, lz = l.t + lh/2;
-    var a = mz[l.m], mcx = (a.l0 + a.l1)/2*A, mcz = (a.t0 + a.t1)/2;
-    keys.push(l.m+'|'+l.l);
-    tmp.rotation.set(0,0,0);
-    tmp.position.set(lx, 0.17, lz); tmp.scale.set(lw-0.02, 0.06, lh-0.02); tmp.updateMatrix(); bordes.setMatrixAt(i, tmp.matrix);
-    tmp.position.set(lx, 0.2, lz); tmp.scale.set(lw-0.22, 0.06, lh-0.22); tmp.updateMatrix(); jardin.setMatrixAt(i, tmp.matrix);
-    var horiz = lw >= lh;
-    var short = horiz ? lh : lw, long_ = horiz ? lw : lh;
-    var fr = Math.min(2.0, short*0.74), dp = 3.2, hh = 1.6;
-    var dir = horiz ? (lx < mcx ? -1 : 1) : (lz < mcz ? -1 : 1);
-    var hx = lx, hz = lz;
-    if (horiz) hx = lx + dir*(long_/2 - dp/2 - 0.15); else hz = lz + dir*(long_/2 - dp/2 - 0.15);
-    var sx = horiz ? dp : fr, sz = horiz ? fr : dp;
-    tmp.position.set(hx, 0.23 + hh/2, hz); tmp.scale.set(sx, hh, sz); tmp.updateMatrix(); muros.setMatrixAt(i, tmp.matrix);
-    tmp.position.set(hx, 0.23 + hh + 0.1, hz); tmp.scale.set(sx+0.2, 0.2, sz+0.2); tmp.updateMatrix(); techos.setMatrixAt(i, tmp.matrix);
-    // puerta y ventanas en la cara que da a la calle
-    var fx = horiz ? hx + dir*(dp/2 + 0.02) : hx, fz = horiz ? hz : hz + dir*(dp/2 + 0.02);
-    function cara(inst_, off, w_, h_, y_){
-      var px = horiz ? fx : hx + off, pz = horiz ? hz + off : fz;
-      tmp.position.set(px, y_, pz); tmp.scale.set(horiz ? 0.05 : w_, h_, horiz ? w_ : 0.05); tmp.updateMatrix(); inst_.setMatrixAt(i, tmp.matrix);
-    }
-    cara(puertas, 0, 0.55, 1.0, 0.23 + 0.5);
-    cara(vent1, -fr*0.33, 0.45, 0.5, 0.23 + 0.85);
-    cara(vent2, fr*0.33, 0.45, 0.5, 0.23 + 0.85);
-    techos.setColorAt(i, col.setHex(p3dColorEstado(l.e)));
-    jardin.setColorAt(i, col.setHex(0x7cb95a));
-  });
-  [bordes, jardin, muros, techos, puertas, vent1, vent2].forEach(function(m){ m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; });
-
-  // parques (formas simples, un árbol por parque)
-  var parques = [];
-  ETAPA5_RECREACION_PLANO.forEach(function(r){
-    var px = (r.le + r.w/2)*A, pz = r.t + r.h/2;
-    var pad = plano(0xa9d6a0, px, pz, r.w*A-0.3, r.h-0.3, 0.15, 0.1);
-    pad.userData.area = r.m; parques.push(pad);
-    var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.25,1.4,8), new THREE.MeshLambertMaterial({color:0x7a5230}));
-    trunk.position.set(px, 1, pz); scene.add(trunk);
-    var copa = new THREE.Mesh(new THREE.SphereGeometry(1.5,12,10), new THREE.MeshLambertMaterial({color:0x3f9e52}));
-    copa.position.set(px, 2.6, pz); scene.add(copa);
-    var lb = p3dEtiqueta('Parque', 2.6, 'rgba(255,255,255,0.9)', '#1f5a3a');
-    lb.position.set(px, 5.6, pz); scene.add(lb);
-  });
-  ETAPA5_CALLES.forEach(function(c){
-    if (c.g) return;
-    var lb = p3dEtiqueta(c.n, 2.3, null, '#ffffff');
-    lb.position.set(c.le*A, 0.9, c.t); scene.add(lb);
-  });
-
-  var controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(cx, 0, cz + 2);
-  var vfov = camera.fov*Math.PI/180, hfov = 2*Math.atan(Math.tan(vfov/2)*camera.aspect);
-  var distAncho = (100*A + 10)/(2*Math.tan(hfov/2)), distAlto = 125/(2*Math.tan(vfov/2));
-  var dist = Math.max(distAncho, distAlto*0.8, 90);
-  var elev = 42*Math.PI/180;
-  camera.position.set(cx, Math.sin(elev)*dist, cz + 2 + Math.cos(elev)*dist);
-  controls.enableDamping = true; controls.dampingFactor = 0.08;
-  controls.maxPolarAngle = 1.38; controls.minDistance = 16; controls.maxDistance = dist*1.4;
-  controls.update();
-
-  // leyenda y ayuda
-  var leg = document.createElement('div'); leg.className = 'p3d-legend';
-  leg.innerHTML = '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-warn"></i> Separado</span><span><i class="lote-dot lote-dot-neutral"></i> Vendido</span><span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>';
-  el.appendChild(leg);
-  var hint = document.createElement('div'); hint.className = 'p3d-hint'; hint.textContent = 'Arrastra para girar · pellizca para acercar · toca una casa';
-  el.appendChild(hint);
-  var sheetBox = document.createElement('div'); sheetBox.id = 'p3d-sheet'; el.appendChild(sheetBox);
-
-  p3d.renderer = renderer; p3d.scene = scene; p3d.camera = camera; p3d.controls = controls;
-  p3d.keys = keys; p3d.techos = techos; p3d.jardin = jardin; p3d.muros = muros; p3d.parques = parques; p3d.sheetBox = sheetBox;
-  p3d.hintEl = hint;
-
-  // selección por toque
-  var ray = new THREE.Raycaster(), ptr = new THREE.Vector2(), down = null;
-  renderer.domElement.addEventListener('pointerdown', function(ev){ down = {x:ev.clientX, y:ev.clientY}; p3d.hintEl.style.display = 'none'; });
-  renderer.domElement.addEventListener('pointerup', function(ev){
-    if (!down || Math.hypot(ev.clientX-down.x, ev.clientY-down.y) > 6) return;
-    var r = renderer.domElement.getBoundingClientRect();
-    ptr.set(((ev.clientX-r.left)/r.width)*2-1, -((ev.clientY-r.top)/r.height)*2+1);
-    ray.setFromCamera(ptr, camera);
-    var hits = ray.intersectObjects([techos, muros, jardin].concat(parques), false);
-    if (!hits.length) return;
-    var h = hits[0];
-    if (h.object.userData && h.object.userData.area){ p3dSeleccionarArea(h.object.userData.area); }
-    else if (h.instanceId != null){ p3dSeleccionar(keys[h.instanceId]); }
-  });
-  p3d.onResize = function(){
-    var w = el.clientWidth, h = el.clientHeight;
-    renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
-  };
-  window.addEventListener('resize', p3d.onResize);
-  (function loop(){
-    if (!p3d) return;
-    p3d.raf = requestAnimationFrame(loop);
-    controls.update();
-    renderer.render(scene, camera);
-  })();
-  p3dRefrescarSeleccion();
-}
-function p3dRefrescarSeleccion(){
-  if (!p3d || !p3d.keys) return;
-  var col = new THREE.Color(), sel = ui.interesadoLoteSel;
-  ETAPA5_LOTES_PLANO.forEach(function(l, i){
-    var esSel = (l.m+'|'+l.l) === sel;
-    p3d.techos.setColorAt(i, col.setHex(esSel ? 0x397ead : p3dColorEstado(l.e)));
-    p3d.jardin.setColorAt(i, col.setHex(esSel ? 0x6fa8d8 : 0x7cb95a));
-  });
-  p3d.techos.instanceColor.needsUpdate = true; p3d.jardin.instanceColor.needsUpdate = true;
-  var html = (sel || ui.etapa5AreaSel) ? renderLoteSheetEtapa5() : '';
-  p3d.sheetBox.innerHTML = html.replace(/etapa5-sheet-cerrar/g, 'etapa5-3d-sheet-cerrar').replace(/etapa5-full-cerrar/g, 'etapa5-3d-ficha');
-}
-function p3dSeleccionar(key){
-  ui.interesadoLoteSel = (ui.interesadoLoteSel === key) ? null : key;
-  ui.etapa5AreaSel = null;
-  p3dRefrescarSeleccion();
-}
-function p3dSeleccionarArea(m){
-  ui.etapa5AreaSel = m; ui.interesadoLoteSel = null;
-  p3dRefrescarSeleccion();
-}
 
 async function asesoraLlamar(fn, args){
   ui.asesoraBusy = true; ui.asesoraError = ''; ui.sepMsg = ''; render();
