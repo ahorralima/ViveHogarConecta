@@ -659,6 +659,79 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .fab{position:fixed;right:18px;bottom:88px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--whatsapp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 10px 24px -6px rgba(37,211,102,0.55);text-decoration:none;}
 .fab:active{transform:scale(0.94);}
+
+/* ===== Modo asesor ===== */
+.as-login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px 20px;max-width:420px;margin:0 auto;}
+.as-login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 18px;box-shadow:0 14px 34px -14px rgba(15,40,70,0.35);}
+.as-login-card h2{font-size:1.35rem;font-weight:800;color:var(--ink);margin:10px 0 2px;text-align:center;}
+.as-login-card p.as-login-sub{font-size:0.86rem;color:var(--ink-soft);text-align:center;margin-bottom:14px;}
+.as-login-card label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink-soft);margin:10px 0 4px;}
+.as-login-logo{display:block;width:150px;max-width:60%;margin:0 auto;}
+.as-err{color:var(--danger);font-size:0.82rem;margin-top:10px;font-weight:600;}
+.as-hero{background:linear-gradient(135deg,#397EAD,#27608c);color:#fff;border-radius:18px;padding:16px;margin:12px 0 14px;box-shadow:0 10px 24px -12px rgba(20,60,100,0.6);}
+.as-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.as-hello{font-size:1.2rem;font-weight:800;line-height:1.2;}
+.as-sub{font-size:0.8rem;opacity:0.88;margin-top:3px;}
+.as-salir{background:rgba(255,255,255,0.2);color:#fff;border:0;border-radius:999px;padding:7px 13px;font-weight:700;font-size:0.78rem;cursor:pointer;flex:none;}
+.as-cuentas{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.as-cuenta{border:1px solid rgba(255,255,255,0.5);background:transparent;color:#fff;border-radius:999px;padding:5px 11px;font-size:0.76rem;font-weight:700;cursor:pointer;}
+.as-cuenta.on{background:#fff;color:#27608c;}
+.as-mes{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;opacity:0.85;margin-top:14px;font-weight:700;}
+.as-big{font-size:2.8rem;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;}
+.as-big small{font-size:1.25rem;font-weight:700;opacity:0.85;}
+.as-bar{height:10px;background:rgba(255,255,255,0.25);border-radius:999px;overflow:hidden;margin-top:10px;}
+.as-bar i{display:block;height:100%;background:#7ee2a8;border-radius:999px;transition:width .4s;}
+.as-bar-dark{background:var(--surface-2);height:8px;margin-top:6px;}
+.as-bar-dark i{background:var(--teal);}
+.as-note{font-size:0.8rem;margin-top:8px;opacity:0.92;}
+.as-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(15,30,50,0.05);}
+.as-card h4{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:8px;}
+.as-card h4 small{font-weight:600;color:var(--ink-faint);font-size:0.75rem;margin-left:6px;}
+.as-rank-row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border);}
+.as-rank-row:first-of-type{border-top:0;}
+.as-rank-row.me{background:rgba(57,126,173,0.09);margin:0 -8px;padding:9px 8px;border-radius:10px;border-top-color:transparent;}
+.as-pos{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.8rem;color:var(--ink-soft);}
+.as-pos.p1{background:#f4c542;color:#4a3600;}
+.as-pos.p2{background:#d5dade;color:#333;}
+.as-pos.p3{background:#e3b48a;color:#4a2a08;}
+.as-rank-name{font-weight:700;font-size:0.9rem;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.as-rank-score{font-weight:800;font-size:0.95rem;font-variant-numeric:tabular-nums;color:var(--ink);text-align:right;}
+.as-rank-score small{font-weight:600;color:var(--ink-faint);}
+.as-etapa{border-top:1px solid var(--border);padding:9px 0;}
+.as-etapa:first-of-type{border-top:0;}
+.as-etapa-head{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:2px 0;cursor:pointer;font-size:0.92rem;color:var(--ink);text-align:left;}
+.as-etapa-head strong{font-weight:800;}
+.as-etapa-n{background:rgba(46,160,90,0.14);color:#1f7a47;font-weight:800;border-radius:999px;padding:3px 10px;font-size:0.8rem;}
+.as-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+.as-lotechip{border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:5px 9px;font-size:0.76rem;font-weight:700;cursor:pointer;}
+.as-lotechip.of{border-color:#e0a000;background:#fff6dc;}
+.as-oferta-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:0.86rem;}
+.as-oferta-row:first-of-type{border-top:0;}
+.as-oferta-row s{color:var(--ink-faint);}
+.as-oferta-row b{color:#b36b00;}
+.as-x{border:0;background:var(--surface-2);border-radius:8px;padding:5px 9px;cursor:pointer;color:var(--danger);font-weight:800;}
+.as-res{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border);}
+.as-res:first-of-type{border-top:0;}
+.as-timer{font-variant-numeric:tabular-nums;font-weight:800;color:#b36b00;background:#fff3d6;border-radius:8px;padding:3px 8px;}
+.as-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.as-form-grid label{display:block;font-size:0.72rem;font-weight:700;color:var(--ink-soft);margin-bottom:3px;}
+.as-form-grid .full{grid-column:1/-1;}
+.as-meta-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--border);font-size:0.86rem;}
+.as-meta-row:first-of-type{border-top:0;}
+.as-meta-row input{width:74px;text-align:center;}
+.as-ok{color:var(--teal);font-size:0.84rem;font-weight:700;margin-top:8px;}
+.as-clave{background:#eefaf2;border:1px dashed #2f9e6a;border-radius:10px;padding:10px;margin-top:8px;font-size:0.86rem;}
+.as-clave b{font-size:1.25rem;letter-spacing:0.12em;}
+.as-details>summary{cursor:pointer;font-weight:800;font-size:0.95rem;list-style:none;}
+.lote-dot-oferta{background:#fff;border:2px solid #e0a000;}
+.lote-hotspot.lote-oferta{box-shadow:inset 0 0 0 2px #ffd24d;}
+.lote-hotspot.lote-ok{background:#2fb36f;}
+.lote-hotspot.lote-neutral{background:repeating-linear-gradient(135deg,#c3c9cf 0 3px,#dde1e5 3px 6px);}
+.oferta-chip{display:inline-block;margin-top:8px;background:#fff3d6;color:#8a5200;border-radius:8px;padding:4px 9px;font-size:0.78rem;font-weight:800;}
+.precio-oferta s{color:var(--ink-faint);font-weight:600;font-size:0.8em;margin-right:6px;}
+.precio-oferta b{color:#b36b00;}
+.cuota-chip-neutral{background:rgba(120,130,140,0.16);color:#4c555e;}
+
 </style>
 </head>
 <body>
@@ -1553,6 +1626,498 @@ function renderPerfil(){
   return html;
 }
 
+// ============ MODO ASESOR (v7) ============
+// Ingreso con nombre + contraseña, panel de ventas/metas/ranking, ofertas del
+// jefe de ventas y separación con 1 hora de plazo. Todo pasa por funciones de
+// Supabase (ver supabase-schema-v7-asesores.sql).
+var PROY_SEPARACION = { sullana: 4000, castilla: 3000, ejidos: 2000, lambayeque: 4000 };
+var PROY_NOMBRES = { sullana: 'Vive Hogar Sullana', castilla: 'Vive Hogar Castilla', ejidos: 'Vive Hogar Ejidos', lambayeque: 'Vive Hogar Lambayeque' };
+
+ui.asesorPanel = null;
+ui.asesorPanelError = '';
+ui.asesorLoginError = '';
+ui.asNombre = '';
+ui.asEtapaAbierta = {};
+ui.renderPendiente = false;
+ui.sepOp = '';
+ui.sepMonto = '';
+ui.jefeMsg = '';
+ui.claveNueva = null;
+ui.ofTipo = 'soles';
+ui.ofValor = '';
+ui.ofHasta = '';
+ui.ofEtapa = '';
+ui.ofMz = '';
+ui.newAsesor = '';
+
+function modoAsesor(){ return appGate === 'asesor' && !!asesoraPin && !!asesoraIdActual; }
+function esJefe(){ return !!(ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.rol === 'jefe'); }
+function sepMonto(){
+  if (ui.asesorPanel && ui.asesorPanel.monto_separacion) return Number(ui.asesorPanel.monto_separacion);
+  return PROY_SEPARACION[ui.interesadoProyecto] || SEPARACION_LOTE;
+}
+function lotePrecio(l){ return l.of ? l.of : l.pv; }
+function precioHtml(l){
+  if (l.e === 'DISPONIBLE' && l.of) return '<span class="precio-oferta"><s>'+fmtMoney(l.pv)+'</s><b>'+fmtMoney(l.of)+'</b></span>';
+  return fmtMoney(l.pv);
+}
+function estInfo(e){
+  if (e === 'DISPONIBLE') return {cls:'ok', txt:'Disponible'};
+  if (e === 'VENDIDO') return {cls:'neutral', txt:'Vendida'};
+  if (e === 'SEPARADO') return {cls:'neutral', txt:'Separada'};
+  if (e === 'SEPARACION_EN_PROCESO' || e === 'EN_ATENCION') return {cls:'neutral', txt:'Separación en proceso'};
+  return {cls:'neutral', txt:'No disponible'};
+}
+function fmtFechaCorta(iso){
+  try { return new Date(iso).toLocaleDateString('es-PE', {day:'2-digit', month:'2-digit'}); } catch(e){ return ''; }
+}
+function fmtHoy(d){
+  var x = new Date(Date.now() + d*86400000);
+  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+}
+function primerNombre(n){ return toTitleCase(String(n||'').trim().split(/\s+/)[0] || ''); }
+function esMiReserva(loteId){
+  var m = ui.asesorPanel && ui.asesorPanel.mis_reservas || [];
+  return m.some(function(r){ return String(r.id) === String(loteId); });
+}
+function mmss(iso){
+  var ms = new Date(iso).getTime() - Date.now();
+  if (!(ms > 0)) return '00:00';
+  var s = Math.floor(ms/1000);
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+function etiquetaLote(m, l){ return esc(m)+'-Lt'+esc(l); }
+
+// Evita borrar lo que se está escribiendo cuando llega una actualización en vivo
+function renderSiLibre(){
+  var a = document.activeElement;
+  if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)){ ui.renderPendiente = true; return; }
+  ui.renderPendiente = false;
+  render();
+}
+
+function asesorCargarPanel(){
+  if (!asesoraPin || !asesoraIdActual) return Promise.resolve();
+  return sb.rpc('ec_panel_asesor', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(function(res){
+    if (res.error){
+      ui.asesorPanelError = (res.error.code === 'PGRST202') ? 'sin_v7' : 'red';
+      if (!ui.asesorPanel) render();
+      return;
+    }
+    if (!res.data || !res.data.ok){
+      if (res.data && res.data.error === 'codigo') salirAsesorTotal('Tu sesión venció. Ingresa de nuevo.');
+      return;
+    }
+    ui.asesorPanelError = '';
+    var nuevo = JSON.stringify(res.data);
+    var cambio = nuevo !== ui._panelJson;
+    ui._panelJson = nuevo;
+    ui.asesorPanel = res.data;
+    ui.interesadoProyecto = res.data.yo.proyecto;
+    try { localStorage.setItem('ec_asesor_proy_v1', res.data.yo.proyecto); } catch(e){}
+    if (cambio || ui.renderPendiente) renderSiLibre();
+  });
+}
+
+async function asesorLogin(){
+  var n = document.getElementById('as-nombre'), c = document.getElementById('as-clave');
+  ui.asNombre = n ? n.value : '';
+  var clave = c ? c.value : '';
+  ui.asesorLoginError = '';
+  if (!ui.asNombre.trim() || !clave){
+    ui.asesorLoginError = 'Escribe tu nombre y tu contraseña.';
+    render(); return;
+  }
+  ui.asesoraBusy = true; render();
+  var res = await sb.rpc('ec_asesor_login', { p_nombre: ui.asNombre, p_clave: clave });
+  ui.asesoraBusy = false;
+  var d = res.data;
+  if (res.error || !d){
+    ui.asesorLoginError = (res.error && res.error.code === 'PGRST202')
+      ? 'Falta activar la actualización v7 en Supabase.'
+      : 'No pudimos conectar. Revisa tu internet e intenta de nuevo.';
+  } else if (!d.ok){
+    ui.asesorLoginError = d.error === 'bloqueada' ? 'Demasiados intentos. Espera 10 minutos.' : 'Nombre o contraseña incorrectos.';
+  } else {
+    var cuentas = d.cuentas, c0 = cuentas[0];
+    saveAsesoraSesion(clave, String(c0.id), c0.nombre);
+    try { localStorage.setItem('ec_asesor_cuentas_v1', JSON.stringify(cuentas)); } catch(e){}
+    ui.asesorCuentas = cuentas;
+    ui.interesadoProyecto = c0.proyecto;
+    ui.interesadoStep = 'mapa';
+    ui.interesadoEtapaSel = null; ui.interesadoLoteSel = null;
+    ui.asNombre = ''; ui.asesorPanel = null; ui._panelJson = '';
+    render();
+    await asesorCargarPanel();
+    toast('¡Bienvenid@, '+primerNombre(c0.nombre)+'!');
+    window.scrollTo(0,0);
+  }
+  render();
+}
+
+function salirAsesorTotal(msg){
+  salirModoAsesora();
+  ui.asesorPanel = null; ui._panelJson = ''; ui.asesorCuentas = null;
+  ui.interesadoEtapaSel = null; ui.interesadoLoteSel = null; ui.sepMsg = ''; ui.asesoraError = '';
+  try { localStorage.removeItem('ec_asesor_cuentas_v1'); localStorage.removeItem('ec_asesor_proy_v1'); } catch(e){}
+  setGate(null);
+  window.scrollTo(0,0);
+  render();
+  if (msg) toast(msg);
+}
+
+function asesorCuentas(){
+  if (ui.asesorCuentas) return ui.asesorCuentas;
+  try { ui.asesorCuentas = JSON.parse(localStorage.getItem('ec_asesor_cuentas_v1')) || []; } catch(e){ ui.asesorCuentas = []; }
+  return ui.asesorCuentas;
+}
+function asesorCambiarCuenta(id){
+  var c = asesorCuentas().filter(function(x){ return String(x.id) === String(id); })[0];
+  if (!c) return;
+  saveAsesoraSesion(asesoraPin, String(c.id), c.nombre);
+  ui.asesorPanel = null; ui._panelJson = '';
+  ui.interesadoProyecto = c.proyecto;
+  ui.interesadoEtapaSel = null; ui.interesadoLoteSel = null; ui.sepMsg = '';
+  render();
+  asesorCargarPanel();
+}
+
+function asesorIrALote(v){
+  var p = v.split('|');
+  if (ui.interesadoProyecto !== 'sullana' || p[0] !== '5'){ toast('El plano de esa etapa todavía no está cargado.'); return; }
+  ui.interesadoEtapaSel = '5';
+  ui.interesadoLoteSel = p[1]+'|'+p[2];
+  ui.etapa5AreaSel = null; ui.sepFormLote = null; ui.asesoraError = ''; ui.sepMsg = '';
+  render();
+  setTimeout(function(){
+    var d = document.querySelector('.lote-detail-card');
+    if (d) d.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 80);
+}
+
+// ---------- Acciones del jefe de ventas ----------
+async function jefeGuardarMetas(){
+  var inputs = document.querySelectorAll('.js-meta');
+  var mes = ui.asesorPanel && ui.asesorPanel.mes;
+  var ok = 0, mal = 0;
+  ui.jefeMsg = ''; ui.asesoraError = '';
+  for (var i = 0; i < inputs.length; i++){
+    var v = inputs[i].value.trim();
+    if (v === '') continue;
+    var r = await asesoraLlamar('ec_meta_definir', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin,
+      p_asesora_id: parseInt(inputs[i].getAttribute('data-id'),10), p_mes: mes, p_meta: parseInt(v,10) });
+    if (r.ok) ok++; else mal++;
+  }
+  if (ok) ui.jefeMsg = 'Metas guardadas ('+ok+').';
+  await asesorCargarPanel();
+  render();
+}
+function jefeLoteIds(etapa, mz){
+  var p = ui.asesorPanel; if (!p) return [];
+  var e = p.etapas.filter(function(x){ return String(x.etapa) === String(etapa); })[0];
+  if (!e) return [];
+  return e.lotes.filter(function(l){ return !mz || l.m === mz; }).map(function(l){ return l.id; });
+}
+function jefeOfertaManzana(){
+  var etapa = ui.ofEtapa || (ui.asesorPanel.etapas[0] && ui.asesorPanel.etapas[0].etapa);
+  jefeOfertaLotes(jefeLoteIds(etapa, ui.ofMz));
+}
+async function jefeOfertaLotes(ids){
+  ui.jefeMsg = ''; ui.asesoraError = '';
+  var valor = parseFloat(String(ui.ofValor).replace(',','.'));
+  var hasta = ui.ofHasta || fmtHoy(7);
+  if (!ids.length){ ui.asesoraError = 'No hay casas disponibles en esa selección.'; render(); return; }
+  if (!(valor > 0)){ ui.asesoraError = 'Escribe el descuento (monto en soles o porcentaje).'; render(); return; }
+  var r = await asesoraLlamar('ec_oferta_definir', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin,
+    p_lote_ids: ids, p_tipo: ui.ofTipo || 'soles', p_valor: valor, p_hasta: hasta+'T23:59:00-05:00' });
+  if (r.ok){
+    ui.jefeMsg = r.lotes ? ('Oferta aplicada a '+r.lotes+' casa'+(r.lotes===1?'':'s')+' hasta el '+hasta.split('-').reverse().join('/')+'.') : 'Ninguna casa cambió (el descuento dejaría el precio por debajo de la mitad).';
+    await etapa5Refrescar(); await asesorCargarPanel();
+  }
+  render();
+}
+async function jefeQuitarOferta(id){
+  var r = await asesoraLlamar('ec_oferta_quitar', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_lote_ids: [id] });
+  if (r.ok){ ui.jefeMsg = 'Oferta quitada.'; await etapa5Refrescar(); await asesorCargarPanel(); }
+  render();
+}
+async function jefeCrearAsesor(){
+  var nom = (ui.newAsesor || '').trim();
+  ui.jefeMsg = ''; ui.claveNueva = null;
+  if (nom.length < 5 || nom.indexOf(' ') === -1){ ui.asesoraError = 'Escribe nombre y apellido.'; render(); return; }
+  var r = await asesoraLlamar('ec_asesor_crear', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_nombre: nom });
+  if (r.ok){ ui.claveNueva = {nombre: nom, clave: r.clave}; ui.newAsesor = ''; await asesorCargarPanel(); }
+  render();
+}
+async function jefeDarDeBaja(id){
+  var a = (ui.asesorPanel.ranking || []).filter(function(x){ return x.id === id; })[0];
+  if (!confirm('¿Dar de baja a '+(a ? toTitleCase(a.nombre) : 'esta asesora')+'? Ya no podrá ingresar ni aparecerá en el ranking (sus ventas pasadas se conservan).')) return;
+  var r = await asesoraLlamar('ec_asesor_activar', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_asesora_id: id, p_activo: false });
+  if (r.ok){ ui.jefeMsg = 'Asesora dada de baja.'; await asesorCargarPanel(); }
+  render();
+}
+async function jefeReiniciarClave(id){
+  var a = (ui.asesorPanel.ranking || []).filter(function(x){ return x.id === id; })[0];
+  if (!confirm('¿Generar una contraseña nueva para '+(a ? a.nombre : 'esta asesora')+'? La anterior dejará de servir.')) return;
+  var r = await asesoraLlamar('ec_asesor_reiniciar_clave', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_asesora_id: id });
+  if (r.ok) ui.claveNueva = {nombre: a ? a.nombre : '', clave: r.clave};
+  render();
+}
+
+// ---------- Pantallas ----------
+function renderAsesorLogin(){
+  return '<div class="as-login"><button type="button" class="back-btn" data-action="gate-back" style="align-self:flex-start;">← Volver</button>'+
+    '<div class="as-login-card">'+
+      '<img class="as-login-logo" src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
+      '<h2>Ingreso de asesores</h2>'+
+      '<p class="as-login-sub">Escribe tu nombre y tu contraseña. Te llevamos directo a tu proyecto.</p>'+
+      '<label for="as-nombre">Nombre y apellido</label>'+
+      '<input class="text-input" type="text" id="as-nombre" autocomplete="off" autocapitalize="words" placeholder="Ej. Yanina Pinedo" value="'+esc(ui.asNombre)+'" />'+
+      '<label for="as-clave">Contraseña</label>'+
+      '<input class="text-input" type="password" id="as-clave" autocomplete="off" placeholder="••••••" />'+
+      (ui.asesorLoginError ? '<p class="as-err">'+esc(ui.asesorLoginError)+'</p>' : '')+
+      '<button type="button" class="btn btn-primary btn-block" style="margin-top:14px;" data-action="asesor-login"'+(ui.asesoraBusy?' disabled':'')+'>'+(ui.asesoraBusy?'Entrando…':'Entrar')+'</button>'+
+    '</div></div>';
+}
+
+function renderAsesorPanelHtml(){
+  var p = ui.asesorPanel;
+  var salir = '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
+  if (!p){
+    if (ui.asesorPanelError === 'sin_v7'){
+      return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Falta activar la actualización</div><div class="as-sub">Hay que correr el archivo v7 en Supabase (SQL Editor).</div></div>'+salir+'</div></div>';
+    }
+    if (ui.asesorPanelError === 'red'){
+      return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Sin conexión</div><div class="as-sub">Revisa tu internet. Se reintenta solo.</div></div>'+salir+'</div></div>';
+    }
+    return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Cargando tu panel…</div></div>'+salir+'</div></div>';
+  }
+  var yo = p.ranking.filter(function(r){ return String(r.id) === String(p.yo.id); })[0];
+  var jefe = p.yo.rol === 'jefe';
+  var mesTxt = '';
+  try { mesTxt = new Date(p.mes+'T12:00:00').toLocaleDateString('es-PE', {month:'long', year:'numeric'}); } catch(e){}
+  var h = '<div class="as-hero">'+
+    '<div class="as-hero-top"><div><div class="as-hello">Hola, '+esc(primerNombre(p.yo.nombre))+' 👋</div>'+
+    '<div class="as-sub">'+esc(p.proyecto_nombre || PROY_NOMBRES[p.yo.proyecto] || '')+(jefe ? ' · Jefe de ventas' : ' · Asesora de ventas')+'</div></div>'+salir+'</div>';
+  var cuentas = asesorCuentas();
+  if (cuentas.length > 1){
+    h += '<div class="as-cuentas">'+cuentas.map(function(c){
+      return '<button type="button" class="as-cuenta'+(String(c.id)===String(p.yo.id)?' on':'')+'" data-action="asesor-cuenta" data-value="'+c.id+'">'+esc(toTitleCase(c.proyecto))+'</button>';
+    }).join('')+'</div>';
+  }
+  if (!jefe){
+    var v = yo ? yo.ventas : 0, m = yo ? yo.meta : 0;
+    var pct = m > 0 ? Math.min(100, Math.round(v/m*100)) : 0;
+    h += '<div class="as-mes">Tus ventas · '+esc(mesTxt)+'</div>'+
+      '<div class="as-big">'+v+' <small>/ '+(m > 0 ? m : '—')+' casas</small></div>'+
+      '<div class="as-bar"><i style="width:'+pct+'%"></i></div>'+
+      '<div class="as-note">'+(m > 0 ? (v >= m ? '🎉 ¡Meta cumplida!' : 'Te faltan '+(m-v)+' para tu meta') : 'Tu jefe de ventas aún no define tu meta de este mes')+'</div>';
+  } else {
+    var tv = p.ranking.reduce(function(a,r){ return a + r.ventas; }, 0);
+    var tm = p.ranking.reduce(function(a,r){ return a + r.meta; }, 0);
+    var tp = tm > 0 ? Math.min(100, Math.round(tv/tm*100)) : 0;
+    h += '<div class="as-mes">Ventas de la sala · '+esc(mesTxt)+'</div>'+
+      '<div class="as-big">'+tv+' <small>/ '+(tm > 0 ? tm : '—')+' casas</small></div>'+
+      '<div class="as-bar"><i style="width:'+tp+'%"></i></div>';
+  }
+  h += '</div>';
+
+  // Ranking de la sala
+  h += '<div class="as-card"><h4>🏆 Ranking de la sala <small>'+esc(mesTxt)+'</small></h4>';
+  if (!p.ranking.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);">Aún no hay asesoras en este proyecto.</p>';
+  p.ranking.forEach(function(r, i){
+    var pct2 = r.meta > 0 ? Math.min(100, Math.round(r.ventas/r.meta*100)) : 0;
+    h += '<div class="as-rank-row'+(String(r.id)===String(p.yo.id)?' me':'')+'">'+
+      '<span class="as-pos'+(i<3 && r.ventas>0 ? ' p'+(i+1) : '')+'">'+(i+1)+'</span>'+
+      '<div style="min-width:0;"><div class="as-rank-name">'+esc(toTitleCase(r.nombre))+(String(r.id)===String(p.yo.id)?' (tú)':'')+'</div>'+
+      '<div class="as-bar as-bar-dark"><i style="width:'+pct2+'%"></i></div></div>'+
+      '<div class="as-rank-score">'+r.ventas+'<small> / '+(r.meta > 0 ? r.meta : '—')+'</small></div></div>';
+  });
+  h += '</div>';
+
+  // Separaciones mías en curso
+  if (p.mis_reservas && p.mis_reservas.length){
+    h += '<div class="as-card"><h4>⏳ Mis separaciones en proceso</h4>';
+    p.mis_reservas.forEach(function(r){
+      h += '<div class="as-res"><div><strong>'+etiquetaLote(r.m, r.l)+'</strong><div style="font-size:0.74rem;color:var(--ink-faint);">Etapa '+esc(r.etapa)+' · falta registrar el comprobante</div></div>'+
+        '<div style="display:flex;gap:8px;align-items:center;"><span class="as-timer js-vence" data-vence=\"'+esc(r.vence)+'\">'+mmss(r.vence)+'</span>'+
+        '<button type="button" class="as-lotechip" data-action="asesor-ir-lote" data-value="'+esc(r.etapa)+'|'+esc(r.m)+'|'+esc(r.l)+'">Abrir</button></div></div>';
+    });
+    h += '</div>';
+  }
+
+  // Disponibles por etapa
+  var totalDisp = p.etapas.reduce(function(a,e){ return a + e.n; }, 0);
+  h += '<div class="as-card"><h4>🏡 Casas disponibles <small>'+totalDisp+' en total</small></h4>';
+  if (!p.etapas.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);">Todavía no hay lotes cargados para este proyecto.</p>';
+  p.etapas.forEach(function(e){
+    var abierta = !!ui.asEtapaAbierta[e.etapa];
+    h += '<div class="as-etapa"><button type="button" class="as-etapa-head" data-action="asesor-etapa-toggle" data-value="'+esc(e.etapa)+'">'+
+      '<span><strong>Etapa '+esc(e.etapa)+'</strong></span><span class="as-etapa-n">'+e.n+' disponible'+(e.n===1?'':'s')+' '+(abierta?'▴':'▾')+'</span></button>';
+    if (abierta){
+      var ofIds = {}; (p.ofertas||[]).forEach(function(o){ ofIds[o.id] = 1; });
+      h += '<div class="as-chips">'+e.lotes.slice(0, 80).map(function(l){
+        return '<button type="button" class="as-lotechip'+(ofIds[l.id]?' of':'')+'" data-action="asesor-ir-lote" data-value="'+esc(e.etapa)+'|'+esc(l.m)+'|'+esc(l.l)+'">'+(ofIds[l.id]?'🏷️ ':'')+etiquetaLote(l.m, l.l)+'</button>';
+      }).join('')+(e.lotes.length > 80 ? '<span style="font-size:0.76rem;color:var(--ink-faint);align-self:center;">y '+(e.lotes.length-80)+' más…</span>' : '')+'</div>';
+    }
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Ofertas vigentes
+  if (p.ofertas && p.ofertas.length){
+    h += '<div class="as-card"><h4>🏷️ Ofertas vigentes <small>'+p.ofertas.length+' casa'+(p.ofertas.length===1?'':'s')+'</small></h4>';
+    p.ofertas.slice(0, 40).forEach(function(o){
+      h += '<div class="as-oferta-row"><div><strong>'+etiquetaLote(o.m, o.l)+'</strong> · Etapa '+esc(o.etapa)+'<div style="font-size:0.74rem;color:var(--ink-faint);">hasta el '+fmtFechaCorta(o.hasta)+'</div></div>'+
+        '<div><s>'+fmtMoney(o.precio)+'</s> <b>'+fmtMoney(o.oferta)+'</b></div>'+
+        (jefe ? '<button type="button" class="as-x" data-action="oferta-quitar" data-value="'+o.id+'" aria-label="Quitar oferta">✕</button>' : '')+
+        '</div>';
+    });
+    h += '</div>';
+  }
+
+  if (jefe) h += renderJefePanelHtml(p);
+  return h;
+}
+
+function renderJefePanelHtml(p){
+  var h = '<div class="as-card"><h4>🎯 Metas del mes <small>solo tú las defines</small></h4>';
+  if (!p.ranking.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);">Aún no hay asesoras para asignar metas.</p>';
+  p.ranking.forEach(function(r){
+    h += '<div class="as-meta-row"><span>'+esc(toTitleCase(r.nombre))+' <small style="color:var(--ink-faint);">· vende '+r.ventas+'</small></span>'+
+      '<input class="text-input js-meta" type="number" inputmode="numeric" min="0" max="500" data-id="'+r.id+'" value="'+(r.meta||'')+'" placeholder="0" /></div>';
+  });
+  if (p.ranking.length) h += '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="meta-guardar"'+(ui.asesoraBusy?' disabled':'')+'>Guardar metas</button>';
+  h += '</div>';
+
+  // Ofertas por manzana
+  var et = ui.ofEtapa || (p.etapas[0] && p.etapas[0].etapa) || '';
+  var etObj = p.etapas.filter(function(x){ return String(x.etapa) === String(et); })[0];
+  var mzs = []; if (etObj) etObj.lotes.forEach(function(l){ if (mzs.indexOf(l.m) === -1) mzs.push(l.m); });
+  var tipo = ui.ofTipo || 'soles';
+  h += '<div class="as-card"><h4>🏷️ Poner casas en oferta</h4>'+
+    '<div class="as-form-grid">'+
+      '<div><label>Etapa</label><select class="text-input" data-ui="ofEtapa" data-rerender="1">'+
+        p.etapas.map(function(x){ return '<option value="'+esc(x.etapa)+'"'+(String(x.etapa)===String(et)?' selected':'')+'>Etapa '+esc(x.etapa)+'</option>'; }).join('')+'</select></div>'+
+      '<div><label>Manzana</label><select class="text-input" data-ui="ofMz">'+
+        '<option value="">Todas las disponibles</option>'+mzs.map(function(m){ return '<option value="'+esc(m)+'"'+(ui.ofMz===m?' selected':'')+'>'+esc(m)+'</option>'; }).join('')+'</select></div>'+
+      '<div><label>Tipo de descuento</label><select class="text-input" data-ui="ofTipo" data-rerender="1"><option value="soles"'+(tipo==='soles'?' selected':'')+'>Monto en S/</option><option value="porcentaje"'+(tipo==='porcentaje'?' selected':'')+'>Porcentaje %</option></select></div>'+
+      '<div><label>'+(tipo==='soles'?'Descuento (S/)':'Descuento (%)')+'</label><input class="text-input" type="number" inputmode="decimal" min="0" data-ui="ofValor" value="'+esc(ui.ofValor)+'" placeholder="'+(tipo==='soles'?'3000':'5')+'" /></div>'+
+      '<div class="full"><label>La oferta vale hasta el</label><input class="text-input" type="date" data-ui="ofHasta" min="'+fmtHoy(1)+'" value="'+esc(ui.ofHasta || fmtHoy(7))+'" /></div>'+
+    '</div>'+
+    '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="oferta-manzana"'+(ui.asesoraBusy?' disabled':'')+'>Aplicar oferta'+(ui.ofMz ? ' a la manzana '+esc(ui.ofMz) : '')+'</button>'+
+    '<p style="font-size:0.74rem;color:var(--ink-faint);margin-top:8px;">También puedes poner una sola casa en oferta: ábrela en el plano y usa el mismo formulario. Las ofertas se apagan solas al llegar la fecha.</p>'+
+    (ui.jefeMsg ? '<p class="as-ok">'+esc(ui.jefeMsg)+'</p>' : '')+
+    (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '')+
+  '</div>';
+
+  // Equipo
+  h += '<div class="as-card"><h4>👥 Mi equipo</h4>';
+  p.ranking.forEach(function(r){
+    h += '<div class="as-meta-row"><span>'+esc(toTitleCase(r.nombre))+'</span><span style="display:flex;gap:6px;"><button type="button" class="as-lotechip" data-action="asesor-reiniciar" data-value="'+r.id+'">Nueva contraseña</button><button type="button" class="as-x" data-action="asesor-baja" data-value="'+r.id+'" title="Dar de baja">Baja</button></span></div>';
+  });
+  h += '<div class="as-form-grid" style="margin-top:10px;"><div class="full"><label>Agregar asesora o asesor</label><input class="text-input" type="text" data-ui="newAsesor" placeholder="Nombre y apellido" value="'+esc(ui.newAsesor)+'" /></div></div>'+
+    '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesor-crear">Crear y generar contraseña</button>';
+  if (ui.claveNueva) h += '<div class="as-clave">Contraseña de <strong>'+esc(toTitleCase(ui.claveNueva.nombre))+'</strong>: <b>'+esc(ui.claveNueva.clave)+'</b><br><span style="font-size:0.76rem;color:var(--ink-soft);">Anótala y entrégasela: no se vuelve a mostrar.</span></div>';
+  h += '</div>';
+  return h;
+}
+
+function ofertaLoteHtml(lote){
+  var tipo = ui.ofTipo || 'soles';
+  return '<div class="asesora-form" style="margin-top:10px;"><label>🏷️ Oferta para esta casa</label>'+
+    '<div class="as-form-grid">'+
+      '<div><select class="text-input" data-ui="ofTipo" data-rerender="1"><option value="soles"'+(tipo==='soles'?' selected':'')+'>Monto en S/</option><option value="porcentaje"'+(tipo==='porcentaje'?' selected':'')+'>Porcentaje %</option></select></div>'+
+      '<div><input class="text-input" type="number" inputmode="decimal" min="0" data-ui="ofValor" value="'+esc(ui.ofValor)+'" placeholder="'+(tipo==='soles'?'3000':'5')+'" /></div>'+
+      '<div class="full"><label>Vale hasta el</label><input class="text-input" type="date" data-ui="ofHasta" min="'+fmtHoy(1)+'" value="'+esc(ui.ofHasta || fmtHoy(7))+'" /></div>'+
+    '</div>'+
+    '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="oferta-lote" data-value="'+lote.id+'">Poner en oferta</button>'+
+    (lote.of ? '<button type="button" class="btn btn-secondary btn-block" style="margin-top:6px;" data-action="oferta-quitar" data-value="'+lote.id+'">Quitar oferta</button>' : '')+
+  '</div>';
+}
+
+function renderAsesorLoteAcciones(lote){
+  if (!modoAsesor()) return '';
+  var busy = ui.asesoraBusy ? ' disabled' : '';
+  var info = ui.sepInfo[lote.id];
+  var h = '<div class="lote-detail-section"><div class="lote-detail-section-title">🧑‍💼 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
+  if (lote.e === 'DISPONIBLE'){
+    h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>1 hora</strong>.</p>'+
+      '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (1 hora)</button>';
+    if (esJefe()) h += ofertaLoteHtml(lote);
+  } else if (lote.e === 'EN_ATENCION' && lote.vence){
+    var mia = esMiReserva(lote.id);
+    h += '<p class="sep-info">⏳ Separación en proceso · tiempo restante <span class="as-timer js-vence" data-vence=\"'+esc(lote.vence)+'\">'+mmss(lote.vence)+'</span></p>';
+    if (mia){
+      h += '<div class="asesora-form">'+
+        '<label>Nombre y apellidos del cliente</label>'+
+        '<input class="text-input" type="text" id="sep-nombre" data-ui="sepNombre" autocomplete="off" placeholder="Como figura en su DNI" value="'+esc(ui.sepNombre)+'" />'+
+        '<label style="margin-top:8px;">DNI del cliente</label>'+
+        '<input class="text-input" type="text" id="sep-dni" data-ui="sepDni" inputmode="numeric" autocomplete="off" placeholder="12345678" value="'+esc(ui.sepDni)+'" />'+
+        '<label style="margin-top:8px;">N.º de operación o comprobante</label>'+
+        '<input class="text-input" type="text" id="sep-op" data-ui="sepOp" autocomplete="off" placeholder="Ej. 00123456" value="'+esc(ui.sepOp)+'" />'+
+        '<label style="margin-top:8px;">Monto pagado (S/) · mínimo '+fmtMoney(sepMonto())+'</label>'+
+        '<input class="text-input" type="number" id="sep-monto" data-ui="sepMonto" inputmode="decimal" value="'+esc(ui.sepMonto !== '' ? ui.sepMonto : sepMonto())+'" />'+
+        '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="sep-confirmar" data-value="'+lote.id+'"'+busy+'>'+(ui.asesoraBusy?'Guardando…':'✅ Confirmar pago y separar')+'</button>'+
+        '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="reserva-cancelar" data-value="'+lote.id+'"'+busy+'>Cancelar separación</button>'+
+      '</div>';
+    } else {
+      h += '<p class="sep-info">Otra asesora está separando esta casa. Si no registra el pago a tiempo, vuelve a quedar disponible.</p>';
+      if (esJefe()) h += '<button type="button" class="btn btn-secondary btn-block" data-action="reserva-cancelar" data-value="'+lote.id+'"'+busy+'>Liberar esta separación</button>';
+    }
+  } else if (lote.e === 'EN_ATENCION'){
+    h += '<button type="button" class="btn btn-secondary btn-block" data-action="asesora-liberar" data-value="'+lote.id+'"'+busy+'>✅ Liberar lote</button>';
+  } else if (lote.e === 'SEPARADO' || lote.e === 'VENDIDO'){
+    if (info && info.hay) h += '<p class="sep-info">Cliente: <strong>'+esc(info.cliente)+'</strong><br>Separó: '+esc(info.asesora)+' · '+esc(new Date(info.desde).toLocaleDateString('es-PE'))+'</p>';
+    if (lote.e === 'SEPARADO'){
+      h += '<button type="button" class="btn btn-primary btn-block" data-action="sep-comprado" data-value="'+lote.id+'"'+busy+'>✅ Marcar como vendida</button>'+
+        '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-liberar" data-value="'+lote.id+'"'+busy+'>↩️ Liberar (no se concretó)</button>';
+    }
+  }
+  h += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
+    (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '')+'</div>';
+  return h;
+}
+
+// ---------- Relojes: cuenta regresiva de 1 hora y actualización del panel ----------
+var asRelojesOn = false;
+function asesorIniciarRelojes(){
+  if (asRelojesOn) return;
+  asRelojesOn = true;
+  setInterval(function(){
+    var els = document.querySelectorAll('.js-vence');
+    if (!els.length) return;
+    var vencio = false;
+    els.forEach(function(el){
+      var ms = new Date(el.getAttribute('data-vence')).getTime() - Date.now();
+      if (ms <= 0){ el.textContent = '00:00'; vencio = true; return; }
+      var s = Math.floor(ms/1000);
+      el.textContent = String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    });
+    if (vencio && !ui._venceBusy){
+      ui._venceBusy = true;
+      Promise.all([etapa5Refrescar(), asesorCargarPanel()]).then(function(){ render(); });
+      setTimeout(function(){ ui._venceBusy = false; }, 4000);
+    }
+  }, 1000);
+  setInterval(function(){
+    if (modoAsesor() && !document.hidden) asesorCargarPanel();
+  }, 8000);
+}
+
+// Guarda lo que se escribe en los campos con data-ui (para que no se pierda al refrescar)
+function asesorUiBind(ev){
+  var el = ev.target;
+  if (!el || !el.getAttribute) return;
+  var k = el.getAttribute('data-ui');
+  if (!k) return;
+  ui[k] = el.value;
+  if (ev.type === 'change' && el.getAttribute('data-rerender') === '1') render();
+}
+document.addEventListener('input', asesorUiBind);
+document.addEventListener('change', asesorUiBind);
+
+
 function renderSplash(){
   return '<div class="splash-screen-v2">'+
     '<img class="splash-v2-photo" src="'+GATE_AERIAL_DATAURI+'" alt="" />'+
@@ -1574,7 +2139,7 @@ function renderGate(){
       '</div>'+
       '<div class="gate-v2-bottom">'+
         '<div class="gate-v2-badge">🏡 +3,500 viviendas entregadas</div>'+
-        '<button type="button" class="gate-v2-cta-primary" data-action="gate-interesado">🔍 Quiero información</button>'+
+        '<button type="button" class="gate-v2-cta-primary" data-action="gate-asesor">🧑‍💼 Soy Asesor</button>'+
         '<button type="button" class="gate-v2-cta-secondary" data-action="gate-cliente">Ya tengo una vivienda Vive Hogar</button>'+
       '</div>'+
     '</div>'+
@@ -1859,14 +2424,35 @@ function mapaEtapa5Row(r){
     id: r.id, m: r.manzana, l: r.lote, a: r.area, v: r.vista,
     pl: r.precio_lista, d: r.descuento, pv: r.precio_venta,
     t: r.pos_top, le: r.pos_left, w: r.pos_width, h: r.pos_height,
-    e: etapa5EstadoLegacy(r.estado)
+    e: etapa5EstadoLegacy(r.estado),
+    of: r.oferta_precio ? Number(r.oferta_precio) : null,
+    oh: r.oferta_hasta || null,
+    vence: r.vence || null
   };
+}
+
+// Pide los lotes con la función nueva (ofertas + reservas de 1 hora). Si todavía
+// no se activó en Supabase, usa la función anterior para no romper nada.
+var etapa5Usa2 = true;
+function etapa5Fetch(){
+  var args = { p_proyecto: "sullana", p_etapa: "5" };
+  if (!etapa5Usa2) return sb.rpc("ec_lotes_etapa", args);
+  return sb.rpc("ec_lotes_etapa2", args).then(function(res){
+    if (res.error){ etapa5Usa2 = false; return sb.rpc("ec_lotes_etapa", args); }
+    return res;
+  });
+}
+function etapa5Refrescar(){
+  return etapa5Fetch().then(function(res){
+    if (res.error || !res.data) return;
+    ETAPA5_LOTES_PLANO = res.data.map(mapaEtapa5Row);
+  });
 }
 
 function asegurarEtapa5Lotes(){
   if (etapa5LotesEstado !== "pendiente") return;
   etapa5LotesEstado = "cargando";
-  sb.rpc("ec_lotes_etapa", { p_proyecto: "sullana", p_etapa: "5" }).then(function(res){
+  etapa5Fetch().then(function(res){
     if (res.error || !res.data || !res.data.length){
       etapa5LotesEstado = "error";
     } else {
@@ -1888,14 +2474,14 @@ function etapa5IniciarPolling(){
       etapa5PollTimer = null;
       return;
     }
-    sb.rpc("ec_lotes_etapa", { p_proyecto: "sullana", p_etapa: "5" }).then(function(res){
+    etapa5Fetch().then(function(res){
       if (res.error || !res.data) return;
       var nuevo = res.data.map(mapaEtapa5Row);
       var cambio = JSON.stringify(nuevo) !== JSON.stringify(ETAPA5_LOTES_PLANO);
       ETAPA5_LOTES_PLANO = nuevo;
-      if (cambio) render();
+      if (cambio || ui.renderPendiente) renderSiLibre();
     });
-  }, 10000);
+  }, 4000);
 }
 var ETAPA5_RECREACION_PLANO = [{"m":"I14","t":56.942,"le":27.893,"w":8.605,"h":18.352,"a":847.88},{"m":"I16","t":37.961,"le":47.923,"w":11.424,"h":12.374,"a":847.8}];
 
@@ -1983,7 +2569,7 @@ function renderEntornoChips(){
   return '<div class="entorno-chips">'+chips.map(function(c){ return '<span class="entorno-chip">'+c+'</span>'; }).join('')+'</div>';
 }
 
-var SEPARACION_LOTE = 500;
+var SEPARACION_LOTE = 4000; // Sullana (valor por defecto); cada proyecto tiene el suyo, ver sepMonto()
 var VHS_BFH_SULLANA = 47850;
 
 // FAQ de Vive Hogar Sullana: solo preguntas con respuesta verificada
@@ -2094,11 +2680,11 @@ function renderMapaEtapa5Html(){
   var etapa5Disponibles = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE'; }).length;
   html += '<h4 style="margin-bottom:2px;">Etapa 5</h4>';
   html += '<div class="etapa5-header-sub">Elige tu casa · '+etapa5Disponibles+' lotes disponibles</div>';
-  html += '<p class="lote-hint-small">👆 Toca un lote para ver sus características</p>';
+  html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>verde</strong> para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
   html += '<div class="lote-legend">'+
     '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
-    '<span><i class="lote-dot lote-dot-neutral"></i> Vendido</span>'+
-    '<span><i class="lote-dot lote-dot-warn"></i> Separado</span>'+
+    '<span><i class="lote-dot lote-dot-neutral"></i> No disponible (vendida o separada)</span>'+
+    '<span><i class="lote-dot lote-dot-oferta"></i> En oferta</span>'+
     '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
     '<span><i class="lote-dot lote-dot-area"></i> Parque</span>'+
   '</div>';
@@ -2151,11 +2737,11 @@ function renderMapaEtapa5Html(){
       }).join('')+
       ETAPA5_LOTES_PLANO.map(function(l){
         var key = l.m+'|'+l.l;
-        var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : (l.e === 'SEPARADO' || l.e === 'BLOQUEADO' || l.e === 'SEPARACION_EN_PROCESO' || l.e === 'EN_ATENCION') ? 'lote-warn' : 'lote-neutral';
+        var cls = (l.e === 'DISPONIBLE' ? 'lote-ok' : 'lote-neutral') + (l.e === 'DISPONIBLE' && l.of ? ' lote-oferta' : '');
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
         var isSel = ui.interesadoLoteSel === key;
         var dim = (!isSel && ui.interesadoLoteSel) || (!isSel && filtrosActivos && !loteCoincide(l));
-        var estTxt = l.e === 'DISPONIBLE' ? 'disponible' : l.e === 'VENDIDO' ? 'vendido' : l.e === 'SEPARADO' ? 'separado' : l.e === 'SEPARACION_EN_PROCESO' ? 'separación en proceso' : l.e === 'EN_ATENCION' ? 'en atención' : 'no disponible';
+        var estTxt = estInfo(l.e).txt.toLowerCase();
         return '<div role="button" tabindex="0" aria-label="Manzana '+esc(l.m)+', lote '+esc(String(l.l))+', '+estTxt+'" class="lote-hotspot '+cls+mine+(isSel?' active':'')+(dim?' lote-hotspot-dim':'')+'" '+
           'style="top:'+l.t+'%;left:'+l.le+'%;width:'+l.w+'%;height:'+l.h+'%;" '+
           'data-action="interesado-lote" data-value="'+key+'">'+(mine?'<span class="lote-hotspot-mine-label">Tu casa</span>':'')+'<span class="lote-hotspot-num" aria-hidden="true">'+esc(String(l.l))+'</span></div>';
@@ -2183,14 +2769,7 @@ function renderMapaEtapa5Html(){
     var selParts = ui.interesadoLoteSel.split('|');
     var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === selParts[0] && String(l.l) === selParts[1]; })[0];
     if (lote){
-      var estadoInfo = lote.e === 'DISPONIBLE' ? {cls:'ok', txt:'Disponible'}
-        : lote.e === 'VENDIDO' ? {cls:'neutral', txt:'Vendido'}
-        : lote.e === 'SEPARADO' ? {cls:'warn', txt:'Separado'}
-        : lote.e === 'SEPARACION_EN_PROCESO' ? {cls:'warn', txt:'Separación en proceso'}
-        : lote.e === 'EN_ATENCION' ? {cls:'warn', txt:'En atención'}
-        : lote.e === 'BLOQUEADO' ? {cls:'warn', txt:'Bloqueado'}
-        : lote.e === 'DEVUELTO' ? {cls:'warn', txt:'Devuelto'}
-        : {cls:'neutral', txt:esc(lote.e||'')};
+      var estadoInfo = estInfo(lote.e);
       html += '<div class="lote-detail-card" style="margin-top:12px;">';
       html += '<div class="lote-summary-strip">'+
         '<div class="lote-summary-label">Lote seleccionado</div>'+
@@ -2201,8 +2780,9 @@ function renderMapaEtapa5Html(){
         '<div class="lote-summary-sub">Etapa 5 · Vista '+(lote.v ? 'a '+esc(lote.v.toLowerCase()) : '—')+'</div>'+
         '<div class="lote-summary-grid">'+
           '<div><span>Área del terreno</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
-          '<div><span>Precio total</span><strong>'+fmtMoney(lote.pv)+'</strong></div>'+
+          '<div><span>Precio total</span><strong>'+precioHtml(lote)+'</strong></div>'+
         '</div>'+
+        (lote.e==='DISPONIBLE' && lote.of ? '<div class="oferta-chip">🏷️ Oferta hasta el '+fmtFechaCorta(lote.oh)+'</div>' : '')+
         (lote.e==='DISPONIBLE' ? '<a class="btn btn-primary btn-block" href="#cuotas-calc-anchor" style="margin-top:10px;">Simular cuotas ↓</a>' : '')+
       '</div>';
       html += '<div class="lote-detail-section">'+
@@ -2213,67 +2793,25 @@ function renderMapaEtapa5Html(){
         '</div>'+
       '</div>';
       var bfh = VHS_BFH_SULLANA;
-      var inicialCliente = Math.max(0, lote.pv - bfh);
+      var inicialCliente = Math.max(0, lotePrecio(lote) - bfh);
       html += '<div class="lote-detail-section">'+
         '<div class="lote-detail-section-title">✅ Estado y forma de pago</div>'+
         '<div class="lote-detail-grid">'+
           '<div class="lote-detail-tile"><span>Estado</span><strong class="cuota-chip cuota-chip-'+estadoInfo.cls+'" style="margin-top:3px;">'+estadoInfo.txt+'</strong></div>'+
           '<div class="lote-detail-tile"><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
           '<div class="lote-detail-tile"><span>Bono Familiar Habitacional</span><strong>'+fmtMoney(bfh)+'</strong></div>'+
-          '<div class="lote-detail-tile"><span>Precio total del lote</span><strong>'+fmtMoney(lote.pv)+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Precio total del lote</span><strong>'+precioHtml(lote)+'</strong></div>'+
         '</div>'+
         '<p style="font-size:0.74rem;color:var(--ink-faint);margin-top:8px;">El Bono Familiar Habitacional lo descuenta el Estado directamente del precio — el cliente solo paga la inicial.</p>'+
       '</div>';
       if (lote.d){
         html += '<p style="font-size:0.78rem;color:var(--ink-faint);padding:0 16px 14px;">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
       }
-      if (asesoraPin && asesoraIdActual && ['DISPONIBLE','EN_ATENCION','SEPARADO','VENDIDO'].indexOf(lote.e) !== -1){
-        var busy = ui.asesoraBusy ? ' disabled' : '';
-        var info = ui.sepInfo[lote.id];
-        html += '<div class="lote-detail-section">'+
-          '<div class="lote-detail-section-title">👩‍💼 Modo asesora — '+esc(asesoraNombreActual||'')+'</div>';
-        if ((lote.e === 'SEPARADO' || lote.e === 'VENDIDO') && info && info.hay){
-          html += '<p class="sep-info">Cliente: <strong>'+esc(info.cliente)+'</strong><br>Separó: '+esc(info.asesora)+' · '+esc(new Date(info.desde).toLocaleDateString('es-PE'))+'</p>';
-        }
-        if (String(ui.sepFormLote) === String(lote.id) && (lote.e === 'DISPONIBLE' || lote.e === 'EN_ATENCION')){
-          html += '<div class="asesora-form">'+
-            '<label>Nombre y apellidos del cliente</label>'+
-            '<input class="text-input" type="text" id="sep-nombre" autocomplete="off" placeholder="Como figura en su DNI" value="'+esc(ui.sepNombre)+'" />'+
-            '<label style="margin-top:8px;">DNI del cliente</label>'+
-            '<input class="text-input" type="text" id="sep-dni" inputmode="numeric" autocomplete="off" placeholder="12345678" value="'+esc(ui.sepDni)+'" />'+
-            '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="sep-confirmar" data-value="'+lote.id+'"'+busy+'>'+(ui.asesoraBusy?'Guardando…':'Confirmar separación')+'</button>'+
-            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-cancelar"'+busy+'>Cancelar</button>'+
-          '</div>';
-        } else if (lote.e === 'DISPONIBLE'){
-          html += '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar lote</button>'+
-            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesora-marcar" data-value="'+lote.id+'"'+busy+'>📍 Solo marcar en atención</button>';
-        } else if (lote.e === 'EN_ATENCION'){
-          html += '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar lote</button>'+
-            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesora-liberar" data-value="'+lote.id+'"'+busy+'>✅ Liberar lote</button>';
-        } else if (lote.e === 'SEPARADO'){
-          html += '<button type="button" class="btn btn-primary btn-block" data-action="sep-comprado" data-value="'+lote.id+'"'+busy+'>✅ Lote comprado</button>'+
-            '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-liberar" data-value="'+lote.id+'"'+busy+'>↩️ Liberar (no se vendió)</button>';
-        }
-        html += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
-          (ui.asesoraError ? '<p style="color:var(--danger);font-size:0.78rem;margin-top:6px;">'+esc(ui.asesoraError)+'</p>' : '')+
-        '</div>';
-      }
-      var vistaRenders = rendersParaVista(lote.v);
-      if (vistaRenders.length){
-        html += '<div class="lote-detail-section">'+
-          '<div class="lote-detail-section-title">📷 Así se vería tu vista: '+esc(lote.v||'')+'</div>'+
-          '<div class="renders-gallery">'+
-            vistaRenders.map(function(r){
-              return '<div class="renders-gallery-item"><div class="media-img-wrap"><img src="'+r.src+'" alt="'+esc(r.label)+'" loading="lazy" />'+mediaTag('render')+'</div><span class="media-caption">'+esc(r.label)+'</span></div>';
-            }).join('')+
-          '</div>'+
-          '<p style="font-size:0.72rem;color:var(--ink-faint);margin-top:8px;">Fotos referenciales del proyecto, no de este lote exacto. Todas las viviendas son iguales, por lo que así lucirán según el tipo de vista.</p>'+
-        '</div>';
-      }
+      html += renderAsesorLoteAcciones(lote);
       if (lote.e === 'DISPONIBLE'){
         var calcModo = ui.loteCalcModo || 'cuotas';
         var calcMeses = ui.loteCalcMeses || 24;
-        var saldoFinanciar = Math.max(0, inicialCliente - SEPARACION_LOTE);
+        var saldoFinanciar = Math.max(0, inicialCliente - sepMonto());
         var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
         html += '<div class="cuotas-calc" id="cuotas-calc-anchor">';
         html += '<div class="cuotas-calc-title">Simula tu cuota mensual</div>';
@@ -2291,6 +2829,7 @@ function renderMapaEtapa5Html(){
             '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(cuotaMensual)+'</div>'+
             '<div class="cuotas-calc-breakdown">'+
               '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Separación (ya pagada)</span><strong>− '+fmtMoney(sepMonto())+'</strong></div>'+
               '<div><span>Monto financiado</span><strong>'+fmtMoney(saldoFinanciar)+'</strong></div>'+
             '</div>'+
           '</div>';
@@ -2300,43 +2839,19 @@ function renderMapaEtapa5Html(){
             '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(saldoFinanciar)+'</div>'+
             '<div class="cuotas-calc-breakdown">'+
               '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
-              '<div><span>Separación ya pagada</span><strong>'+fmtMoney(SEPARACION_LOTE)+'</strong></div>'+
+              '<div><span>Separación ya pagada</span><strong>'+fmtMoney(sepMonto())+'</strong></div>'+
             '</div>'+
           '</div>';
         }
         html += '<p class="cuotas-calc-disclaimer">Simulación referencial, sin intereses. Sujeta a confirmación con tu asesora.</p>';
         html += '</div>';
-        var loteMsg = encodeURIComponent('Hola, me interesa la Manzana '+lote.m+' - Lote '+lote.l+' de la Etapa 5 en Vive Hogar Sullana (inicial '+fmtMoney(inicialCliente)+' + Bono '+fmtMoney(bfh)+'). ¿Podemos coordinar una cita con una asesora?');
         html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">'+
           '<button type="button" class="btn btn-secondary btn-block" data-action="descargar-cotizacion" data-value="'+esc(lote.m)+'|'+esc(String(lote.l))+'">📄 Descargar cotización (PDF)</button>'+
-          '<a class="btn btn-primary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg+'" target="_blank" rel="noopener">📅 Agendar cita con una asesora</a>'+
-          '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+loteMsg.replace('coordinar%20una%20cita%20con%20una%20asesora','saber%20c%C3%B3mo%20reservarlo')+'" target="_blank" rel="noopener">💳 Cómo reservar este lote</a>'+
         '</div>';
       }
     }
     html += '</div>';
   }
-
-  html += '<div class="asesora-panel"><div class="asesora-title">Acceso para asesores · uso interno</div>';
-  if (!asesoraPin || !asesoraIdActual){
-    if (!ui.showAsesoraForm){
-      html += '<button type="button" class="asesora-link" data-action="asesora-mostrar-form">Soy asesora: ingresar</button>';
-    } else {
-      html += '<div class="asesora-form">';
-      html += '<label>Código de acceso del asesor</label>';
-      html += '<input class="text-input" type="password" inputmode="numeric" id="asesora-pin-input" placeholder="••••" value="'+esc(ui.asesoraPinInput||'')+'" />';
-      html += '<label style="margin-top:8px;">¿Quién eres?</label>';
-      html += '<select class="text-input" id="asesora-nombre-select">'+
-        (ui.asesorasLista||[]).map(function(a){ return '<option value="'+a.id+'">'+esc(a.nombre)+'</option>'; }).join('')+
-      '</select>';
-      if (ui.asesoraError) html += '<p style="color:var(--danger);font-size:0.78rem;margin-top:6px;">'+esc(ui.asesoraError)+'</p>';
-      html += '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="asesora-entrar"'+(ui.asesoraBusy?' disabled':'')+'>'+(ui.asesoraBusy?'Entrando…':'Entrar')+'</button>';
-      html += '</div>';
-    }
-  } else {
-    html += '<div class="asesora-activa">👩‍💼 Modo asesora: <strong>'+esc(asesoraNombreActual)+'</strong> · <button type="button" class="btn-link-inline" data-action="asesora-salir">Salir</button></div>';
-  }
-  html += '</div>';
 
   html += '</div>';
   return html;
@@ -2477,24 +2992,27 @@ function renderLoteSheetEtapa5(){
   var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === p[0] && String(l.l) === p[1]; })[0];
   if (!lote) return '';
   var disp = lote.e === 'DISPONIBLE';
-  var est = disp ? {c:'ok',t:'Disponible'} : lote.e === 'VENDIDO' ? {c:'neutral',t:'Vendido'} : lote.e === 'SEPARADO' ? {c:'warn',t:'Separado'}
-    : lote.e === 'SEPARACION_EN_PROCESO' ? {c:'warn',t:'Separación en proceso'} : lote.e === 'EN_ATENCION' ? {c:'warn',t:'En atención'}
-    : lote.e === 'BLOQUEADO' ? {c:'warn',t:'Bloqueado'} : {c:'neutral',t:esc(lote.e||'')};
+  var est0 = estInfo(lote.e), est = {c:est0.cls, t:est0.txt};
   var msg = 'Hola, estoy interesado en el lote Mz. '+lote.m+', Lt. '+String(lote.l).padStart(2,'0')+' de Vive Hogar Sullana (Etapa 5).';
   return '<div class="lote-sheet">'+
     '<div class="ls-head"><span class="cuota-chip cuota-chip-'+est.c+'">'+est.t+'</span>'+
       '<strong class="ls-id">Mz '+esc(lote.m)+' · Lt '+esc(String(lote.l).padStart(2,'0'))+'</strong>'+close+'</div>'+
     '<div class="ls-row"><div class="ls-meta">'+parseFloat(lote.a).toFixed(2)+' m²'+(lote.v ? ' · Vista '+esc(lote.v.toLowerCase()) : '')+'</div>'+
-      (disp ? '<div class="ls-price">'+fmtMoney(lote.pv)+'</div>' : '')+'</div>'+
-    '<a class="btn btn-block ls-wa" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>'+
-    (disp ? '<button type="button" class="ls-link" data-action="etapa5-full-cerrar" data-value="ficha">Ver detalle y simular cuotas</button>' : '')+
+      (disp ? '<div class="ls-price">'+precioHtml(lote)+'</div>' : '')+'</div>'+
+    (modoAsesor() ? '' : '<a class="btn btn-block ls-wa" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>')+
+    ((disp || modoAsesor()) ? '<button type="button" class="ls-link" data-action="etapa5-full-cerrar" data-value="ficha">'+(modoAsesor() ? (disp ? 'Ver detalle, simular cuotas y separar' : 'Ver detalle') : 'Ver detalle y simular cuotas')+'</button>' : '')+
   '</div>';
 }
 
 function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
-  var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
+  var esAsesor = modoAsesor();
+  var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
+  if (esAsesor && proy === 'sullana' && !ui.interesadoEtapaSel) ui.interesadoEtapaSel = '5';
   var html = '<div class="interesado-screen" style="padding-bottom:64px;">';
+  if (esAsesor){
+    html += renderAsesorPanelHtml();
+  } else {
   html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button>';
   html += '<div class="interesado-elegir-header interesado-elegir-header-lg" style="margin-top:12px;">'+
     '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
@@ -2511,8 +3029,9 @@ function renderInteresadoMapa(){
     '</div>'+
     '<a class="cta-secondary-pill" href="#mapa-proyecto-panel">Consultar precios y disponibilidad →</a>'+
     '</div>';
+  }
 
-  if (proy === 'sullana') html += renderBarraConfianza();
+  if (proy === 'sullana' && !esAsesor) html += renderBarraConfianza();
 
   if (proy === 'sullana'){
     html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
@@ -2545,7 +3064,7 @@ function renderInteresadoMapa(){
     }
     html += '</div>';
 
-    html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
+    if (!esAsesor) html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
       '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Descubre qué encontrarás alrededor de Vive Hogar Sullana.</p>'+
       '<p class="ubicacion-tag">📍 '+esc(PROYECTOS[1].ciudad === 'Piura' ? 'Piura' : PROYECTOS[1].ciudad+', Piura')+'</p>'+
@@ -2555,6 +3074,9 @@ function renderInteresadoMapa(){
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&q='+encodeURIComponent(PROYECTOS[1].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
     '</div>';
+  } else if (esAsesor){
+    html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Plano del proyecto</h4>'+
+      '<p style="font-size:0.9rem;color:var(--ink-soft);">El plano interactivo de <strong>'+esc(nombreProy)+'</strong> se activa cuando carguemos sus lotes y ubicaciones. Mientras tanto, arriba ves tus ventas, tu ranking y las casas disponibles por etapa.</p></div>';
   } else {
     html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
       '<div class="map-hint-banner">👆 Selecciona una manzana para explorar los lotes disponibles</div>'+
@@ -2584,16 +3106,16 @@ function renderInteresadoMapa(){
   }
   var asesorHref = 'https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg);
 
-  if (proy === 'sullana') html += renderVideosProyecto();
-  if (proy === 'sullana') html += renderPanelConfianza();
-  if (proy === 'sullana'){
+  if (proy === 'sullana' && !esAsesor) html += renderVideosProyecto();
+  if (proy === 'sullana' && !esAsesor) html += renderPanelConfianza();
+  if (proy === 'sullana' && !esAsesor){
     html += '<div class="panel panel-flat"><h4>Preguntas frecuentes</h4>'+
       renderFaqAccordion(VHS_FAQ_SULLANA, asesorHref)+
     '</div>';
   }
 
   html += '</div>';
-  html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
+  if (!esAsesor) html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
 }
 
@@ -2619,6 +3141,11 @@ function renderApp(){
   }
   if (appGate === 'cliente-pendiente'){
     document.getElementById('app').innerHTML = renderClienteVerificacion();
+    return;
+  }
+  if (appGate === 'asesor'){
+    document.getElementById('app').innerHTML = modoAsesor() ? renderInteresadoMapa() : renderAsesorLogin();
+    initEtapa5ZoomDrag();
     return;
   }
   if (appGate === 'interesado'){
@@ -2828,6 +3355,45 @@ document.addEventListener('click', async function(ev){
     setGate('cliente-pendiente');
     window.scrollTo(0,0);
     render();
+  } else if (action === 'gate-asesor'){
+    ui.asesorLoginError = '';
+    setGate('asesor');
+    window.scrollTo(0,0);
+    render();
+    if (modoAsesor()) asesorCargarPanel();
+  } else if (action === 'asesor-login'){
+    asesorLogin();
+  } else if (action === 'asesor-salir'){
+    if (confirm('¿Salir de tu cuenta de asesor?')){ salirAsesorTotal(); }
+  } else if (action === 'asesor-cuenta'){
+    asesorCambiarCuenta(t.getAttribute('data-value'));
+  } else if (action === 'asesor-etapa-toggle'){
+    var etK = t.getAttribute('data-value');
+    ui.asEtapaAbierta[etK] = !ui.asEtapaAbierta[etK];
+    render();
+  } else if (action === 'asesor-ir-lote'){
+    asesorIrALote(t.getAttribute('data-value'));
+  } else if (action === 'meta-guardar'){
+    jefeGuardarMetas();
+  } else if (action === 'oferta-manzana'){
+    jefeOfertaManzana();
+  } else if (action === 'oferta-lote'){
+    jefeOfertaLotes([parseInt(t.getAttribute('data-value'),10)]);
+  } else if (action === 'oferta-quitar'){
+    jefeQuitarOferta(parseInt(t.getAttribute('data-value'),10));
+  } else if (action === 'asesor-crear'){
+    jefeCrearAsesor();
+  } else if (action === 'asesor-baja'){
+    jefeDarDeBaja(parseInt(t.getAttribute('data-value'),10));
+  } else if (action === 'asesor-reiniciar'){
+    jefeReiniciarClave(parseInt(t.getAttribute('data-value'),10));
+  } else if (action === 'reserva-cancelar'){
+    var rcId = t.getAttribute('data-value');
+    if (confirm('¿Cancelar esta separación? La casa vuelve a estar disponible para todos.')){
+      var rcr = await asesoraLlamar('ec_reserva_cancelar', { p_lote_id: rcId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+      if (rcr.ok){ ui.sepMsg = 'Separación cancelada: la casa volvió a estar disponible.'; ui.sepFormLote = null; await etapa5Refrescar(); await asesorCargarPanel(); }
+      render();
+    }
   } else if (action === 'gate-interesado'){
     ui.interesadoStep = 'elegir';
     ui.interesadoDesdeMiCasa = false;
@@ -2913,7 +3479,7 @@ document.addEventListener('click', async function(ev){
     ui.interesadoLoteSel = (ui.interesadoLoteSel === loteVal) ? null : loteVal;
     ui.etapa5AreaSel = null;
     ui.sepFormLote = null; ui.asesoraError = ''; ui.sepMsg = '';
-    if (ui.interesadoLoteSel && asesoraPin && asesoraIdActual){
+    if (ui.interesadoLoteSel && modoAsesor()){
       var lSel = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m+'|'+l.l === loteVal; })[0];
       if (lSel && (lSel.e === 'SEPARADO' || lSel.e === 'VENDIDO') && !ui.sepInfo[lSel.id]) cargarSepInfo(lSel.id).then(function(){ render(); });
     }
@@ -2990,19 +3556,28 @@ document.addEventListener('click', async function(ev){
     if (rAt.ok) asesoraCambioLocal(loteId, marcar ? 'EN_ATENCION' : 'DISPONIBLE', '');
     render();
   } else if (action === 'sep-abrir'){
-    ui.sepFormLote = t.getAttribute('data-value'); ui.sepNombre = ''; ui.sepDni = ''; ui.asesoraError = ''; ui.sepMsg = '';
-    render();
-  } else if (action === 'sep-cancelar'){
-    ui.sepFormLote = null; ui.asesoraError = '';
+    // "Separar": bloquea la casa 1 hora para todos
+    var rvId = t.getAttribute('data-value');
+    ui.sepMsg = ''; ui.sepOp = ''; ui.sepNombre = ''; ui.sepDni = ''; ui.sepMonto = '';
+    var rv = await asesoraLlamar('ec_reservar_lote', { p_lote_id: rvId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+    if (rv.ok){
+      ui.sepMsg = 'Casa bloqueada por 1 hora. Cobra la separación y registra el comprobante antes de que se acabe el tiempo.';
+      await etapa5Refrescar(); await asesorCargarPanel();
+    }
     render();
   } else if (action === 'sep-confirmar'){
     var sepId = t.getAttribute('data-value');
-    var nIn = document.getElementById('sep-nombre'), dIn = document.getElementById('sep-dni');
-    ui.sepNombre = nIn ? nIn.value : ''; ui.sepDni = dIn ? dIn.value : '';
-    var rSep = await asesoraLlamar('ec_lote_separar', { p_lote_id: sepId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin, p_nombre: ui.sepNombre, p_dni: ui.sepDni });
+    ['sep-nombre:sepNombre','sep-dni:sepDni','sep-op:sepOp','sep-monto:sepMonto'].forEach(function(p){
+      var kv = p.split(':'), el = document.getElementById(kv[0]);
+      if (el) ui[kv[1]] = el.value;
+    });
+    var montoNum = parseFloat(String(ui.sepMonto).replace(',','.'));
+    var rSep = await asesoraLlamar('ec_reserva_confirmar', { p_lote_id: sepId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin,
+      p_nombre: ui.sepNombre, p_dni: ui.sepDni, p_operacion: ui.sepOp, p_monto: isNaN(montoNum) ? null : montoNum });
     if (rSep.ok){
-      ui.sepFormLote = null; ui.sepNombre = ''; ui.sepDni = '';
-      asesoraCambioLocal(sepId, 'SEPARADO', 'Lote separado. El cliente ya puede entrar a la app con su nombre y DNI.' + (rSep.aviso === 'nombre_distinto' ? ' Ojo: ese DNI ya estaba registrado con otro nombre; puede que no pueda entrar con este.' : ''));
+      ui.sepNombre = ''; ui.sepDni = ''; ui.sepOp = ''; ui.sepMonto = '';
+      ui.sepMsg = '¡Pago registrado! La casa quedó SEPARADA.' + (rSep.aviso === 'nombre_distinto' ? ' Ojo: ese DNI ya estaba registrado con otro nombre; puede que no pueda entrar con este.' : '');
+      await etapa5Refrescar(); await asesorCargarPanel();
       await cargarSepInfo(sepId);
     }
     render();
@@ -3097,7 +3672,9 @@ async function asesoraLlamar(fn, args){
   ui.asesoraBusy = false;
   var d = res.data;
   if (res.error || !d){
-    ui.asesoraError = 'No se pudo completar. Revisa tu conexión e intenta de nuevo.';
+    ui.asesoraError = (res.error && res.error.code === 'PGRST202')
+      ? 'Falta activar la actualización v7 en Supabase (ver instrucciones).'
+      : 'No se pudo completar. Revisa tu conexión e intenta de nuevo.';
     return {ok:false};
   }
   if (!d.ok){
@@ -3108,14 +3685,27 @@ async function asesoraLlamar(fn, args){
       dni: 'El DNI debe tener entre 5 y 8 dígitos (solo números).',
       no_disponible: 'Ese lote ya no está disponible: alguien se te adelantó.',
       no_separado: 'Ese lote ya no está separado.',
-      no_existe: 'No se encontró el lote.'
+      no_existe: 'No se encontró el lote.',
+      vencida: 'Se acabó el tiempo de esta separación (1 hora). La casa volvió a estar disponible; si sigue libre, sepárala de nuevo.',
+      operacion: 'Escribe el número de operación del comprobante (entre 4 y 30 letras o números).',
+      operacion_repetida: 'Ese número de operación ya fue usado en otra separación.',
+      monto_bajo: 'El monto es menor que la separación de este proyecto.',
+      muchas_reservas: 'Ya tienes 3 casas separadas en proceso. Confirma o cancela alguna primero.',
+      otro_proyecto: 'Esa casa es de otro proyecto.',
+      no_reserva: 'No hay una separación en proceso que cancelar.',
+      no_jefe: 'Solo el jefe de ventas puede hacer esto.',
+      fecha: 'Elige una fecha de fin válida (entre mañana y 120 días).',
+      valor: 'Descuento no válido (máximo 30 % o que el precio no baje de la mitad).',
+      meta: 'La meta debe ser un número entre 0 y 500.',
+      existe: 'Ya existe una asesora con ese nombre en tu proyecto.',
+      nombre_asesora: 'Escribe nombre y apellido.'
     };
     ui.asesoraError = msgs[d.error] || 'No se pudo completar.';
     return {ok:false};
   }
   return d;
 }
-function asesoraCambioLocal(loteId, estado, msg){
+function asesoraCambioLocal(loteId, estado, msg){ // (ya no se usa en la separación; se mantiene para compatibilidad)
   var l = ETAPA5_LOTES_PLANO.filter(function(x){ return String(x.id) === String(loteId); })[0];
   if (l) l.e = estado;
   ui.sepMsg = msg || '';
@@ -3306,8 +3896,8 @@ function generarCotizacionPDF(mz, loteNum){
   var modo = ui.loteCalcModo || 'cuotas';
   var meses = ui.loteCalcMeses || 24;
   var bfh = VHS_BFH_SULLANA;
-  var inicialCliente = Math.max(0, lote.pv - bfh);
-  var saldo = Math.max(0, inicialCliente - SEPARACION_LOTE);
+  var inicialCliente = Math.max(0, lotePrecio(lote) - bfh);
+  var saldo = Math.max(0, inicialCliente - sepMonto());
   var cuota = Math.round(saldo / meses);
 
   var doc = new window.jspdf.jsPDF();
@@ -3326,7 +3916,7 @@ function generarCotizacionPDF(mz, loteNum){
   y += 6; doc.text('Estado: '+(lote.e==='DISPONIBLE'?'Disponible':lote.e), 14, y);
 
   y += 12; doc.setFontSize(13); doc.setTextColor(20,20,20);
-  doc.text('Precio total del lote: '+fmtMoney(lote.pv), 14, y);
+  doc.text('Precio total del lote: '+fmtMoney(lotePrecio(lote)), 14, y);
   y += 7; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
   doc.text('Bono Familiar Habitacional: '+fmtMoney(bfh), 14, y);
   y += 6; doc.setFontSize(13); doc.setTextColor(20,20,20);
@@ -3334,7 +3924,7 @@ function generarCotizacionPDF(mz, loteNum){
   y += 10; doc.setFontSize(12); doc.setTextColor(57,126,173);
   doc.text(modo === 'contado' ? 'Plan: Al contado' : 'Plan: En cuotas ('+meses+' meses)', 14, y);
   y += 8; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
-  doc.text('Separación referencial: '+fmtMoney(SEPARACION_LOTE), 14, y);
+  doc.text('Separación: '+fmtMoney(sepMonto()), 14, y);
   y += 6;
   if (modo === 'contado'){
     doc.text('Saldo en un solo pago: '+fmtMoney(saldo), 14, y);
@@ -3663,6 +4253,12 @@ async function init(){
     }
   }catch(e){ console.error(e); }
   if (!appGate && identity){ setGate('cliente-verificado'); }
+  if (appGate === 'asesor' && modoAsesor()){
+    try { ui.interesadoProyecto = localStorage.getItem('ec_asesor_proy_v1') || 'sullana'; } catch(e){}
+    ui.interesadoStep = 'mapa';
+    asesorCargarPanel();
+  }
+  asesorIniciarRelojes();
   await refreshServicios();
   loading = false;
   render();
