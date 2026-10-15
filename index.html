@@ -1898,7 +1898,7 @@ function renderAsesorPanelHtml(){
   try { mesTxt = new Date(p.mes+'T12:00:00').toLocaleDateString('es-PE', {month:'long', year:'numeric'}); } catch(e){}
   var h = '<div class="as-hero">'+
     '<div class="as-hero-top"><div><div class="as-hello">Hola, '+esc(primerNombre(p.yo.nombre))+' 👋</div>'+
-    '<div class="as-sub">'+esc(p.proyecto_nombre || PROY_NOMBRES[p.yo.proyecto] || '')+(jefe ? ' · Jefe de ventas' : ' · Asesora de ventas')+'</div></div>'+salir+'</div>';
+    '<div class="as-sub">'+esc(p.proyecto_nombre || PROY_NOMBRES[p.yo.proyecto] || '')+' · '+esc(p.yo.cargo || (jefe ? 'Jefe de ventas' : 'Asesora de ventas'))+'</div></div>'+salir+'</div>';
   var cuentas = asesorCuentas();
   if (cuentas.length > 1){
     h += '<div class="as-cuentas">'+cuentas.map(function(c){
