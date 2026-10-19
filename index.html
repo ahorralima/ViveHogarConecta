@@ -3744,7 +3744,7 @@ document.addEventListener('click', async function(ev){
       var cw = outer ? outer.clientWidth : 300;
       var ch = outer ? outer.clientHeight : 300;
       var factor = dir === 'in' ? 1.5 : (1/1.5);
-      var newScale = Math.min(4, Math.max(1, z.scale * factor));
+      var newScale = Math.min(4, Math.max(etapa5MinZoom(), z.scale * factor));
       var cx = cw/2, cy = ch/2;
       var newX = cx - ((cx - z.x) * (newScale/z.scale));
       var newY = cy - ((cy - z.y) * (newScale/z.scale));
@@ -3831,6 +3831,7 @@ function clampZoom(z, cw, ch){
 }
 
 var etapa5FitScaleCache = null;
+function etapa5MinZoom(){ return Math.min(1, etapa5FitScaleCache || 1); }
 function etapa5Bbox(){
   var items = ETAPA5_LOTES_PLANO.concat(ETAPA5_RECREACION_PLANO);
   var minTop=100, maxBottom=0, minLeft=100, maxRight=0;
@@ -3862,9 +3863,16 @@ function computeEtapa5FitZoom(outer){
   inner.style.transform = prevTransform;
   outer.style.height = prevHeight;
   if (!iw || !ih || !cw) return {scale:1,x:0,y:0};
-  var ch = isFull ? outer.clientHeight : Math.max(380, Math.min(640, Math.round(window.innerHeight*0.7)));
-  if (!isFull) outer.style.height = ch+'px';
   var bbox = etapa5Bbox();
+  var ch;
+  if (isFull) ch = outer.clientHeight;
+  else {
+    // Alto del visor = alto del plano completo ajustado al ancho (sin espacios vacíos), entre 300px y 78% de la pantalla
+    var fitH = (bbox.height/100)*ih*(cw/((bbox.width/100)*iw*1.04));
+    ch = Math.round(Math.max(200, Math.min(fitH + 12, window.innerHeight*0.78)));
+    outer.style.minHeight = '0';
+    outer.style.height = ch+'px';
+  }
   var bboxLeftPx = (bbox.left/100) * iw;
   var bboxTopPx = (bbox.top/100) * ih;
   var bboxWidthPx = (bbox.width/100) * iw;
@@ -3872,7 +3880,8 @@ function computeEtapa5FitZoom(outer){
   var padding = 1.04;
   var scale = Math.max(cw/(bboxWidthPx*padding), ch/(bboxHeightPx*padding));
   if (isFull) scale = Math.min(cw/(bboxWidthPx*1.1), ch/(bboxHeightPx*1.1));
-  scale = Math.min(4, Math.max(1, scale));
+  else scale = Math.min(cw/(bboxWidthPx*padding), ch/(bboxHeightPx*padding));
+  scale = Math.min(4, Math.max(isFull ? 1 : 0.3, scale));
   etapa5FitScaleCache = scale;
   if (isFull){
     // Plano muy ancho (como la Etapa 1) en pantalla alta: se acerca y se empieza por la izquierda,
@@ -3949,7 +3958,7 @@ function initEtapa5ZoomDrag(){
       var midLocal = {x:mid.x-rect.left, y:mid.y-rect.top};
       if (lastDist){
         var scaleFactor = dist / lastDist;
-        var newScale = Math.min(4, Math.max(1, z.scale * scaleFactor));
+        var newScale = Math.min(4, Math.max(etapa5MinZoom(), z.scale * scaleFactor));
         var effFactor = newScale / z.scale;
         var newX = midLocal.x - ((midLocal.x - z.x) * effFactor);
         var newY = midLocal.y - ((midLocal.y - z.y) * effFactor);
