@@ -2339,7 +2339,7 @@ function renderCuotas(){
       '<div style="width:52px;height:52px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 14px;">💰</div>'+
       '<h3 style="margin-bottom:6px;">Tu información de pagos</h3>'+
       '<p style="color:var(--ink-soft);font-size:0.9rem;">Todavía no hay cuotas vinculadas a tu perfil.</p>'+
-      '<p style="color:var(--ink-faint);font-size:0.82rem;margin-top:4px;">Si ya realizaste pagos, podemos ayudarte a asociar tu historial.</p>'+
+      '<p style="color:var(--ink-faint);font-size:0.82rem;margin-top:4px;">Si ya realizaste pagos, podemos ayudarte a asociar tu historial. Al escribirnos, ten a mano tu nombre completo, tu DNI y tu manzana y lote.</p>'+
       '<a class="btn btn-primary btn-block" style="margin-top:14px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no veo mis cuotas registradas en la app y ya hice pagos. ¿Me ayudan a asociar mi historial?')+'" target="_blank" rel="noopener">Solicitar ayuda</a>'+
     '</div>';
     return html;
@@ -2755,7 +2755,7 @@ function renderMapaEtapa5Html(etapaN){
   var html = '<div class="mapa-vhs-detail">';
   var etapa5Disponibles = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE'; }).length;
   html += '<h4 style="margin-bottom:2px;">Etapa '+esc(ETAPA_ACTUAL)+'</h4>';
-  html += '<div class="etapa5-header-sub">Elige tu casa · '+etapa5Disponibles+' lotes disponibles</div>';
+  html += '<div class="etapa5-header-sub">'+(etapa5Disponibles === 0 ? 'Por ahora no hay lotes disponibles en esta etapa (los demás están vendidos o separados)' : 'Elige tu casa · '+etapa5Disponibles+(etapa5Disponibles === 1 ? ' lote disponible' : ' lotes disponibles'))+'</div>';
   html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>verde</strong> para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
   html += '<div class="lote-legend">'+
     '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
