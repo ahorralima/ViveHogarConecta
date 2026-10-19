@@ -1129,8 +1129,14 @@ function visibleServicios(){
       return (s.titulo+' '+s.descripcion+' '+s.autorNombre).toLowerCase().indexOf(q) !== -1;
     });
   }
+  // Cercanía: dentro del proyecto, primero los avisos de la etapa del usuario y luego los de otras etapas
+  var miEtapa = String((identity && identity.etapa) || (localPref && localPref.etapa) || '');
   list.sort(function(a,b){
     if (!!a.demo !== !!b.demo) return a.demo ? 1 : -1;
+    if (miEtapa){
+      var ae = String(a.etapa) === miEtapa, be = String(b.etapa) === miEtapa;
+      if (ae !== be) return ae ? -1 : 1;
+    }
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
   return list;
@@ -1381,7 +1387,8 @@ function renderDetalle(){
     html += '<div class="demo-callout">'+iconSvg('info',17)+'<span>Este es un servicio de ejemplo para mostrar cómo funciona ViveHogarConecta. No tiene un contacto real — ¡publica el tuyo!</span></div>';
   } else {
     var msg = 'Hola, vi tu servicio "'+s.titulo+'" en ViveHogarConecta. ¿Sigue disponible?';
-    html += '<a class="wa-btn" href="'+waLink(s.autorTelefono, msg)+'" target="_blank" rel="noopener">'+svgWa()+' Contactar por WhatsApp</a>';
+    html += '<a class="wa-btn" href="'+waLink(s.autorTelefono, msg)+'" target="_blank" rel="noopener">'+svgWa()+' Contactar por WhatsApp</a>'+
+      '<p style="font-size:0.75rem;color:var(--ink-faint);margin:-8px 0 14px;text-align:center;">Se abrirá WhatsApp con un mensaje ya escrito (nombre del servicio). No se envía nada hasta que tú lo envíes.</p>';
   }
   html += '<a class="maps-btn" href="'+mapsUrl(s)+'" target="_blank" rel="noopener">'+svgPin()+' Cómo llegar hasta ahí</a>';
   if (!s.direccion) html += '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:-10px;margin-bottom:16px;text-align:center;">Ubicación aproximada — este vecino no dejó una referencia exacta.</p>';
