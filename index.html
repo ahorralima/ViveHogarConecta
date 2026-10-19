@@ -397,13 +397,16 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-vhs-img{width:100%;display:block;}
 .mapa-vhs-hotspot{position:absolute;border:2px solid rgba(57,126,173,0.55);background:rgba(57,126,173,0.22);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0;}
 .mapa-vhs-hotspot span{background:var(--paprika);color:#fff;font-weight:800;font-size:0.85rem;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);}
-.mapa-etapa-zona{border:none;border-radius:0;background:rgba(255,255,255,0);animation:none !important;}
-.mapa-etapa-zona.active{background:rgba(255,255,255,0.28);}
+.mapa-etapa-zona{border:none;border-radius:0;background:rgba(255,255,255,0.10);animation:none !important;}
+.mapa-etapa-zona.active{background:rgba(248,177,50,0.42);}
+.mapa-gen{background:#dfe3e8 !important;}
+.mapa-gen-leyenda{position:absolute;left:8px;bottom:8px;z-index:30;display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.94);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:0.72rem;font-weight:600;color:#1f2933;box-shadow:0 2px 8px rgba(0,0,0,0.2);pointer-events:none;}
+.mapa-gen-leyenda i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-2px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,0.25);}
 .mapa-gen{height:auto;min-height:0;}
 .mapa-gen.mapa-full{height:100dvh !important;}
 .mapa-gen .mapa-vhs-img{user-select:none;-webkit-user-drag:none;}
-.mapa-etapa-num{position:absolute;transform:translate(-50%,-50%) scale(var(--zs,1));background:var(--paprika);color:#fff;font-weight:800;font-size:0.8rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);pointer-events:none;}
-.mapa-etapa-num.active{background:var(--gold-fill);color:#222;}
+.mapa-etapa-num{position:absolute;transform:translate(-50%,-50%) scale(var(--zs,1));background:#3a4656;color:#fff;font-weight:800;font-size:0.8rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);pointer-events:none;}
+.mapa-etapa-num.active{background:var(--gold-fill);color:#222;width:28px;height:28px;font-size:0.95rem;z-index:2;}
 .mapa-etapas-otras{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;font-size:0.85rem;color:var(--ink-soft);}
 .mapa-vhs-hotspot.active{background:rgba(248,177,50,0.3);border-color:var(--gold-fill);}
 .mapa-vhs-hotspot.active span{background:var(--gold-fill);color:#222;}
@@ -3540,7 +3543,7 @@ document.addEventListener('click', async function(ev){
     if (gv === 'reset'){ ui.genZoom = genFit(document.getElementById('gen-zoom')); genApply(); }
     else genZoomBy(gv === 'in' ? 1.6 : 1/1.6);
   } else if (action === 'interesado-etapa'){
-    var vinoDelMapa = !!ui.genFull; ui.genFull = false;
+    var vinoDelMapa = !!ui.genFull; ui.genFull = false; ui.genZoom = null;
     if (vinoDelMapa) setTimeout(function(){ var d = document.querySelector('.mapa-vhs-detail'); if (d) d.scrollIntoView({block:'start'}); }, 80);
     ui.interesadoEtapaSel = t.getAttribute('data-value');
     ui.interesadoManzanaSel = null;
@@ -4001,6 +4004,7 @@ function renderMapaGeneralVisor(){
           zonas+
         '</div>'+
       '</div>'+
+      '<div class="mapa-gen-leyenda"><span><i style="background:var(--gold-fill);"></i>Etapa seleccionada</span><span><i style="background:#3a4656;"></i>Otras etapas</span></div>'+
       '<div class="mapa-zoom-controls">'+
         '<button type="button" class="mapa-zoom-btn" data-action="gen-zoom" data-value="in" title="Acercar">+</button>'+
         '<button type="button" class="mapa-zoom-btn" data-action="gen-zoom" data-value="out" title="Alejar">−</button>'+
@@ -4035,6 +4039,15 @@ function genFit(outer){
   var cw = outer.clientWidth, ch = outer.clientHeight;
   var scale = Math.min(cw/iw, ch/ih); if (!isFinite(scale) || scale <= 0) scale = 1;
   ui.genFitScale = scale;
+  var sel = MAPA_GENERAL_ETAPAS[String(ui.interesadoEtapaSel)];
+  if (sel){
+    // Encuadra la etapa seleccionada
+    var xs = sel.map(function(p){return p[0];}), ys = sel.map(function(p){return p[1];});
+    var bx0 = Math.min.apply(null,xs), bx1 = Math.max.apply(null,xs), by0 = Math.min.apply(null,ys), by1 = Math.max.apply(null,ys);
+    var fw = (bx1-bx0)/100*iw, fh = (by1-by0)/100*ih;
+    var s2 = Math.min(cw/fw, ch/fh)*0.85; s2 = Math.max(scale, Math.min(s2, scale*5));
+    return genClamp({scale:s2, x:cw/2 - (bx0+bx1)/200*iw*s2, y:ch/2 - (by0+by1)/200*ih*s2}, cw, ch);
+  }
   // Vista inicial: acercada hacia las etapas con casas (centro-derecha del terreno)
   var sc = scale*2.1;
   return genClamp({scale:sc, x:cw/2 - 0.575*iw*sc, y:ch/2 - 0.40*ih*sc}, cw, ch);
