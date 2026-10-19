@@ -420,7 +420,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cuota-chip-neutral2{background:rgba(120,120,120,0.12);color:var(--ink-faint);}
 .mapa-lotes-wrap{touch-action:pan-y;}
 .lote-hotspot{container-type:size;position:absolute;border:1px solid rgba(0,0,0,0.35);cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.lote-hotspot-num{font-size:min(68cqh,44cqw);font-weight:800;color:#1a1a1a;text-shadow:0 1px 1px rgba(255,255,255,0.85);pointer-events:none;line-height:1;}
+.lote-hotspot-num{font-size:min(var(--nf,999px),68cqh,44cqw);font-weight:800;color:#1a1a1a;text-shadow:0 1px 1px rgba(255,255,255,0.85);pointer-events:none;line-height:1;}
 .lote-hotspot.lote-ok{background:rgba(46,160,90,0.32);}
 .lote-hotspot.lote-neutral{background:rgba(120,120,120,0.28);}
 .lote-hotspot.lote-warn{background:rgba(248,177,50,0.38);}
@@ -3864,6 +3864,9 @@ function computeEtapa5FitZoom(outer){
   outer.style.height = prevHeight;
   if (!iw || !ih || !cw) return {scale:1,x:0,y:0};
   var bbox = etapa5Bbox();
+  // Tamaño de número uniforme en todo el plano: el de un lote "típico" (percentil 10); solo los lotes muy chicos lo reducen
+  var nfs = ETAPA5_LOTES_PLANO.map(function(l){ return Math.min(0.68*(l.h/100)*ih, 0.44*(l.w/100)*iw); }).filter(function(v){ return v > 0; }).sort(function(a,b){ return a-b; });
+  if (nfs.length) inner.style.setProperty('--nf', nfs[Math.floor(nfs.length*0.1)].toFixed(2)+'px');
   var ch;
   if (isFull) ch = outer.clientHeight;
   else {
