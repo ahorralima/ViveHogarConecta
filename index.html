@@ -532,6 +532,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cuotas-calc-tab.active{background:var(--teal);color:#fff;}
 .cuotas-calc-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .cuotas-calc-slider-row input[type=range]{flex:1;accent-color:var(--teal);}
+.cuotas-calc-num{width:84px;flex:none;text-align:center;font-weight:700;}
+.as-form-grid .text-input,.asesora-form .text-input{width:100%;min-width:0;max-width:100%;box-sizing:border-box;}
+.as-form-grid input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-height:44px;text-align:left;}
+.as-form-grid>div{min-width:0;}
 .cuotas-calc-meses-label{font-size:0.82rem;font-weight:700;color:var(--ink-soft);white-space:nowrap;}
 .cuotas-calc-result{text-align:center;padding:10px 0;}
 .cuotas-calc-label{font-size:0.78rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.03em;}
@@ -1708,7 +1712,7 @@ function renderPerfil(){
     '<button type="button" class="btn btn-danger btn-block" data-action="delete-account">Eliminar mi cuenta</button>'+
   '</div>';
 
-  html += '<p class="footer-note">ViveHogarConecta · Proyecto de la marca Vive Hogar para Castilla y Sullana · v0.2</p>';
+  html += '<p class="footer-note">ViveHogarConecta · Proyecto de la marca Vive Hogar · v0.2</p>';
   return html;
 }
 
@@ -1716,7 +1720,7 @@ function renderPerfil(){
 // Ingreso con nombre + contraseña, panel de ventas/metas/ranking, ofertas del
 // jefe de ventas y separación con 1 hora de plazo. Todo pasa por funciones de
 // Supabase (ver supabase-schema-v7-asesores.sql).
-var PROY_SEPARACION = { sullana: 4000, castilla: 3000, ejidos: 2000, lambayeque: 4000 };
+var PROY_SEPARACION = { sullana: 500, castilla: 500, ejidos: 500, lambayeque: 500 };
 var PROY_NOMBRES = { sullana: 'Vive Hogar Sullana', castilla: 'Vive Hogar Castilla', ejidos: 'Vive Hogar Ejidos', lambayeque: 'Vive Hogar Lambayeque' };
 
 ui.asesorPanel = null;
@@ -1739,8 +1743,14 @@ ui.newAsesor = '';
 function modoAsesor(){ return appGate === 'asesor' && !!asesoraPin && !!asesoraIdActual; }
 function esJefe(){ return !!(ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.rol === 'jefe'); }
 function sepMonto(){
-  if (ui.asesorPanel && ui.asesorPanel.monto_separacion) return Number(ui.asesorPanel.monto_separacion);
-  return PROY_SEPARACION[ui.interesadoProyecto] || SEPARACION_LOTE;
+  return SEPARACION_LOTE;   // la separación es S/ 500 en todos los proyectos
+}
+// Un cliente verificado solo ve el detalle de SU casa; en las demás (y en cualquier casa ya vendida/separada) no se muestran precios ni características.
+function loteRestringido(l){
+  if (modoAsesor()) return false;
+  var esMia = !!ui.miCasaKey && ui.miCasaKey === l.m+'|'+l.l;
+  if (esMia) return false;
+  return !!ui.miCasaKey || l.e !== 'DISPONIBLE';
 }
 function lotePrecio(l){ return l.of ? l.of : l.pv; }
 function precioHtml(l){
@@ -2710,7 +2720,7 @@ function renderEntornoChips(){
   return '<div class="entorno-chips">'+chips.map(function(c){ return '<span class="entorno-chip">'+c+'</span>'; }).join('')+'</div>';
 }
 
-var SEPARACION_LOTE = 4000; // Sullana (valor por defecto); cada proyecto tiene el suyo, ver sepMonto()
+var SEPARACION_LOTE = 500; // separación igual en todos los proyectos; el resto de la inicial se paga en cuotas
 var VHS_BFH_SULLANA = 47850;
 
 // FAQ de Vive Hogar Sullana: solo preguntas con respuesta verificada
@@ -2919,6 +2929,19 @@ function renderMapaEtapa5Html(etapaN){
     var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === selParts[0] && String(l.l) === selParts[1]; })[0];
     if (lote){
       var estadoInfo = estInfo(lote.e);
+      if (loteRestringido(lote)){
+        html += '<div class="lote-detail-card" style="margin-top:12px;"><div class="lote-summary-strip">'+
+          '<div class="lote-summary-label">Lote seleccionado</div>'+
+          '<div class="lote-summary-top"><span class="cuota-chip cuota-chip-'+estadoInfo.cls+'">'+estadoInfo.txt+'</span>'+
+          '<span class="lote-summary-id">Mz. '+esc(lote.m)+' · Lt. '+esc(String(lote.l).padStart(2,'0'))+'</span></div>'+
+          '<div class="lote-summary-sub">Etapa '+esc(ETAPA_ACTUAL)+'</div>'+
+          '<p style="font-size:0.8rem;color:var(--ink-faint);margin-top:8px;">'+(ui.miCasaKey ? 'Solo puedes ver el detalle de tu casa.' : 'Esta casa ya no está disponible.')+'</p>'+
+        '</div></div>';
+        lote = null;
+      }
+    }
+    if (lote){
+      var estadoInfo = estInfo(lote.e);
       html += '<div class="lote-detail-card" style="margin-top:12px;">';
       html += '<div class="lote-summary-strip">'+
         '<div class="lote-summary-label">Lote seleccionado</div>'+
@@ -2970,8 +2993,9 @@ function renderMapaEtapa5Html(etapaN){
         '</div>';
         if (calcModo === 'cuotas'){
           html += '<div class="cuotas-calc-slider-row">'+
-            '<input type="range" id="lote-calc-meses" min="6" max="36" step="6" value="'+calcMeses+'" />'+
-            '<span class="cuotas-calc-meses-label">'+calcMeses+' meses</span>'+
+            '<label for="lote-calc-meses" class="cuotas-calc-meses-label" style="margin:0;">Número de cuotas</label>'+
+            '<input type="number" class="text-input cuotas-calc-num" id="lote-calc-meses" inputmode="numeric" min="1" max="36" step="1" value="'+calcMeses+'" />'+
+            '<span class="cuotas-calc-meses-label">meses</span>'+
           '</div>';
           html += '<div class="cuotas-calc-result">'+
             '<div class="cuotas-calc-label">Tu cuota mensual referencial</div>'+
@@ -3142,6 +3166,13 @@ function renderLoteSheetEtapa5(){
   if (!lote) return '';
   var disp = lote.e === 'DISPONIBLE';
   var est0 = estInfo(lote.e), est = {c:est0.cls, t:est0.txt};
+  if (loteRestringido(lote)){
+    return '<div class="lote-sheet">'+
+      '<div class="ls-head"><span class="cuota-chip cuota-chip-'+est.c+'">'+est.t+'</span>'+
+        '<strong class="ls-id">Mz '+esc(lote.m)+' · Lt '+esc(String(lote.l).padStart(2,'0'))+'</strong>'+close+'</div>'+
+      '<p class="ls-note">'+(ui.miCasaKey ? 'Solo puedes ver el detalle de tu casa.' : 'Esta casa ya no está disponible.')+'</p>'+
+    '</div>';
+  }
   var msg = 'Hola, estoy interesado en el lote Mz. '+lote.m+', Lt. '+String(lote.l).padStart(2,'0')+' de Vive Hogar Sullana (Etapa '+ETAPA_ACTUAL+').';
   return '<div class="lote-sheet">'+
     '<div class="ls-head"><span class="cuota-chip cuota-chip-'+est.c+'">'+est.t+'</span>'+
@@ -4263,8 +4294,7 @@ document.addEventListener('input', function(ev){
     ui.fEtapa = ev.target.value.trim();
     render();
   } else if (ev.target.id === 'lote-calc-meses'){
-    var label = document.querySelector('.cuotas-calc-meses-label');
-    if (label) label.textContent = ev.target.value + ' meses';
+    // se actualiza al terminar de escribir (evento change)
   }
 });
 
@@ -4292,7 +4322,7 @@ document.addEventListener('change', function(ev){
     return;
   }
   if (ev.target.id === 'lote-calc-meses'){
-    ui.loteCalcMeses = parseInt(ev.target.value, 10) || 24;
+    ui.loteCalcMeses = Math.min(36, Math.max(1, parseInt(ev.target.value, 10) || 24));
     render();
   }
 });
