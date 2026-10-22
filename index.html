@@ -1841,7 +1841,7 @@ async function asesorLogin(){
     ui.asesorCuentas = cuentas;
     ui.interesadoProyecto = c0.proyecto;
     ui.interesadoStep = 'mapa';
-    ui.interesadoEtapaSel = null; ui.interesadoLoteSel = null;
+    ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null;
     ui.asNombre = ''; ui.asesorPanel = null; ui._panelJson = '';
     render();
     await asesorCargarPanel();
@@ -1854,7 +1854,7 @@ async function asesorLogin(){
 function salirAsesorTotal(msg){
   salirModoAsesora();
   ui.asesorPanel = null; ui._panelJson = ''; ui.asesorCuentas = null;
-  ui.interesadoEtapaSel = null; ui.interesadoLoteSel = null; ui.sepMsg = ''; ui.asesoraError = '';
+  ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null; ui.sepMsg = ''; ui.asesoraError = '';
   try { localStorage.removeItem('ec_asesor_cuentas_v1'); localStorage.removeItem('ec_asesor_proy_v1'); } catch(e){}
   setGate(null);
   window.scrollTo(0,0);
@@ -1873,7 +1873,7 @@ function asesorCambiarCuenta(id){
   saveAsesoraSesion(asesoraPin, String(c.id), c.nombre);
   ui.asesorPanel = null; ui._panelJson = '';
   ui.interesadoProyecto = c.proyecto;
-  ui.interesadoEtapaSel = null; ui.interesadoLoteSel = null; ui.sepMsg = '';
+  ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null; ui.sepMsg = '';
   render();
   asesorCargarPanel();
 }
@@ -1881,7 +1881,7 @@ function asesorCambiarCuenta(id){
 function asesorIrALote(v){
   var p = v.split('|');
   if (ui.interesadoProyecto !== 'sullana' || !etapaTienePlano(p[0])){ toast('El plano de esa etapa todavía no está cargado.'); return; }
-  ui.interesadoEtapaSel = String(p[0]);
+  ui.interesadoEtapaSel = String(p[0]); ui.genFocus = true; ui.genZoom = null;
   ui.interesadoLoteSel = p[1]+'|'+p[2];
   ui.etapa5AreaSel = null; ui.sepFormLote = null; ui.asesoraError = ''; ui.sepMsg = '';
   render();
@@ -2136,7 +2136,7 @@ function renderAsesorLoteAcciones(lote){
   if (!modoAsesor()) return '';
   var busy = ui.asesoraBusy ? ' disabled' : '';
   var info = ui.sepInfo[lote.id];
-  var h = '<div class="lote-detail-section"><div class="lote-detail-section-title">🧑‍💼 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
+  var h = '<div class="lote-detail-section"><div class="lote-detail-section-title">👨‍💼 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
   if (lote.e === 'DISPONIBLE'){
     h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>1 hora</strong>.</p>'+
       '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (1 hora)</button>';
@@ -2235,7 +2235,7 @@ function renderGate(){
       '</div>'+
       '<div class="gate-v2-bottom">'+
         '<div class="gate-v2-badge">🏡 +3,500 viviendas entregadas</div>'+
-        '<button type="button" class="gate-v2-cta-primary" data-action="gate-asesor">🧑‍💼 Soy Asesor</button>'+
+        '<button type="button" class="gate-v2-cta-primary" data-action="gate-asesor">👨‍💼 Soy Asesor</button>'+
         '<button type="button" class="gate-v2-cta-secondary" data-action="gate-cliente">Ya tengo una vivienda Vive Hogar</button>'+
       '</div>'+
     '</div>'+
@@ -3627,7 +3627,7 @@ document.addEventListener('click', async function(ev){
     }
   } else if (action === 'interesado-proyecto'){
     ui.interesadoProyecto = t.getAttribute('data-value');
-    ui.interesadoEtapaSel = null;
+    ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null;
     ui.interesadoManzanaSel = null;
     ui.interesadoStep = 'cargando';
     window.scrollTo(0,0);
@@ -3654,7 +3654,7 @@ document.addEventListener('click', async function(ev){
     if (gv === 'reset'){ ui.genZoom = genFit(document.getElementById('gen-zoom')); genApply(); }
     else genZoomBy(gv === 'in' ? 1.6 : 1/1.6);
   } else if (action === 'interesado-etapa'){
-    var vinoDelMapa = !!ui.genFull; ui.genFull = false; ui.genZoom = null;
+    var vinoDelMapa = !!ui.genFull; ui.genFull = false; ui.genZoom = null; ui.genFocus = true;
     if (vinoDelMapa) setTimeout(function(){ var d = document.querySelector('.mapa-vhs-detail'); if (d) d.scrollIntoView({block:'start'}); }, 80);
     ui.interesadoEtapaSel = t.getAttribute('data-value');
     ui.interesadoManzanaSel = null;
@@ -4161,18 +4161,17 @@ function genFit(outer){
   var cw = outer.clientWidth, ch = outer.clientHeight;
   var scale = Math.min(cw/iw, ch/ih); if (!isFinite(scale) || scale <= 0) scale = 1;
   ui.genFitScale = scale;
-  var sel = MAPA_GENERAL_ETAPAS[String(ui.interesadoEtapaSel)];
+  var sel = ui.genFocus ? MAPA_GENERAL_ETAPAS[String(ui.interesadoEtapaSel)] : null;
   if (sel){
     // Encuadra la etapa seleccionada
     var xs = sel.map(function(p){return p[0];}), ys = sel.map(function(p){return p[1];});
     var bx0 = Math.min.apply(null,xs), bx1 = Math.max.apply(null,xs), by0 = Math.min.apply(null,ys), by1 = Math.max.apply(null,ys);
     var fw = (bx1-bx0)/100*iw, fh = (by1-by0)/100*ih;
-    var s2 = Math.min(cw/fw, ch/fh)*0.85; s2 = Math.max(scale, Math.min(s2, scale*5));
+    var s2 = Math.min(cw/fw, ch/fh)*0.5; s2 = Math.max(scale, Math.min(s2, scale*2.5));
     return genClamp({scale:s2, x:cw/2 - (bx0+bx1)/200*iw*s2, y:ch/2 - (by0+by1)/200*ih*s2}, cw, ch);
   }
-  // Vista inicial: acercada hacia las etapas con casas (centro-derecha del terreno)
-  var sc = scale*2.1;
-  return genClamp({scale:sc, x:cw/2 - 0.575*iw*sc, y:ch/2 - 0.40*ih*sc}, cw, ch);
+  // Vista inicial: el plano completo
+  return genClamp({scale:scale, x:0, y:0}, cw, ch);
 }
 function genZoomBy(factor){
   var outer = document.getElementById('gen-zoom'); if (!outer) return;
