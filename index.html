@@ -4048,11 +4048,15 @@ function initEtapa5ZoomDrag(){
   var pointers = {};
   var dragging = false;
   var lastDist = 0;
+  var dragMoved = 0;
 
   outer.addEventListener('pointerdown', function(ev){
     if (ev.target.closest('.lote-sheet, .mapa-full-close, .mapa-zoom-controls, .mz-tag')) return;
     pointers[ev.pointerId] = {x:ev.clientX, y:ev.clientY};
-    outer.setPointerCapture(ev.pointerId);
+    dragMoved = 0;
+    // Con mouse, capturar el puntero al hacer clic desvía el 'click' al
+    // contenedor y el lote nunca se selecciona: se captura recién al arrastrar.
+    if (ev.pointerType !== 'mouse') outer.setPointerCapture(ev.pointerId);
     dragging = true;
   });
   outer.addEventListener('pointermove', function(ev){
@@ -4079,6 +4083,8 @@ function initEtapa5ZoomDrag(){
       lastDist = dist;
     } else if (ids.length === 1 && dragging){
       var dx = ev.movementX || 0, dy = ev.movementY || 0;
+      dragMoved += Math.abs(dx) + Math.abs(dy);
+      if (ev.pointerType === 'mouse' && dragMoved > 6 && !outer.hasPointerCapture(ev.pointerId)) outer.setPointerCapture(ev.pointerId);
       if (dx || dy){
         ui.etapa5Zoom = clampZoom({scale:z.scale, x:z.x+dx, y:z.y+dy}, cw, ch);
         applyEtapa5Zoom();
@@ -4093,6 +4099,7 @@ function initEtapa5ZoomDrag(){
   outer.addEventListener('pointerup', endPointer);
   outer.addEventListener('pointercancel', endPointer);
   outer.addEventListener('pointerleave', endPointer);
+  outer.addEventListener('click', function(ev){ if (dragMoved > 8){ ev.stopPropagation(); ev.preventDefault(); dragMoved = 0; } }, true);
 }
 
 var etapa5LastW = window.innerWidth;
