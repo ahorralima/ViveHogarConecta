@@ -421,6 +421,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .presup-sol{font-weight:800;color:var(--ink-soft);}
 .presup-input{flex:1;min-width:0;}
 .presup-btn{padding:10px 16px;white-space:nowrap;}
+.presup-alcance{margin-top:8px;width:100%;}
 .presup-result{margin-top:10px;font-size:0.86rem;}
 .presup-result p{margin:0 0 6px;}
 .presup-fila{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 11px;margin-top:6px;font-size:0.84rem;cursor:pointer;}
@@ -2256,6 +2257,7 @@ function asesorIniciarRelojes(){
   setInterval(function(){
     if (modoAsesor() && !document.hidden) asesorCargarPanel();
     if (modoAsesor() && esJefe() && ui.histAbierto && !document.hidden) cargarHistorial().then(function(){ renderSiLibre(); });
+    if (modoAsesor() && ui.presupuestoTxt && ui.presupAlcance !== 'etapa' && !document.hidden && document.getElementById('presupuesto-input')) cargarPresupTodas().then(function(){ renderSiLibre(); });
   }, 8000);
 }
 
@@ -2907,8 +2909,13 @@ function renderMapaEtapa5Html(etapaN){
   // Presupuesto del cliente (solo asesor): casas disponibles de hasta ese precio; si no hay, las más cercanas
   var presup = modoAsesor() ? (parseInt(String(ui.presupuestoTxt || '').replace(/[^0-9]/g, ''), 10) || 0) : 0;
   var presupSet = null, presupModo = '', presupLista = [];
+  var presupTodas = modoAsesor() && ui.presupAlcance !== 'etapa';
   if (presup > 0){
-    var pool = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE' && lotePrecio(l) > 0 && (!fVista || l.v === fVista); });
+    var delPlano = ETAPA5_LOTES_PLANO.map(function(l){ return {etapa:ETAPA_ACTUAL, m:l.m, l:l.l, v:l.v, pv:l.pv, of:l.of, e:l.e}; });
+    var fuente = (presupTodas && ui.presupData)
+      ? ui.presupData.filter(function(x){ return String(x.etapa) !== String(ETAPA_ACTUAL); }).concat(delPlano)
+      : delPlano;
+    var pool = fuente.filter(function(l){ return l.e === 'DISPONIBLE' && lotePrecio(l) > 0 && (!fVista || l.v === fVista); });
     var dentro = pool.filter(function(l){ return loteInicial(l) <= presup; });
     if (dentro.length){
       presupModo = 'dentro';
@@ -2918,19 +2925,20 @@ function renderMapaEtapa5Html(etapaN){
       presupLista = pool.sort(function(a, b){ return Math.abs(loteInicial(a) - presup) - Math.abs(loteInicial(b) - presup); }).slice(0, 5);
     }
     presupSet = {};
-    presupLista.forEach(function(l){ presupSet[l.m+'|'+l.l] = 1; });
+    presupLista.forEach(function(l){ presupSet[l.etapa+'|'+l.m+'|'+l.l] = 1; });
   }
   var filtrosActivos = !!fVista || presup > 0;
   function loteCoincide(l){
     if (l.e !== 'DISPONIBLE') return false;
     if (fVista && l.v !== fVista) return false;
-    if (presupSet && !presupSet[l.m+'|'+l.l]) return false;
+    if (presupSet && !presupSet[ETAPA_ACTUAL+'|'+l.m+'|'+l.l]) return false;
     return true;
   }
   function presupFilaHtml(l){
     var dif = loteInicial(l) - presup;
-    return '<button type="button" class="presup-fila" data-action="interesado-lote" data-value="'+esc(l.m+'|'+l.l)+'">'+
-      '<span><strong>'+etiquetaLote(l.m, l.l)+'</strong>'+(l.v ? ' · '+esc(l.v) : '')+'<br><small>Precio '+fmtMoney(lotePrecio(l))+'</small></span>'+
+    var otra = String(l.etapa) !== String(ETAPA_ACTUAL);
+    return '<button type="button" class="presup-fila" data-action="'+(otra ? 'asesor-ir-lote' : 'interesado-lote')+'" data-value="'+esc(otra ? l.etapa+'|'+l.m+'|'+l.l : l.m+'|'+l.l)+'">'+
+      '<span><strong>'+(presupTodas ? 'Etapa '+esc(l.etapa)+' · ' : '')+etiquetaLote(l.m, l.l)+'</strong>'+(l.v ? ' · '+esc(l.v) : '')+'<br><small>Precio '+fmtMoney(lotePrecio(l))+'</small></span>'+
       '<span style="text-align:right;"><small>Inicial</small> <b>'+fmtMoney(loteInicial(l))+'</b>'+(dif > 0 ? '<br><small>(+'+fmtMoney(dif)+')</small>' : '')+'</span></button>';
   }
   var presupHtml = '';
@@ -2938,8 +2946,12 @@ function renderMapaEtapa5Html(etapaN){
     presupHtml = '<div class="lote-filtros-row"><span class="lote-filtros-label presup-label">Presupuesto máximo del cliente (inicial que puede pagar)</span>'+
       '<div class="presup-row"><span class="presup-sol">S/</span>'+
       '<input type="text" class="text-input presup-input" id="presupuesto-input" inputmode="numeric" autocomplete="off" placeholder="Ej. 25000" data-ui="presupuestoTxt" value="'+esc(ui.presupuestoTxt || '')+'" />'+
-      '<button type="button" class="btn btn-primary presup-btn" data-action="presupuesto-buscar">Buscar</button></div></div>';
-    if (presup > 0){
+      '<button type="button" class="btn btn-primary presup-btn" data-action="presupuesto-buscar">Buscar</button></div>'+
+      '<div class="chip-row presup-alcance"><button type="button" class="chip'+(presupTodas?' active':'')+'" data-action="presup-alcance" data-value="todas">Todas las etapas</button>'+
+      '<button type="button" class="chip'+(presupTodas?'':' active')+'" data-action="presup-alcance" data-value="etapa">Solo la Etapa '+esc(ETAPA_ACTUAL)+'</button></div></div>';
+    if (presup > 0 && presupTodas && !ui.presupData){
+      presupHtml += '<div class="presup-result"><p>'+(ui.presupError ? 'No se pudo buscar en todas las etapas. Revisa tu conexión y toca Buscar.' : 'Buscando en todas las etapas…')+'</p></div>';
+    } else if (presup > 0){
       presupHtml += '<div class="presup-result">'+
         (presupModo === 'dentro'
           ? '<p><strong>'+presupLista.length+' casa'+(presupLista.length===1?'':'s')+'</strong> disponible'+(presupLista.length===1?'':'s')+' con inicial de hasta <strong>'+fmtMoney(presup)+'</strong>. Se muestran primero las más cercanas a su presupuesto:</p>'
@@ -3924,6 +3936,11 @@ document.addEventListener('click', async function(ev){
     var pIn = document.getElementById('presupuesto-input');
     if (pIn) ui.presupuestoTxt = pIn.value;
     render();
+    if (ui.presupAlcance !== 'etapa'){ await cargarPresupTodas(); render(); }
+  } else if (action === 'presup-alcance'){
+    ui.presupAlcance = t.getAttribute('data-value');
+    render();
+    if (ui.presupAlcance !== 'etapa' && ui.presupuestoTxt){ await cargarPresupTodas(); render(); }
   } else if (action === 'lote-calc-modo'){
     ui.loteCalcModo = t.getAttribute('data-value');
     render();
@@ -4035,6 +4052,24 @@ function asesoraCambioLocal(loteId, estado, msg){ // (ya no se usa en la separac
   var l = ETAPA5_LOTES_PLANO.filter(function(x){ return String(x.id) === String(loteId); })[0];
   if (l) l.e = estado;
   ui.sepMsg = msg || '';
+}
+// Presupuesto en todas las etapas: trae los lotes de las etapas con plano (1 a 5) y los guarda para filtrar
+async function cargarPresupTodas(){
+  var etapas = ['1','2','3','4','5'].filter(etapaTienePlano);
+  var res = await Promise.all(etapas.map(function(n){
+    var args = { p_proyecto: 'sullana', p_etapa: n };
+    return sb.rpc(etapa5Usa2 ? 'ec_lotes_etapa2' : 'ec_lotes_etapa', args).then(function(r){ return {n:n, r:r}; });
+  }));
+  var out = [], fallo = false;
+  res.forEach(function(o){
+    if (o.r.error || !o.r.data){ fallo = true; return; }
+    o.r.data.forEach(function(row){
+      out.push({etapa:o.n, m:row.manzana, l:row.lote, v:row.vista, pv:row.precio_venta,
+        of:row.oferta_precio ? Number(row.oferta_precio) : null, e:etapa5EstadoLegacy(row.estado)});
+    });
+  });
+  if (fallo && !out.length){ ui.presupError = true; return; }
+  ui.presupError = false; ui.presupData = out;
 }
 async function cargarHistorial(){
   if (!asesoraPin || !asesoraIdActual) return;
