@@ -416,6 +416,16 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-gen{background:#dfe3e8 !important;}
 .mapa-gen-leyenda{position:absolute;left:8px;bottom:8px;z-index:30;display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.94);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:0.72rem;font-weight:600;color:#1f2933;box-shadow:0 2px 8px rgba(0,0,0,0.2);pointer-events:none;}
 .mapa-gen-leyenda i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-2px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,0.25);}
+.lote-filtros-label.presup-label{width:100%;}
+.presup-row{display:flex;gap:8px;align-items:center;width:100%;}
+.presup-sol{font-weight:800;color:var(--ink-soft);}
+.presup-input{flex:1;min-width:0;}
+.presup-btn{padding:10px 16px;white-space:nowrap;}
+.presup-result{margin-top:10px;font-size:0.86rem;}
+.presup-result p{margin:0 0 6px;}
+.presup-fila{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 11px;margin-top:6px;font-size:0.84rem;cursor:pointer;}
+.presup-fila small{color:var(--ink-faint);}
+.presup-mas{font-size:0.76rem;color:var(--ink-faint);}
 .mapa-gen{height:auto;min-height:0;}
 .mapa-gen.mapa-full{height:100dvh !important;}
 .mapa-gen .mapa-vhs-img{user-select:none;-webkit-user-drag:none;}
@@ -2769,6 +2779,9 @@ function renderEntornoChips(){
 
 var SEPARACION_LOTE = 500; // separación igual en todos los proyectos; el resto de la inicial se paga en cuotas
 var VHS_BFH_SULLANA = 47850;
+// Máximo de cuotas que acepta cada proyecto (confirmar el de Castilla, Ejidos y Lambayeque cuando haya planos)
+var VHS_CUOTAS_MAX = {sullana: 36, castilla: 36, ejidos: 36, lambayeque: 36};
+function cuotasMax(){ return VHS_CUOTAS_MAX.sullana; }   // el plano de lotes por ahora es solo de Sullana
 
 // FAQ de Vive Hogar Sullana: solo preguntas con respuesta verificada
 // contra lo que ya existe en la app (ver análisis de la conversación).
@@ -2889,11 +2902,52 @@ function renderMapaEtapa5Html(etapaN){
   '</div>';
 
   var fVista = ui.etapa5FVista;
-  var filtrosActivos = !!fVista;
+  // Presupuesto del cliente (solo asesor): casas disponibles de hasta ese precio; si no hay, las más cercanas
+  var presup = modoAsesor() ? (parseInt(String(ui.presupuestoTxt || '').replace(/[^0-9]/g, ''), 10) || 0) : 0;
+  var presupSet = null, presupModo = '', presupLista = [];
+  if (presup > 0){
+    var pool = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE' && lotePrecio(l) > 0 && (!fVista || l.v === fVista); });
+    var dentro = pool.filter(function(l){ return lotePrecio(l) <= presup; });
+    if (dentro.length){
+      presupModo = 'dentro';
+      presupLista = dentro.sort(function(a, b){ return lotePrecio(b) - lotePrecio(a); });
+    } else {
+      presupModo = 'cerca';
+      presupLista = pool.sort(function(a, b){ return Math.abs(lotePrecio(a) - presup) - Math.abs(lotePrecio(b) - presup); }).slice(0, 5);
+    }
+    presupSet = {};
+    presupLista.forEach(function(l){ presupSet[l.m+'|'+l.l] = 1; });
+  }
+  var filtrosActivos = !!fVista || presup > 0;
   function loteCoincide(l){
     if (l.e !== 'DISPONIBLE') return false;
     if (fVista && l.v !== fVista) return false;
+    if (presupSet && !presupSet[l.m+'|'+l.l]) return false;
     return true;
+  }
+  function presupFilaHtml(l){
+    var dif = lotePrecio(l) - presup;
+    return '<button type="button" class="presup-fila" data-action="interesado-lote" data-value="'+esc(l.m+'|'+l.l)+'">'+
+      '<span><strong>'+etiquetaLote(l.m, l.l)+'</strong>'+(l.v ? ' · '+esc(l.v) : '')+'</span>'+
+      '<span><b>'+fmtMoney(lotePrecio(l))+'</b>'+(dif > 0 ? ' <small>(+'+fmtMoney(dif)+')</small>' : '')+'</span></button>';
+  }
+  var presupHtml = '';
+  if (modoAsesor()){
+    presupHtml = '<div class="lote-filtros-row"><span class="lote-filtros-label presup-label">Presupuesto máximo del cliente (precio de la casa)</span>'+
+      '<div class="presup-row"><span class="presup-sol">S/</span>'+
+      '<input type="text" class="text-input presup-input" id="presupuesto-input" inputmode="numeric" autocomplete="off" placeholder="Ej. 90000" data-ui="presupuestoTxt" value="'+esc(ui.presupuestoTxt || '')+'" />'+
+      '<button type="button" class="btn btn-primary presup-btn" data-action="presupuesto-buscar">Buscar</button></div></div>';
+    if (presup > 0){
+      presupHtml += '<div class="presup-result">'+
+        (presupModo === 'dentro'
+          ? '<p><strong>'+presupLista.length+' casa'+(presupLista.length===1?'':'s')+'</strong> disponible'+(presupLista.length===1?'':'s')+' de hasta <strong>'+fmtMoney(presup)+'</strong>. Se muestran primero las más cercanas a su presupuesto:</p>'
+          : (presupLista.length
+              ? '<p>No hay casas disponibles de hasta <strong>'+fmtMoney(presup)+'</strong>. Las <strong>más cercanas</strong> son:</p>'
+              : '<p>No hay casas disponibles con precio cargado.</p>'))+
+        presupLista.slice(0, 8).map(presupFilaHtml).join('')+
+        (presupLista.length > 8 ? '<p class="presup-mas">y '+(presupLista.length-8)+' más (resaltadas en el plano)</p>' : '')+
+      '</div>';
+    }
   }
   var coincidencias = filtrosActivos ? ETAPA5_LOTES_PLANO.filter(loteCoincide).length : 0;
   html += '<div class="lote-filtros">'+
@@ -2902,8 +2956,9 @@ function renderMapaEtapa5Html(etapaN){
         return '<button type="button" class="chip'+(fVista===o[0]?' active':'')+'" data-action="etapa5-filtro" data-key="vista" data-value="'+esc(o[0])+'">'+esc(o[1])+'</button>';
       }).join('')+
     '</div></div>'+
+    presupHtml+
     (filtrosActivos ? '<div class="lote-filtros-count">'+coincidencias+' lote'+(coincidencias===1?'':'s')+' disponible'+(coincidencias===1?'':'s')+' coincide'+(coincidencias===1?'':'n')+
-      ' <button type="button" class="filtro-quitar" data-action="etapa5-filtro" data-key="vista" data-value="">✕ Quitar filtro</button></div>' : '')+
+      ' <button type="button" class="filtro-quitar" data-action="etapa5-filtro" data-key="todos" data-value="">✕ Quitar filtro</button></div>' : '')+
   '</div>';
 
   var mzAcc = {};
@@ -3029,7 +3084,7 @@ function renderMapaEtapa5Html(etapaN){
       html += renderAsesorLoteAcciones(lote);
       if (lote.e === 'DISPONIBLE'){
         var calcModo = ui.loteCalcModo || 'cuotas';
-        var calcMeses = ui.loteCalcMeses || 24;
+        var calcMeses = Math.min(cuotasMax(), ui.loteCalcMeses || 24);
         var saldoFinanciar = Math.max(0, inicialCliente - sepMonto());
         var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
         html += '<div class="cuotas-calc" id="cuotas-calc-anchor">';
@@ -3041,8 +3096,8 @@ function renderMapaEtapa5Html(etapaN){
         if (calcModo === 'cuotas'){
           html += '<div class="cuotas-calc-slider-row">'+
             '<label for="lote-calc-meses" class="cuotas-calc-meses-label" style="margin:0;">Número de cuotas</label>'+
-            '<input type="number" class="text-input cuotas-calc-num" id="lote-calc-meses" inputmode="numeric" min="1" max="36" step="1" value="'+calcMeses+'" />'+
-            '<span class="cuotas-calc-meses-label">meses</span>'+
+            '<input type="number" class="text-input cuotas-calc-num" id="lote-calc-meses" inputmode="numeric" min="1" max="'+cuotasMax()+'" step="1" value="'+calcMeses+'" />'+
+            '<span class="cuotas-calc-meses-label">meses · <strong>máx. '+cuotasMax()+'</strong></span>'+
           '</div>';
           html += '<div class="cuotas-calc-result">'+
             '<div class="cuotas-calc-label">Tu cuota mensual referencial</div>'+
@@ -3861,6 +3916,11 @@ document.addEventListener('click', async function(ev){
     var fKey = t.getAttribute('data-key');
     var fVal = t.getAttribute('data-value');
     if (fKey === 'vista') ui.etapa5FVista = fVal;
+    if (fKey === 'todos'){ ui.etapa5FVista = ''; ui.presupuestoTxt = ''; }
+    render();
+  } else if (action === 'presupuesto-buscar'){
+    var pIn = document.getElementById('presupuesto-input');
+    if (pIn) ui.presupuestoTxt = pIn.value;
     render();
   } else if (action === 'lote-calc-modo'){
     ui.loteCalcModo = t.getAttribute('data-value');
@@ -4413,7 +4473,7 @@ document.addEventListener('change', function(ev){
     return;
   }
   if (ev.target.id === 'lote-calc-meses'){
-    ui.loteCalcMeses = Math.min(36, Math.max(1, parseInt(ev.target.value, 10) || 24));
+    ui.loteCalcMeses = Math.min(cuotasMax(), Math.max(1, parseInt(ev.target.value, 10) || 24));
     render();
   }
 });
