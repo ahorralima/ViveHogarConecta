@@ -1771,6 +1771,8 @@ function loteRestringido(l){
   return !!ui.miCasaKey || l.e !== 'DISPONIBLE';
 }
 function lotePrecio(l){ return l.of ? l.of : l.pv; }
+// Inicial del cliente = precio de la casa menos el Bono Familiar Habitacional (lo paga el Estado)
+function loteInicial(l){ return Math.max(0, lotePrecio(l) - VHS_BFH_SULLANA); }
 function precioHtml(l){
   if (l.e === 'DISPONIBLE' && l.of) return '<span class="precio-oferta"><s>'+fmtMoney(l.pv)+'</s><b>'+fmtMoney(l.of)+'</b></span>';
   return fmtMoney(l.pv);
@@ -2907,13 +2909,13 @@ function renderMapaEtapa5Html(etapaN){
   var presupSet = null, presupModo = '', presupLista = [];
   if (presup > 0){
     var pool = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE' && lotePrecio(l) > 0 && (!fVista || l.v === fVista); });
-    var dentro = pool.filter(function(l){ return lotePrecio(l) <= presup; });
+    var dentro = pool.filter(function(l){ return loteInicial(l) <= presup; });
     if (dentro.length){
       presupModo = 'dentro';
-      presupLista = dentro.sort(function(a, b){ return lotePrecio(b) - lotePrecio(a); });
+      presupLista = dentro.sort(function(a, b){ return loteInicial(b) - loteInicial(a); });
     } else {
       presupModo = 'cerca';
-      presupLista = pool.sort(function(a, b){ return Math.abs(lotePrecio(a) - presup) - Math.abs(lotePrecio(b) - presup); }).slice(0, 5);
+      presupLista = pool.sort(function(a, b){ return Math.abs(loteInicial(a) - presup) - Math.abs(loteInicial(b) - presup); }).slice(0, 5);
     }
     presupSet = {};
     presupLista.forEach(function(l){ presupSet[l.m+'|'+l.l] = 1; });
@@ -2926,23 +2928,23 @@ function renderMapaEtapa5Html(etapaN){
     return true;
   }
   function presupFilaHtml(l){
-    var dif = lotePrecio(l) - presup;
+    var dif = loteInicial(l) - presup;
     return '<button type="button" class="presup-fila" data-action="interesado-lote" data-value="'+esc(l.m+'|'+l.l)+'">'+
-      '<span><strong>'+etiquetaLote(l.m, l.l)+'</strong>'+(l.v ? ' · '+esc(l.v) : '')+'</span>'+
-      '<span><b>'+fmtMoney(lotePrecio(l))+'</b>'+(dif > 0 ? ' <small>(+'+fmtMoney(dif)+')</small>' : '')+'</span></button>';
+      '<span><strong>'+etiquetaLote(l.m, l.l)+'</strong>'+(l.v ? ' · '+esc(l.v) : '')+'<br><small>Precio '+fmtMoney(lotePrecio(l))+'</small></span>'+
+      '<span style="text-align:right;"><small>Inicial</small> <b>'+fmtMoney(loteInicial(l))+'</b>'+(dif > 0 ? '<br><small>(+'+fmtMoney(dif)+')</small>' : '')+'</span></button>';
   }
   var presupHtml = '';
   if (modoAsesor()){
-    presupHtml = '<div class="lote-filtros-row"><span class="lote-filtros-label presup-label">Presupuesto máximo del cliente (precio de la casa)</span>'+
+    presupHtml = '<div class="lote-filtros-row"><span class="lote-filtros-label presup-label">Presupuesto máximo del cliente (inicial que puede pagar)</span>'+
       '<div class="presup-row"><span class="presup-sol">S/</span>'+
-      '<input type="text" class="text-input presup-input" id="presupuesto-input" inputmode="numeric" autocomplete="off" placeholder="Ej. 90000" data-ui="presupuestoTxt" value="'+esc(ui.presupuestoTxt || '')+'" />'+
+      '<input type="text" class="text-input presup-input" id="presupuesto-input" inputmode="numeric" autocomplete="off" placeholder="Ej. 25000" data-ui="presupuestoTxt" value="'+esc(ui.presupuestoTxt || '')+'" />'+
       '<button type="button" class="btn btn-primary presup-btn" data-action="presupuesto-buscar">Buscar</button></div></div>';
     if (presup > 0){
       presupHtml += '<div class="presup-result">'+
         (presupModo === 'dentro'
-          ? '<p><strong>'+presupLista.length+' casa'+(presupLista.length===1?'':'s')+'</strong> disponible'+(presupLista.length===1?'':'s')+' de hasta <strong>'+fmtMoney(presup)+'</strong>. Se muestran primero las más cercanas a su presupuesto:</p>'
+          ? '<p><strong>'+presupLista.length+' casa'+(presupLista.length===1?'':'s')+'</strong> disponible'+(presupLista.length===1?'':'s')+' con inicial de hasta <strong>'+fmtMoney(presup)+'</strong>. Se muestran primero las más cercanas a su presupuesto:</p>'
           : (presupLista.length
-              ? '<p>No hay casas disponibles de hasta <strong>'+fmtMoney(presup)+'</strong>. Las <strong>más cercanas</strong> son:</p>'
+              ? '<p>No hay casas disponibles con inicial de hasta <strong>'+fmtMoney(presup)+'</strong>. Las <strong>más cercanas</strong> son:</p>'
               : '<p>No hay casas disponibles con precio cargado.</p>'))+
         presupLista.slice(0, 8).map(presupFilaHtml).join('')+
         (presupLista.length > 8 ? '<p class="presup-mas">y '+(presupLista.length-8)+' más (resaltadas en el plano)</p>' : '')+
