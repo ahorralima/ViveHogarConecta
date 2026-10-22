@@ -1092,6 +1092,7 @@ var ui = {
   interesadoLoteSel: null,
   interesadoDesdeMiCasa: false,
   loteCalcModo: 'cuotas',
+  loteAdelanto: '',
   loteCalcMeses: 24,
   etapa5FVista: '',
   etapa5Full: false,
@@ -2795,6 +2796,8 @@ var SEPARACION_LOTE = 500; // separación igual en todos los proyectos; el resto
 var VHS_BFH_SULLANA = 47850;
 // Máximo de cuotas que acepta cada proyecto (confirmar el de Castilla, Ejidos y Lambayeque cuando haya planos)
 var VHS_CUOTAS_MAX = {sullana: 36, castilla: 36, ejidos: 36, lambayeque: 36};
+// Adelanto que el cliente deja ahora (modalidad personalizada); solo dígitos
+function calcAdelanto(){ return parseInt(String(ui.loteAdelanto || '').replace(/[^0-9]/g, ''), 10) || 0; }
 function cuotasMax(){ return VHS_CUOTAS_MAX.sullana; }   // el plano de lotes por ahora es solo de Sullana
 
 // FAQ de Vive Hogar Sullana: solo preguntas con respuesta verificada
@@ -3108,14 +3111,17 @@ function renderMapaEtapa5Html(etapaN){
       html += renderAsesorLoteAcciones(lote);
       if (lote.e === 'DISPONIBLE'){
         var calcModo = ui.loteCalcModo || 'cuotas';
+        if (calcModo === 'personalizada' && !modoAsesor()) calcModo = 'cuotas';
         var calcMeses = Math.min(cuotasMax(), ui.loteCalcMeses || 24);
         var saldoFinanciar = Math.max(0, inicialCliente - sepMonto());
+        var adelantoCalc = Math.min(saldoFinanciar, calcAdelanto());
         var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
         html += '<div class="cuotas-calc" id="cuotas-calc-anchor">';
         html += '<div class="cuotas-calc-title">Simula tu cuota mensual</div>';
         html += '<div class="cuotas-calc-tabs">'+
           '<button type="button" class="cuotas-calc-tab'+(calcModo==='contado'?' active':'')+'" data-action="lote-calc-modo" data-value="contado">Al contado</button>'+
           '<button type="button" class="cuotas-calc-tab'+(calcModo==='cuotas'?' active':'')+'" data-action="lote-calc-modo" data-value="cuotas">En cuotas</button>'+
+          (modoAsesor() ? '<button type="button" class="cuotas-calc-tab'+(calcModo==='personalizada'?' active':'')+'" data-action="lote-calc-modo" data-value="personalizada">Personalizada</button>' : '')+
         '</div>';
         if (calcModo === 'cuotas'){
           html += '<div class="cuotas-calc-slider-row">'+
@@ -3130,6 +3136,29 @@ function renderMapaEtapa5Html(etapaN){
               '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
               '<div><span>Separación (ya pagada)</span><strong>− '+fmtMoney(sepMonto())+'</strong></div>'+
               '<div><span>Monto financiado</span><strong>'+fmtMoney(saldoFinanciar)+'</strong></div>'+
+            '</div>'+
+          '</div>';
+        } else if (calcModo === 'personalizada'){
+          // El cliente deja un adelanto ahora y el resto lo paga en cuotas
+          var restoFin = Math.max(0, saldoFinanciar - adelantoCalc);
+          var cuotaPers = Math.round(restoFin / calcMeses);
+          html += '<div class="cuotas-calc-slider-row">'+
+            '<label for="lote-adelanto" class="cuotas-calc-meses-label" style="margin:0;">Adelanto ahora (S/)</label>'+
+            '<input type="text" class="text-input cuotas-calc-num" id="lote-adelanto" inputmode="numeric" autocomplete="off" placeholder="Ej. 10000" data-ui="loteAdelanto" data-rerender="1" value="'+esc(ui.loteAdelanto || '')+'" />'+
+          '</div>'+
+          '<div class="cuotas-calc-slider-row">'+
+            '<label for="lote-calc-meses" class="cuotas-calc-meses-label" style="margin:0;">Resto en cuotas</label>'+
+            '<input type="number" class="text-input cuotas-calc-num" id="lote-calc-meses" inputmode="numeric" min="1" max="'+cuotasMax()+'" step="1" value="'+calcMeses+'" />'+
+            '<span class="cuotas-calc-meses-label">meses · <strong>máx. '+cuotasMax()+'</strong></span>'+
+          '</div>';
+          html += '<div class="cuotas-calc-result">'+
+            '<div class="cuotas-calc-label">'+(restoFin > 0 ? 'Tu cuota mensual referencial' : 'El adelanto cubre toda la inicial')+'</div>'+
+            '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(restoFin > 0 ? cuotaPers : 0)+'</div>'+
+            '<div class="cuotas-calc-breakdown">'+
+              '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Separación (ya pagada)</span><strong>− '+fmtMoney(sepMonto())+'</strong></div>'+
+              '<div><span>Adelanto ahora</span><strong>− '+fmtMoney(adelantoCalc)+'</strong></div>'+
+              '<div><span>Monto financiado</span><strong>'+fmtMoney(restoFin)+'</strong></div>'+
             '</div>'+
           '</div>';
         } else {
@@ -4437,10 +4466,13 @@ function generarCotizacionPDF(mz, loteNum){
   var lote = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === mz && String(l.l) === loteNum; })[0];
   if (!lote || !window.jspdf) { toast('No se pudo generar el PDF. Intenta de nuevo.'); return; }
   var modo = ui.loteCalcModo || 'cuotas';
-  var meses = ui.loteCalcMeses || 24;
+  if (modo === 'personalizada' && !modoAsesor()) modo = 'cuotas';
+  var meses = Math.min(cuotasMax(), ui.loteCalcMeses || 24);
   var bfh = VHS_BFH_SULLANA;
   var inicialCliente = Math.max(0, lotePrecio(lote) - bfh);
-  var saldo = Math.max(0, inicialCliente - sepMonto());
+  var saldoBase = Math.max(0, inicialCliente - sepMonto());
+  var adelanto = modo === 'personalizada' ? Math.min(saldoBase, calcAdelanto()) : 0;
+  var saldo = Math.max(0, saldoBase - adelanto);
   var cuota = Math.round(saldo / meses);
 
   var doc = new window.jspdf.jsPDF();
@@ -4465,10 +4497,14 @@ function generarCotizacionPDF(mz, loteNum){
   y += 6; doc.setFontSize(13); doc.setTextColor(20,20,20);
   doc.text('Inicial del cliente: '+fmtMoney(inicialCliente), 14, y);
   y += 10; doc.setFontSize(12); doc.setTextColor(57,126,173);
-  doc.text(modo === 'contado' ? 'Plan: Al contado' : 'Plan: En cuotas ('+meses+' meses)', 14, y);
+  doc.text(modo === 'contado' ? 'Plan: Al contado' : (modo === 'personalizada' ? 'Plan: Adelanto + cuotas ('+meses+' meses)' : 'Plan: En cuotas ('+meses+' meses)'), 14, y);
   y += 8; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
   doc.text('Separación: '+fmtMoney(sepMonto()), 14, y);
   y += 6;
+  if (modo === 'personalizada'){
+    doc.text('Adelanto ahora: '+fmtMoney(adelanto), 14, y);
+    y += 6;
+  }
   if (modo === 'contado'){
     doc.text('Saldo en un solo pago: '+fmtMoney(saldo), 14, y);
   } else {
