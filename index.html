@@ -500,6 +500,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   .mapa-wide .mapa-2col{display:grid;grid-template-columns:minmax(340px,36%) minmax(0,1fr);gap:18px;align-items:start;}
   .mapa-wide .mapa-col-gen{position:sticky;top:8px;}
   .mapa-wide .mapa-col-etapa .mapa-vhs-detail{margin-top:0;}
+  .mapa-wide.mapa-solo .mapa-2col{grid-template-columns:minmax(0,1fr);}
+  .mapa-wide.mapa-solo .mapa-col-gen{position:static;}
+  .mapa-wide.mapa-solo .mapa-col-etapa{display:none;}
 }
 /* Pistas y veredas alrededor de cada manzana (ayuda al cliente a ubicarse); las unidades cqw escalan con el ancho del plano */
 .mapa-lotes-wrap.mapa-calles{container-type:inline-size;}
@@ -3359,7 +3362,6 @@ function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var esAsesor = modoAsesor();
   var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
-  if (esAsesor && proy === 'sullana' && !ui.interesadoEtapaSel) ui.interesadoEtapaSel = '5';
   var html = '<div class="interesado-screen" style="padding-bottom:64px;">';
   if (esAsesor){
     html += renderAsesorPanelHtml();
@@ -3386,7 +3388,7 @@ function renderInteresadoMapa(){
 
   if (proy === 'sullana'){
     var dosCol = !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));   // en pantalla ancha: plano general a la izquierda y de la etapa a la derecha
-    html += '<div class="panel panel-flat'+(dosCol ? ' mapa-wide' : '')+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
+    html += '<div class="panel panel-flat'+(dosCol ? ' mapa-wide' : (!ui.interesadoEtapaSel ? ' mapa-wide mapa-solo' : ''))+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
       '<div class="map-hint-banner">👆 Selecciona una etapa para explorar los lotes disponibles</div>'+
       '<div class="mapa-2col"><div class="mapa-col-gen">'+
       renderMapaGeneralVisor()+
@@ -3840,8 +3842,10 @@ document.addEventListener('click', async function(ev){
     else genZoomBy(gv === 'in' ? 1.6 : 1/1.6);
   } else if (action === 'interesado-etapa'){
     var vinoDelMapa = !!ui.genFull; ui.genFull = false; ui.genZoom = null; ui.genFocus = true;
+    var etapaVal = t.getAttribute('data-value');
+    if (!vinoDelMapa && String(ui.interesadoEtapaSel) === String(etapaVal)){ etapaVal = null; ui.genFocus = false; }   // tocar la etapa elegida la deselecciona: queda solo el plano general
     if (vinoDelMapa) setTimeout(function(){ var d = document.querySelector('.mapa-vhs-detail'); if (d) d.scrollIntoView({block:'start'}); }, 80);
-    ui.interesadoEtapaSel = t.getAttribute('data-value');
+    ui.interesadoEtapaSel = etapaVal;
     ui.interesadoManzanaSel = null;
     ui.interesadoLoteSel = null;
     render();
