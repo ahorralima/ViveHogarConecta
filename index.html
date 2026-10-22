@@ -492,6 +492,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-lotes-wrap{border:none;border-radius:0;}
 .mapa-lotes-wrap .mapa-vhs-img{visibility:hidden;}
 .mapa-lotes-wrap.mapa-real{background:#fff;}
+/* Pantalla ancha (tablet horizontal / computadora): plano general fijo a la izquierda y plano de la etapa a la derecha */
+@media (min-width:1000px){
+  .mapa-wide{width:min(1400px,calc(100vw - 32px));margin-left:calc(50% - min(700px,calc(50vw - 16px)));}
+  .mapa-wide .mapa-2col{display:grid;grid-template-columns:minmax(340px,36%) minmax(0,1fr);gap:18px;align-items:start;}
+  .mapa-wide .mapa-col-gen{position:sticky;top:8px;}
+  .mapa-wide .mapa-col-etapa .mapa-vhs-detail{margin-top:0;}
+}
 /* Pistas y veredas alrededor de cada manzana (ayuda al cliente a ubicarse); las unidades cqw escalan con el ancho del plano */
 .mapa-lotes-wrap.mapa-calles{container-type:inline-size;}
 .mapa-lotes-wrap.mapa-calles .mz-block{box-shadow:0 0 0 0.5cqw #f4f0e6, 0 0 0 1.75cqw #bcc4cd;}
@@ -3333,12 +3340,14 @@ function renderInteresadoMapa(){
   if (proy === 'sullana' && !esAsesor) html += renderBarraConfianza();
 
   if (proy === 'sullana'){
-    html += '<div class="panel panel-flat" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
+    var dosCol = !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));   // en pantalla ancha: plano general a la izquierda y de la etapa a la derecha
+    html += '<div class="panel panel-flat'+(dosCol ? ' mapa-wide' : '')+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
       '<div class="map-hint-banner">👆 Selecciona una etapa para explorar los lotes disponibles</div>'+
+      '<div class="mapa-2col"><div class="mapa-col-gen">'+
       renderMapaGeneralVisor()+
       '<div class="mapa-etapas-otras">Elegir etapa: '+ETAPAS_SULLANA_MAPA.filter(function(e){ return Number(e.n) <= 5; }).map(function(e){
           return '<button type="button" class="chip'+(String(ui.interesadoEtapaSel)===String(e.n)?' active':'')+'" data-action="interesado-etapa" data-value="'+e.n+'">Etapa '+e.n+'</button>';
-        }).join('')+'</div>';
+        }).join('')+'</div></div><div class="mapa-col-etapa">';
 
     if (ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel)){
       html += renderMapaEtapa5Html(String(ui.interesadoEtapaSel));
@@ -3357,7 +3366,7 @@ function renderInteresadoMapa(){
         html += '</div>';
       }
     }
-    html += '</div>';
+    html += '</div></div></div>';
 
     if (!esAsesor) html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
       '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
@@ -4361,7 +4370,8 @@ function genFit(outer){
   var cw = outer.clientWidth, ch = outer.clientHeight;
   var scale = Math.min(cw/iw, ch/ih); if (!isFinite(scale) || scale <= 0) scale = 1;
   ui.genFitScale = scale;
-  var sel = ui.genFocus ? MAPA_GENERAL_ETAPAS[String(ui.interesadoEtapaSel)] : null;
+  var deLado = !isFull && window.matchMedia('(min-width:1000px)').matches && !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));   // con el plano de la etapa al costado, el general se queda completo
+  var sel = (ui.genFocus && !deLado) ? MAPA_GENERAL_ETAPAS[String(ui.interesadoEtapaSel)] : null;
   if (sel){
     // Encuadra la etapa seleccionada
     var xs = sel.map(function(p){return p[0];}), ys = sel.map(function(p){return p[1];});
