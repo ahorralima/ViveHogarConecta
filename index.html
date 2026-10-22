@@ -518,6 +518,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 @media (min-width:700px){.lote-sheet{left:50%;right:auto;width:520px;transform:translateX(-50%);}}
 .ls-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
 .ls-id{flex:1;font-size:1.1rem;font-weight:800;}
+.as-hist{border-top:1px solid var(--line,#e5e7eb);padding:8px 0;font-size:0.82rem;line-height:1.45;}
+.as-hist-top{display:flex;justify-content:space-between;gap:8px;font-size:0.84rem;}
+.as-hist-top span:last-child{color:var(--ink-faint);white-space:nowrap;}
+.as-hist em{font-style:normal;font-size:0.7rem;font-weight:700;background:var(--surface-2);border-radius:8px;padding:1px 6px;margin-left:4px;}
+.as-hist-lib{background:#fff7ed;border-radius:8px;padding:8px;}
 .lote-sheet-close{width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:none;color:#444;font-size:0.95rem;font-weight:800;cursor:pointer;}
 .ls-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .ls-meta{font-size:0.82rem;color:var(--ink-soft);}
@@ -2076,8 +2081,38 @@ function renderAsesorPanelHtml(){
   return h;
 }
 
+function fmtFechaHora(iso){
+  try { return new Date(iso).toLocaleString('es-PE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}); } catch(e){ return ''; }
+}
+function renderHistorialHtml(){
+  var h = '<div class="as-card"><h4>🕒 Últimos movimientos <small>separaciones y liberaciones</small></h4>'+
+    '<button type="button" class="btn btn-secondary btn-block" data-action="hist-toggle">'+(ui.histAbierto ? 'Ocultar movimientos' : 'Ver últimos movimientos')+'</button>';
+  if (ui.histAbierto){
+    if (ui.histError) h += '<p class="as-err">No se pudo cargar. Revisa tu conexión (o falta activar la actualización v7h en Supabase).</p>';
+    else if (!ui.hist) h += '<p style="font-size:0.85rem;color:var(--ink-faint);margin-top:8px;">Cargando…</p>';
+    else if (!ui.hist.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);margin-top:8px;">Aún no hay movimientos registrados.</p>';
+    else ui.hist.forEach(function(m){
+      var lote = '<strong>'+etiquetaLote(m.m, m.l)+'</strong> · Etapa '+esc(m.etapa);
+      var cli = m.cliente ? '<div>Cliente: <b>'+esc(toTitleCase(m.cliente))+'</b>'+(m.dni ? ' · DNI '+esc(m.dni) : '')+'</div>' : '';
+      var precio = m.precio ? 'Precio '+fmtMoney(m.precio) : '';
+      if (m.tipo === 'libero'){
+        h += '<div class="as-hist as-hist-lib"><div class="as-hist-top"><span>↩️ '+lote+'</span><span>'+esc(fmtFechaHora(m.cuando))+'</span></div>'+
+          '<div>La liberó <b>'+esc(toTitleCase(m.liberado_por || '—'))+'</b> · estaba '+esc(String(m.estado_anterior||'').replace('_',' '))+(m.asesor ? ' · asesor '+esc(toTitleCase(m.asesor)) : '')+'</div>'+
+          cli+(precio ? '<div>'+precio+'</div>' : '')+(m.motivo ? '<div>Motivo: '+esc(m.motivo)+'</div>' : '')+'</div>';
+      } else {
+        var chip = m.estado === 'comprada' ? 'Vendida' : (m.estado === 'liberada' ? 'Liberada' : 'Separada');
+        h += '<div class="as-hist"><div class="as-hist-top"><span>🔒 '+lote+' <em>'+chip+'</em></span><span>'+esc(fmtFechaHora(m.cuando))+'</span></div>'+
+          '<div>Asesor: <b>'+esc(toTitleCase(m.asesor || '—'))+'</b></div>'+cli+
+          '<div>'+precio+(m.monto ? (precio ? ' · ' : '')+'Separación '+fmtMoney(m.monto) : '')+(m.operacion ? ' · Op. '+esc(m.operacion) : '')+'</div></div>';
+      }
+    });
+  }
+  return h + '</div>';
+}
+
 function renderJefePanelHtml(p){
-  var h = '<div class="as-card"><h4>🎯 Metas del mes <small>solo tú las defines</small></h4>';
+  var h = renderHistorialHtml();
+  h += '<div class="as-card"><h4>🎯 Metas del mes <small>solo tú las defines</small></h4>';
   if (!p.ranking.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);">Aún no hay asesoras para asignar metas.</p>';
   p.ranking.forEach(function(r){
     h += '<div class="as-meta-row"><span>'+esc(toTitleCase(r.nombre))+' <small style="color:var(--ink-faint);">· vende '+r.ventas+'</small></span>'+
@@ -2167,8 +2202,13 @@ function renderAsesorLoteAcciones(lote){
     if (info && info.hay) h += '<p class="sep-info">Cliente: <strong>'+esc(info.cliente)+'</strong><br>Separó: '+esc(info.asesora)+' · '+esc(new Date(info.desde).toLocaleDateString('es-PE'))+'</p>';
     if (lote.e === 'SEPARADO'){
       h += '<button type="button" class="btn btn-primary btn-block" data-action="sep-comprado" data-value="'+lote.id+'"'+busy+'>✅ Marcar como vendida</button>'+
-        '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-liberar" data-value="'+lote.id+'"'+busy+'>↩️ Liberar (no se concretó)</button>';
+        (esJefe() ? '' : '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-liberar" data-value="'+lote.id+'"'+busy+'>↩️ Liberar (no se concretó)</button>');
     }
+  }
+  // Jefes, gerentes, propietarios y equipo: devolver a la venta una casa separada, vendida o bloqueada
+  if (esJefe() && lote.id && lote.e !== 'DISPONIBLE' && lote.e !== 'EN_ATENCION'){
+    h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="lote-reponer" data-value="'+lote.id+'"'+busy+'>↩️ Volver a poner a la venta</button>'+
+      '<p class="sep-info" style="margin-top:6px;">Úsalo si se cayó la venta o la separación. La casa vuelve a verde para todos y queda registrado quién la liberó.</p>';
   }
   h += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
     (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '')+'</div>';
@@ -2198,6 +2238,7 @@ function asesorIniciarRelojes(){
   }, 1000);
   setInterval(function(){
     if (modoAsesor() && !document.hidden) asesorCargarPanel();
+    if (modoAsesor() && esJefe() && ui.histAbierto && !document.hidden) cargarHistorial().then(function(){ renderSiLibre(); });
   }, 8000);
 }
 
@@ -3792,6 +3833,24 @@ document.addEventListener('click', async function(ev){
       }
       render();
     }
+  } else if (action === 'lote-reponer'){
+    var rId = t.getAttribute('data-value');
+    var rInfo = ui.sepInfo[rId];
+    var rQuien = rInfo && rInfo.hay ? ' (cliente: ' + rInfo.cliente + ')' : '';
+    if (confirm('¿Volver a poner a la venta esta casa' + rQuien + '? Quedará disponible para todos y se anulará su separación o venta.')){
+      var rR = await asesoraLlamar('ec_lote_liberar_jefe', { p_lote_id: rId, p_jefe_id: asesoraIdActual, p_pin: asesoraPin });
+      if (rR.ok){
+        delete ui.sepInfo[rId];
+        ui.sepMsg = 'Listo: la casa vuelve a estar disponible (verde) para todos.';
+        await etapa5Refrescar(); await asesorCargarPanel();
+        if (ui.histAbierto) await cargarHistorial();
+      }
+      render();
+    }
+  } else if (action === 'hist-toggle'){
+    ui.histAbierto = !ui.histAbierto;
+    render();
+    if (ui.histAbierto){ await cargarHistorial(); render(); }
   } else if (action === 'etapa5-filtro'){
     var fKey = t.getAttribute('data-key');
     var fVal = t.getAttribute('data-value');
@@ -3891,6 +3950,7 @@ async function asesoraLlamar(fn, args){
       otro_proyecto: 'Esa casa es de otro proyecto.',
       no_reserva: 'No hay una separación en proceso que cancelar.',
       no_jefe: 'Solo el jefe de ventas puede hacer esto.',
+      ya_disponible: 'Esa casa ya está disponible.',
       fecha: 'Elige una fecha de fin válida (entre mañana y 120 días).',
       valor: 'Descuento no válido (máximo 30 % o que el precio no baje de la mitad).',
       meta: 'La meta debe ser un número entre 0 y 500.',
@@ -3906,6 +3966,12 @@ function asesoraCambioLocal(loteId, estado, msg){ // (ya no se usa en la separac
   var l = ETAPA5_LOTES_PLANO.filter(function(x){ return String(x.id) === String(loteId); })[0];
   if (l) l.e = estado;
   ui.sepMsg = msg || '';
+}
+async function cargarHistorial(){
+  if (!asesoraPin || !asesoraIdActual) return;
+  var res = await sb.rpc('ec_historial_jefe', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_limite: 60 });
+  if (!res.error && res.data && res.data.ok){ ui.hist = res.data.items; ui.histError = false; }
+  else { ui.histError = true; }
 }
 async function cargarSepInfo(loteId){
   if (!asesoraPin || !asesoraIdActual) return;
