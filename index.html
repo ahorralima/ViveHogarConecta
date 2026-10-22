@@ -492,6 +492,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-lotes-wrap{border:none;border-radius:0;}
 .mapa-lotes-wrap .mapa-vhs-img{visibility:hidden;}
 .mapa-lotes-wrap.mapa-real{background:#fff;}
+/* Pistas y veredas alrededor de cada manzana (ayuda al cliente a ubicarse); las unidades cqw escalan con el ancho del plano */
+.mapa-lotes-wrap.mapa-calles{container-type:inline-size;}
+.mapa-lotes-wrap.mapa-calles .mz-block{box-shadow:0 0 0 0.5cqw #f4f0e6, 0 0 0 1.75cqw #bcc4cd;}
 .mapa-lotes-wrap.mapa-real .mapa-vhs-img{visibility:visible;}
 .mapa-real .lote-hotspot{border:none;border-radius:0;}
 .mapa-real .lote-hotspot.lote-ok{background:rgba(47,158,106,0.62);}
@@ -3004,7 +3007,7 @@ function renderMapaEtapa5Html(etapaN){
   html += '<div class="mapa-zoom-outer'+(isFull?' mapa-full':'')+'" id="etapa5-zoom">'+
     (isFull ? '<button type="button" class="mapa-full-close" data-action="etapa5-full-cerrar" aria-label="Cerrar plano">✕</button>' : '')+
     '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
-    '<div class="mapa-vhs-wrap mapa-lotes-wrap'+(etapaPlanoCfg().real?' mapa-real':'')+'">'+
+    '<div class="mapa-vhs-wrap mapa-lotes-wrap'+(etapaPlanoCfg().real?' mapa-real':' mapa-calles')+'">'+
       '<img class="mapa-vhs-img" src="'+etapaPlanoCfg().img+'" alt="Plano de la Etapa '+esc(ETAPA_ACTUAL)+' de Vive Hogar Sullana" />'+
       (etapaPlanoCfg().real ? '' : mzBlocks)+
       ETAPA5_RECREACION_PLANO.map(function(r){
@@ -4364,7 +4367,7 @@ function genFit(outer){
     var xs = sel.map(function(p){return p[0];}), ys = sel.map(function(p){return p[1];});
     var bx0 = Math.min.apply(null,xs), bx1 = Math.max.apply(null,xs), by0 = Math.min.apply(null,ys), by1 = Math.max.apply(null,ys);
     var fw = (bx1-bx0)/100*iw, fh = (by1-by0)/100*ih;
-    var s2 = Math.min(cw/fw, ch/fh)*0.5; s2 = Math.max(scale, Math.min(s2, scale*2.5));
+    var s2 = Math.min(cw/fw, ch/fh)*0.35; s2 = Math.max(scale, Math.min(s2, scale*1.7));
     return genClamp({scale:s2, x:cw/2 - (bx0+bx1)/200*iw*s2, y:ch/2 - (by0+by1)/200*ih*s2}, cw, ch);
   }
   // Vista inicial: el plano completo
