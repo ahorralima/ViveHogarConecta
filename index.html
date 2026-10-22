@@ -2202,13 +2202,15 @@ function renderAsesorLoteAcciones(lote){
     if (info && info.hay) h += '<p class="sep-info">Cliente: <strong>'+esc(info.cliente)+'</strong><br>Separó: '+esc(info.asesora)+' · '+esc(new Date(info.desde).toLocaleDateString('es-PE'))+'</p>';
     if (lote.e === 'SEPARADO'){
       h += '<button type="button" class="btn btn-primary btn-block" data-action="sep-comprado" data-value="'+lote.id+'"'+busy+'>✅ Marcar como vendida</button>'+
-        (esJefe() ? '' : '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="sep-liberar" data-value="'+lote.id+'"'+busy+'>↩️ Liberar (no se concretó)</button>');
+        '';
     }
   }
   // Jefes, gerentes, propietarios y equipo: devolver a la venta una casa separada, vendida o bloqueada
-  if (esJefe() && lote.id && lote.e !== 'DISPONIBLE' && lote.e !== 'EN_ATENCION'){
+  // Una asesora solo puede hacerlo con una casa que ella separó, dentro de las primeras 24 h (el servidor lo vuelve a validar)
+  var puedeReponer = esJefe() || !!(info && info.hay && info.liberable);
+  if (puedeReponer && lote.id && lote.e !== 'DISPONIBLE' && lote.e !== 'EN_ATENCION'){
     h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="lote-reponer" data-value="'+lote.id+'"'+busy+'>↩️ Volver a poner a la venta</button>'+
-      '<p class="sep-info" style="margin-top:6px;">Úsalo si se cayó la venta o la separación. La casa vuelve a verde para todos y queda registrado quién la liberó.</p>';
+      '<p class="sep-info" style="margin-top:6px;">'+(esJefe() ? 'Úsalo si se cayó la venta o la separación.' : 'Puedes liberarla porque la separaste tú hace menos de 24 horas.')+' La casa vuelve a verde para todos y queda registrado quién la liberó.</p>';
   }
   h += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
     (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '')+'</div>';
@@ -3950,6 +3952,7 @@ async function asesoraLlamar(fn, args){
       otro_proyecto: 'Esa casa es de otro proyecto.',
       no_reserva: 'No hay una separación en proceso que cancelar.',
       no_jefe: 'Solo el jefe de ventas puede hacer esto.',
+      solo_propia_24h: 'Solo puedes liberar una casa que tú separaste, dentro de las primeras 24 horas. Pídele a tu jefe de ventas.',
       ya_disponible: 'Esa casa ya está disponible.',
       fecha: 'Elige una fecha de fin válida (entre mañana y 120 días).',
       valor: 'Descuento no válido (máximo 30 % o que el precio no baje de la mitad).',
