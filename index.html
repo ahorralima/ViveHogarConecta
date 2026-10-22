@@ -417,6 +417,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-gen-leyenda{position:absolute;left:8px;bottom:8px;z-index:30;display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.94);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:0.72rem;font-weight:600;color:#1f2933;box-shadow:0 2px 8px rgba(0,0,0,0.2);pointer-events:none;}
 .mapa-gen-leyenda i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-2px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,0.25);}
 .lote-filtros-label.presup-label{width:100%;}
+.as-demo,.demo-banner{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:#fff7e0;color:#6b4a00;border:1px solid #f1d98a;border-radius:10px;padding:8px 12px;font-size:0.82rem;font-weight:700;margin:8px 0;}
+.demo-banner{position:sticky;top:0;z-index:60;margin:0;border-radius:0;}
 .presup-row{display:flex;gap:8px;align-items:center;width:100%;}
 .presup-sol{font-weight:800;color:var(--ink-soft);}
 .presup-input{flex:1;min-width:0;}
@@ -1043,6 +1045,7 @@ var asesoraPin = null;
 try { asesoraPin = localStorage.getItem('ec_asesora_pin_v1') || null; } catch(e) { asesoraPin = null; }
 var asesoraIdActual = null;
 try { asesoraIdActual = localStorage.getItem('ec_asesora_id_v1') || null; } catch(e) { asesoraIdActual = null; }
+var asesorSoloLectura = false, asesorSoloLecturaId = null;   // cuenta de prueba: ve todo, no puede cambiar nada
 var asesoraNombreActual = null;
 try { asesoraNombreActual = localStorage.getItem('ec_asesora_nombre_v1') || null; } catch(e) { asesoraNombreActual = null; }
 function saveAsesoraSesion(pin, id, nombre){
@@ -1055,6 +1058,7 @@ function saveAsesoraSesion(pin, id, nombre){
 }
 function salirModoAsesora(){
   asesoraPin = null; asesoraIdActual = null; asesoraNombreActual = null;
+  asesorSoloLectura = false; asesorSoloLecturaId = null; ui.demoMarket = false;
   try {
     localStorage.removeItem('ec_asesora_pin_v1');
     localStorage.removeItem('ec_asesora_id_v1');
@@ -1841,6 +1845,13 @@ function asesorCargarPanel(){
     var cambio = nuevo !== ui._panelJson;
     ui._panelJson = nuevo;
     ui.asesorPanel = res.data;
+    if (asesorSoloLecturaId !== String(asesoraIdActual)){
+      asesorSoloLecturaId = String(asesoraIdActual);
+      sb.rpc('ec_asesora_solo_lectura', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
+        asesorSoloLectura = !!(r.data && r.data.ok && r.data.solo_lectura);
+        if (asesorSoloLectura) render();
+      });
+    }
     ui.interesadoProyecto = res.data.yo.proyecto;
     try { localStorage.setItem('ec_asesor_proy_v1', res.data.yo.proyecto); } catch(e){}
     if (cambio || ui.renderPendiente) renderSiLibre();
@@ -2027,6 +2038,9 @@ function renderAsesorPanelHtml(){
   var h = '<div class="as-hero">'+
     '<div class="as-hero-top"><div><div class="as-hello">Hola, '+esc(primerNombre(p.yo.nombre))+' 👋</div>'+
     '<div class="as-sub">'+esc(p.proyecto_nombre || PROY_NOMBRES[p.yo.proyecto] || '')+' · '+esc(p.yo.cargo || (jefe ? 'Jefe de ventas' : 'Asesora de ventas'))+'</div></div>'+salir+'</div>';
+  if (asesorSoloLectura){
+    h += '<div class="as-demo">👁️ Cuenta de prueba · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">Ver marketplace</button></div>';
+  }
   var cuentas = asesorCuentas();
   if (cuentas.length > 1){
     h += '<div class="as-cuentas">'+cuentas.map(function(c){
@@ -2196,6 +2210,8 @@ function ofertaLoteHtml(lote){
 
 function renderAsesorLoteAcciones(lote){
   if (!modoAsesor()) return '';
+  if (asesorSoloLectura) return '<div class="lote-detail-section"><div class="lote-detail-section-title">👁️ Cuenta de prueba</div>'+
+    '<p class="sep-info">Solo lectura: puedes ver precios y planos y simular cuotas, pero no separar ni modificar nada.</p></div>';
   var busy = ui.asesoraBusy ? ' disabled' : '';
   var info = ui.sepInfo[lote.id];
   var h = '<div class="lote-detail-section"><div class="lote-detail-section-title">👨‍💼 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
@@ -3476,7 +3492,8 @@ function renderApp(){
     document.getElementById('app').innerHTML = renderClienteVerificacion();
     return;
   }
-  if (appGate === 'asesor'){
+  var demoMarket = !!(appGate === 'asesor' && modoAsesor() && asesorSoloLectura && ui.demoMarket);
+  if (appGate === 'asesor' && !demoMarket){
     document.getElementById('app').innerHTML = modoAsesor() ? renderInteresadoMapa() : renderAsesorLogin();
     initEtapa5ZoomDrag(); initGenZoom();
     return;
@@ -3497,6 +3514,7 @@ function renderApp(){
   else body = renderHome();
 
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
+  if (demoMarket) html = '<div class="demo-banner">👁️ Cuenta de prueba · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">← Volver a la vista de asesor</button></div>' + html;
   var app = document.getElementById('app');
   app.innerHTML = html;
   initEtapa5ZoomDrag();
@@ -3554,6 +3572,16 @@ document.addEventListener('click', async function(ev){
   var action = t.getAttribute('data-action');
   var value = t.getAttribute('data-value');
 
+  // Cuenta de prueba mirando el marketplace: solo se puede mirar
+  if (modoAsesor() && asesorSoloLectura && ui.demoMarket){
+    var permitidas = ['nav','open','set-proyecto','set-cat','set-etapa','set-precio','toggle-filters','demo-market-toggle','faq-toggle','skip-etapa-prompt'];
+    if (permitidas.indexOf(action) === -1 || (action === 'nav' && value !== 'home')){ toast('Cuenta de prueba: solo lectura'); return; }
+  }
+  if (action === 'demo-market-toggle'){
+    ui.demoMarket = !ui.demoMarket; ui.view = 'home'; render();
+    window.scrollTo(0, 0);
+    return;
+  }
   if (action === 'nav'){
     ui.view = value;
     ui.formErrors = {};
@@ -4053,6 +4081,10 @@ async function asesoraLlamar(fn, args){
   var res = await sb.rpc(fn, args);
   ui.asesoraBusy = false;
   var d = res.data;
+  if (res.error && /solo lectura/i.test(res.error.message || '')){
+    ui.asesoraError = 'Cuenta de prueba: solo lectura (no puede modificar nada).';
+    return {ok:false};
+  }
   if (res.error || !d){
     ui.asesoraError = (res.error && res.error.code === 'PGRST202')
       ? 'Falta activar la actualización v7 en Supabase (ver instrucciones).'
@@ -4575,6 +4607,7 @@ document.addEventListener('submit', async function(ev){
   var form = ev.target.closest('form[data-form]');
   if (!form) return;
   ev.preventDefault();
+  if (modoAsesor() && asesorSoloLectura){ toast('Cuenta de prueba: solo lectura'); return; }
   var kind = form.getAttribute('data-form');
   var fd = new FormData(form);
 
