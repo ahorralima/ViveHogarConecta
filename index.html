@@ -2392,7 +2392,7 @@ function renderAsesorLoteAcciones(lote){
   var puedeReponer = esJefe() || !!(info && info.hay && info.liberable);
   if (puedeReponer && lote.id && lote.e !== 'DISPONIBLE' && lote.e !== 'EN_ATENCION'){
     h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="lote-reponer" data-value="'+lote.id+'"'+busy+'>↩️ Volver a poner a la venta</button>'+
-      '<p class="sep-info" style="margin-top:6px;">'+(esJefe() ? 'Úsalo si se cayó la venta o la separación.' : 'Puedes liberarla porque la separaste tú hace menos de 24 horas.')+' La casa vuelve a blanco (disponible) para todos y queda registrado quién la liberó.</p>';
+      '<p class="sep-info" style="margin-top:6px;">'+(esJefe() ? 'Úsalo si se cayó la venta o la separación.' : 'Puedes liberarla porque la separaste tú hace menos de 24 horas.')+' La casa vuelve a estar disponible para todos y queda registrado quién la liberó.</p>';
   }
   if (String(ui.descLote) === String(lote.id) && (lote.e === 'DISPONIBLE' || lote.e === 'EN_ATENCION')) h += descuentoPanelHtml(lote);
   h += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
@@ -3079,11 +3079,14 @@ function renderMapaEtapa5Html(etapaN){
   var etapa5Disponibles = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'DISPONIBLE'; }).length;
   html += '<h4 style="margin-bottom:2px;">Etapa '+esc(ETAPA_ACTUAL)+'</h4>';
   html += '<div class="etapa5-header-sub">'+(etapa5Disponibles === 0 ? 'Por ahora no hay lotes disponibles en esta etapa (los demás están vendidos o separados)' : 'Elige tu casa · '+etapa5Disponibles+(etapa5Disponibles === 1 ? ' lote disponible' : ' lotes disponibles'))+'</div>';
-  html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>blanca</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
+  html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>'+(planoProy() === 'sullana' ? 'blanca' : 'verde')+'</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
   html += '<div class="lote-legend">'+
-    '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span>'+
-    '<span><i class="lote-dot lote-dot-sep"></i> Separación</span>'+
-    '<span><i class="lote-dot lote-dot-vend"></i> Venta (vendida)</span>'+
+    (planoProy() === 'sullana'
+      ? '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span>'+
+        '<span><i class="lote-dot lote-dot-sep"></i> Separación</span>'+
+        '<span><i class="lote-dot lote-dot-vend"></i> Venta (vendida)</span>'
+      : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
+        '<span><i class="lote-dot lote-dot-neutral"></i> No disponible (vendida o separada)</span>')+
     '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
     '<span><i class="lote-dot lote-dot-area"></i> Parque</span>'+
   '</div>';
@@ -3195,7 +3198,9 @@ function renderMapaEtapa5Html(etapaN){
       }).join('')+
       ETAPA5_LOTES_PLANO.map(function(l){
         var key = l.m+'|'+l.l;
-        var cls = l.e === 'DISPONIBLE' ? 'lote-libre' : (l.e === 'VENDIDO' ? 'lote-vend' : 'lote-sep');
+        var cls = planoProy() === 'sullana'
+          ? (l.e === 'DISPONIBLE' ? 'lote-libre' : (l.e === 'VENDIDO' ? 'lote-vend' : 'lote-sep'))
+          : (l.e === 'DISPONIBLE' ? 'lote-ok' : 'lote-neutral');
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
         var isSel = ui.interesadoLoteSel === key;
         var dim = (!isSel && ui.interesadoLoteSel) || (!isSel && filtrosActivos && !loteCoincide(l));
@@ -4198,7 +4203,7 @@ document.addEventListener('click', async function(ev){
       var rR = await asesoraLlamar('ec_lote_liberar_jefe', { p_lote_id: rId, p_jefe_id: asesoraIdActual, p_pin: asesoraPin });
       if (rR.ok){
         delete ui.sepInfo[rId];
-        ui.sepMsg = 'Listo: la casa vuelve a estar disponible (blanca) para todos.';
+        ui.sepMsg = 'Listo: la casa vuelve a estar disponible para todos.';
         await etapa5Refrescar(); await asesorCargarPanel();
         if (ui.histAbierto) await cargarHistorial();
       }
