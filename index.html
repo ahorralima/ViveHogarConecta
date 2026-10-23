@@ -813,7 +813,45 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 // ============ Supabase ============
 var SUPABASE_URL = 'https://swfoeonrikpzytxbqdye.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_sJ9ORPu0KAmp8XViQRb8Ew__acyucuf';
-var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Apagado de emergencia: si Supabase responde 503, se verifica el interruptor y se bloquea la app
+var apagadaOn = false, apagadaChequeando = false;
+function appFetch(url, opts){
+  return fetch(url, opts).then(function(r){
+    if (r.status === 503 && !apagadaChequeando && !apagadaOn) apagadaVerificar();
+    return r;
+  });
+}
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { global: { fetch: appFetch } });
+async function apagadaVerificar(){
+  if (apagadaChequeando) return;
+  apagadaChequeando = true;
+  try {
+    var r = await sb.rpc('ec_app_estado');
+    var off = !!(r && r.data && r.data.apagada);
+    if (off && !apagadaOn){ apagadaOn = true; apagadaMostrar(); }
+    else if (!off && apagadaOn && r && !r.error){ location.reload(); }
+  } catch(e) {}
+  apagadaChequeando = false;
+}
+function apagadaMostrar(){
+  var app = document.getElementById('app');
+  if (app) app.innerHTML = '';
+  var ov = document.getElementById('ec-apagada');
+  if (!ov){
+    ov = document.createElement('div');
+    ov.id = 'ec-apagada';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#f6f1e9;color:#2b2b2b;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;';
+    ov.innerHTML = '<div style="max-width:380px;"><div style="font-size:2.6rem;">🔒</div>'+
+      '<h2 style="margin:12px 0 8px;font-size:1.3rem;">Servicio temporalmente suspendido</h2>'+
+      '<p style="margin:0 0 18px;line-height:1.5;color:#5a5a5a;">Estamos revisando el sistema. Vuelve a intentar más tarde.</p>'+
+      '<button type="button" id="ec-apagada-reint" style="background:#1f6f5c;color:#fff;border:0;border-radius:999px;padding:11px 22px;font-weight:700;font-size:0.95rem;">Reintentar</button></div>';
+    document.body.appendChild(ov);
+    document.getElementById('ec-apagada-reint').addEventListener('click', function(){ apagadaVerificar(); });
+  }
+  document.body.style.overflow = 'hidden';
+}
+setInterval(function(){ if (!document.hidden) apagadaVerificar(); }, 60000);
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) apagadaVerificar(); });
 
 // ============ utilities ============
 function esc(s){
@@ -2195,6 +2233,21 @@ function renderJefePanelHtml(p){
     '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesor-crear">Crear y generar contraseña</button>';
   if (ui.claveNueva) h += '<div class="as-clave">Contraseña de <strong>'+esc(toTitleCase(ui.claveNueva.nombre))+'</strong>: <b>'+esc(ui.claveNueva.clave)+'</b><br><span style="font-size:0.76rem;color:var(--ink-soft);">Anótala y entrégasela: no se vuelve a mostrar.</span></div>';
   h += '</div>';
+  var nmYo = String((ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.nombre) || '').toLowerCase().replace(/ú/g,'u').trim();
+  if (!asesorSoloLectura && (nmYo === 'jesus blanco' || nmYo === 'marcelo blanco')){
+    h += '<div class="as-card" style="border:1.5px solid #c0392b;"><h4>🛑 Apagado de emergencia</h4>'+
+      '<p style="font-size:0.82rem;color:var(--ink-soft);margin:0 0 8px;">Bloquea la app para TODOS (asesores y clientes) al instante. Solo se vuelve a encender desde Supabase.</p>';
+    if (!ui.apagarPaso){
+      h += '<button type="button" class="btn btn-secondary btn-block" style="color:#c0392b;border-color:#c0392b;" data-action="app-apagar-paso">Apagar la app…</button>';
+    } else {
+      h += '<label style="font-size:0.8rem;">Para confirmar escribe <b>APAGAR</b></label>'+
+        '<input class="text-input" type="text" data-ui="apagarTxt" value="'+esc(ui.apagarTxt||'')+'" autocomplete="off" autocapitalize="characters" />'+
+        '<div style="display:flex;gap:8px;margin-top:8px;"><button type="button" class="btn btn-secondary btn-block" data-action="app-apagar-cancelar">Cancelar</button>'+
+        '<button type="button" class="btn btn-primary btn-block" style="background:#c0392b;border-color:#c0392b;" data-action="app-apagar-ok"'+(ui.asesoraBusy?' disabled':'')+'>Apagar ahora</button></div>'+
+        (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '');
+    }
+    h += '</div>';
+  }
   return h;
 }
 
@@ -3535,6 +3588,7 @@ function renderApp(){
   }
 }
 function render(){
+  if (apagadaOn) return;
   renderApp();
   var planoAbierto = !!document.getElementById('etapa5-zoom');
   if (!planoAbierto) ui.etapa5Full = false;
@@ -3747,6 +3801,17 @@ document.addEventListener('click', async function(ev){
     render();
   } else if (action === 'asesor-ir-lote'){
     asesorIrALote(t.getAttribute('data-value'));
+  } else if (action === 'app-apagar-paso'){
+    ui.apagarPaso = true; ui.apagarTxt = ''; ui.asesoraError = ''; render();
+  } else if (action === 'app-apagar-cancelar'){
+    ui.apagarPaso = false; ui.apagarTxt = ''; ui.asesoraError = ''; render();
+  } else if (action === 'app-apagar-ok'){
+    if (String(ui.apagarTxt||'').trim().toUpperCase() !== 'APAGAR'){ ui.asesoraError = 'Escribe APAGAR para confirmar.'; render(); }
+    else {
+      var apr = await asesoraLlamar('ec_app_apagar', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin, p_motivo: null });
+      if (apr.ok){ ui.apagarPaso = false; ui.apagarTxt = ''; apagadaOn = true; apagadaMostrar(); }
+      else render();
+    }
   } else if (action === 'meta-guardar'){
     jefeGuardarMetas();
   } else if (action === 'oferta-manzana'){
@@ -4112,6 +4177,7 @@ async function asesoraLlamar(fn, args){
       otro_proyecto: 'Esa casa es de otro proyecto.',
       no_reserva: 'No hay una separación en proceso que cancelar.',
       no_jefe: 'Solo el jefe de ventas puede hacer esto.',
+      permiso: 'Tu cuenta no puede apagar la app.',
       solo_propia_24h: 'Solo puedes liberar una casa que tú separaste, dentro de las primeras 24 horas. Pídele a tu jefe de ventas.',
       ya_disponible: 'Esa casa ya está disponible.',
       fecha: 'Elige una fecha de fin válida (entre mañana y 120 días).',
@@ -4901,6 +4967,8 @@ async function init(){
     asesorCargarPanel();
   }
   asesorIniciarRelojes();
+  await apagadaVerificar();
+  if (apagadaOn) return;
   await refreshServicios();
   loading = false;
   render();
