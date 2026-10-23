@@ -1711,6 +1711,12 @@ function renderMiCasa(){
     '</div>'+
   '</div>';
 
+  if (esSullana){
+    html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Recorre tu casa en 3D</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Camina por dentro de tu vivienda y prueba colores y muebles.</p>'+
+      '<a class="btn btn-primary btn-block" href="casa3d/">Entrar a mi casa 3D →</a></div>';
+  }
+
   if (esSullana && etapaTienePlano(etapaNum)){
     html += '<div class="panel">'+renderMapaEtapa5Html(String(etapaNum))+'</div>';
   } else if (!esSullana && etapaNum === '11'){
