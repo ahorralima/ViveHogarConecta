@@ -4516,6 +4516,25 @@ function applyEtapa5Zoom(){
   }
 }
 
+// "Ver mi vivienda": el plano abre acercado a la manzana del cliente (con su casa marcada); se puede mover y alejar
+function etapa5ZoomMiCasa(outer){
+  if (!ui.miCasaKey) return null;
+  var mz = String(ui.miCasaKey).split('|')[0];
+  var inner = document.getElementById('etapa5-zoom-inner');
+  var items = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === mz; });
+  if (!items.length || !inner || !outer) return null;
+  var iw = inner.offsetWidth, ih = inner.offsetHeight, cw = outer.clientWidth, ch = outer.clientHeight;
+  if (!iw || !ih || !cw || !ch) return null;
+  var t0 = Math.min.apply(null, items.map(function(l){ return l.t; }));
+  var t1 = Math.max.apply(null, items.map(function(l){ return l.t + l.h; }));
+  var l0 = Math.min.apply(null, items.map(function(l){ return l.le; }));
+  var l1 = Math.max.apply(null, items.map(function(l){ return l.le + l.w; }));
+  var bw = (l1-l0)/100*iw, bh = (t1-t0)/100*ih;
+  var sc = Math.min(4, Math.max(1, Math.min(cw/(bw*1.8), ch/(bh*1.25))));
+  var cxp = (l0+l1)/2/100*iw*sc, cyp = (t0+t1)/2/100*ih*sc;
+  return clampZoom({scale:sc, x:cw/2 - cxp, y:ch/2 - cyp}, cw, ch);
+}
+
 function initEtapa5ZoomDrag(){
   var outer = document.getElementById('etapa5-zoom');
   if (!outer) return;
@@ -4525,7 +4544,8 @@ function initEtapa5ZoomDrag(){
   var fitImg = outer.querySelector('.mapa-vhs-img');
   function doInitialFit(){
     if (!ui.etapa5Zoom){
-      ui.etapa5Zoom = computeEtapa5FitZoom(outer);
+      var fitZ = computeEtapa5FitZoom(outer);
+      ui.etapa5Zoom = etapa5ZoomMiCasa(outer) || fitZ;
     }
     applyEtapa5Zoom();
   }
