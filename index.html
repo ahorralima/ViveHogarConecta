@@ -817,6 +817,12 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .precio-oferta b{color:#b36b00;}
 .cuota-chip-neutral{background:rgba(120,130,140,0.16);color:#4c555e;}
 
+/* Planos de Castilla y Ejidos: casillas llenas como en Sullana (2 colores) */
+.mapa-real .lote-hotspot.lote-ok{background:#2fb36f;border:1px solid #56626e;}
+.mapa-real .lote-hotspot.lote-neutral{background:repeating-linear-gradient(135deg,#c3c9cf 0 3px,#dde1e5 3px 6px);border:1px solid #56626e;}
+.mapa-real .lote-hotspot.lote-ok .lote-hotspot-num{color:#fff;font-size:min(var(--nf,999px),68cqh,44cqw);text-shadow:none;}
+.mapa-real .lote-hotspot.lote-neutral .lote-hotspot-num{color:#444c54;font-size:min(var(--nf,999px),68cqh,44cqw);text-shadow:none;}
+.mapa-real .lote-hotspot.active{background:#397ead;border:1px solid #0f3d63;box-shadow:0 0 0 1.5px #0f3d63;z-index:6;}
 </style>
 </head>
 <body>
