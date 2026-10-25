@@ -2311,6 +2311,7 @@ function editorPrecioHtml(p){
         ['fijar','subir','bajar','subir_pct','bajar_pct'].map(function(a){ return '<option value="'+a+'"'+(accion===a?' selected':'')+'>'+peNombreAccion(a)+'</option>'; }).join('')+'</select></div>'+
       '<div><label>'+(accion==='fijar'?'Precio nuevo (S/)':/pct/.test(accion)?'Porcentaje (%)':'Monto (S/)')+'</label><input class="text-input" type="number" inputmode="decimal" min="0" data-ui="peValor" value="'+esc(ui.peValor)+'" placeholder="'+(accion==='fijar'?'95000':/pct/.test(accion)?'3':'2000')+'" /></div>'+
     '</div>'+
+    '<div style="margin-top:10px;"><label>Oferta válida hasta (opcional)</label><input class="text-input" type="date" data-ui="ofHasta" min="'+fmtHoy(1)+'" max="'+fmtHoy(120)+'" value="'+esc(ui.ofHasta)+'" />'+'<p class="sep-info" style="margin:4px 0 0;">Si eliges fecha, el descuento es una oferta temporal (solo con “Bajar”). Si la dejas vacía, el cambio de precio es permanente.</p></div>'+
     '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="pe-aplicar"'+((ui.asesoraBusy||!nSel)?' disabled':'')+'>Aplicar a '+nSel+' casa'+(nSel===1?'':'s')+'</button>'+
     (ui.jefeMsg ? '<p class="as-ok">'+esc(ui.jefeMsg)+'</p>' : '')+
     (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '')+
@@ -2323,9 +2324,16 @@ async function peAplicar(ids){
   if (!ids.length){ ui.asesoraError = 'Marca al menos una casa.'; render(); return; }
   if (!(valor > 0)){ ui.asesoraError = 'Escribe el monto o el porcentaje.'; render(); return; }
   var acc = ui.peAccion || 'fijar';
-  var r = await asesoraLlamar('ec_precio_editar', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_lote_ids: ids, p_accion: acc, p_valor: valor });
+  var hasta = ui.ofHasta || '';
+  if (hasta && acc !== 'bajar' && acc !== 'bajar_pct'){ ui.asesoraError = 'La fecha límite solo sirve para ofertas: elige "Bajar" o quita la fecha.'; render(); return; }
+  var r = hasta
+    ? await asesoraLlamar('ec_oferta_definir', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_lote_ids: ids, p_tipo: acc === 'bajar_pct' ? 'porcentaje' : 'soles', p_valor: valor, p_hasta: hasta+'T23:59:00-05:00' })
+    : await asesoraLlamar('ec_precio_editar', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_lote_ids: ids, p_accion: acc, p_valor: valor });
   if (r.ok){
-    ui.jefeMsg = r.lotes ? ('Precio actualizado en '+r.lotes+' casa'+(r.lotes===1?'':'s')+'.') : 'Ninguna casa cambió (el precio quedaría en cero o igual).';
+    ui.jefeMsg = hasta
+      ? (r.lotes ? ('Oferta aplicada a '+r.lotes+' casa'+(r.lotes===1?'':'s')+', válida hasta el '+hasta.split('-').reverse().join('/')+'.') : 'Ninguna casa cambió (el descuento dejaría el precio por debajo de la mitad).')
+      : (r.lotes ? ('Precio actualizado en '+r.lotes+' casa'+(r.lotes===1?'':'s')+'.') : 'Ninguna casa cambió (el precio quedaría en cero o igual).');
+    if (hasta) ui.ofHasta = '';
     ui.peSel = {}; ui.peValor = ''; ui.peCache = {};
     await etapa5Refrescar(); await asesorCargarPanel();
   }
@@ -2340,6 +2348,7 @@ function ofertaLoteHtml(lote){
         ['fijar','subir','bajar','subir_pct','bajar_pct'].map(function(a){ return '<option value="'+a+'"'+(acc===a?' selected':'')+'>'+peNombreAccion(a)+'</option>'; }).join('')+'</select></div>'+
       '<div><input class="text-input" type="number" inputmode="decimal" min="0" data-ui="peValor" value="'+esc(ui.peValor)+'" placeholder="'+(acc==='fijar'?'Precio nuevo':/pct/.test(acc)?'%':'Monto S/')+'" /></div>'+
     '</div>'+
+    '<div style="margin-top:10px;"><label>Oferta válida hasta (opcional)</label><input class="text-input" type="date" data-ui="ofHasta" min="'+fmtHoy(1)+'" max="'+fmtHoy(120)+'" value="'+esc(ui.ofHasta)+'" />'+'<p class="sep-info" style="margin:4px 0 0;">Si eliges fecha, el descuento es una oferta temporal (solo con “Bajar”). Si la dejas vacía, el cambio de precio es permanente.</p></div>'+
     '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="pe-lote" data-value="'+lote.id+'">Cambiar precio de esta casa</button>'+
     (lote.of ? '<button type="button" class="btn btn-secondary btn-block" style="margin-top:6px;" data-action="oferta-quitar" data-value="'+lote.id+'">Quitar oferta antigua</button>' : '')+
   '</div>';
@@ -4612,7 +4621,7 @@ function computeEtapa5FitZoom(outer){
   var scale = Math.max(cw/(bboxWidthPx*padding), ch/(bboxHeightPx*padding));
   if (isFull) scale = Math.min(cw/(bboxWidthPx*1.1), ch/(bboxHeightPx*1.1));
   else scale = Math.min(cw/(bboxWidthPx*padding), ch/(bboxHeightPx*padding));
-  scale = Math.min(4, Math.max(isFull ? 1 : 0.3, scale));
+  scale = Math.min(4, Math.max(isFull ? 0.1 : 0.3, scale));
   etapa5FitScaleCache = scale;
   if (isFull){
     // Plano muy ancho (como la Etapa 1) en pantalla alta: se acerca y se empieza por la izquierda,
