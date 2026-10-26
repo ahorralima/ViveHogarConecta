@@ -1835,7 +1835,9 @@ ui.sepOp = '';
 ui.sepMonto = '';
 ui.sepImg = '';
 ui.descLote = null; ui.descInfo = {}; ui._descCarg = {}; ui.descMonto = '';
-ui.ventasMes = null; ui.ventasMesId = null; ui.ventasErr = false; ui.ventaAbierta = null; ui.ventaImg = {};
+ui.ventasMes = null; ui.ventasMesId = null; ui.ventasErr = false; ui.ventaAbierta = null; ui.ventaImg = {}; ui.ventaImg2 = {};
+ui.misVentas = null; ui.misVentasId = null; ui.misVentasErr = false; ui.mvAbierta = null;
+ui.pago2Op = ''; ui.pago2Monto = ''; ui.pago2Img = ''; ui.pago2ImgBusy = false; ui.pago2ImgErr = false;
 ui.jefeMsg = '';
 ui.claveNueva = null;
 ui.ofTipo = 'soles';
@@ -2396,7 +2398,7 @@ function renderAsesorLoteAcciones(lote){
   } else if (lote.e === 'EN_ATENCION'){
     h += '<button type="button" class="btn btn-secondary btn-block" data-action="asesora-liberar" data-value="'+lote.id+'"'+busy+'>✅ Liberar lote</button>';
   } else if (lote.e === 'SEPARADO' || lote.e === 'VENDIDO'){
-    if (info && info.hay) h += '<p class="sep-info">Cliente: <strong>'+esc(info.cliente)+'</strong><br>Separó: '+esc(info.asesora)+' · '+esc(new Date(info.desde).toLocaleDateString('es-PE'))+'</p>';
+    if (info && info.hay) h += '<p class="sep-info">'+(lote.e === 'VENDIDO' ? 'Casa vendida por' : 'Casa separada por')+' <strong>'+esc(toTitleCase(info.asesora || ''))+'</strong>'+(info.cliente ? '<br>Cliente: <strong>'+esc(info.cliente)+'</strong>' : '')+'</p>';
     if (lote.e === 'SEPARADO'){
       h += '<button type="button" class="btn btn-primary btn-block" data-action="sep-comprado" data-value="'+lote.id+'"'+busy+'>✅ Marcar como vendida</button>'+
         '';
@@ -3654,6 +3656,7 @@ function renderInteresadoMapa(){
   }
 
   if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml();
+  else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml();
   html += '</div>';
   if (!esAsesor) html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
@@ -3962,6 +3965,34 @@ document.addEventListener('click', async function(ev){
     var vr = await sb.rpc('ec_venta_comprobante', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_sep_id: viId });
     ui.ventaImg[viId] = (!vr.error && vr.data && vr.data.ok && vr.data.img) ? vr.data.img : null;
     render();
+  } else if (action === 'venta-img2'){
+    var vi2 = t.getAttribute('data-value');
+    ui.ventaImg2[vi2] = 'cargando'; render();
+    var vr2 = await sb.rpc('ec_venta_comprobante2', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin, p_sep_id: vi2 });
+    ui.ventaImg2[vi2] = (!vr2.error && vr2.data && vr2.data.ok && vr2.data.img) ? vr2.data.img : null;
+    render();
+  } else if (action === 'mv-toggle'){
+    var mvId = t.getAttribute('data-value');
+    ui.mvAbierta = String(ui.mvAbierta) === String(mvId) ? null : mvId;
+    ui.asesoraError = ''; ui.sepMsg = ''; ui.pago2Op = ''; ui.pago2Monto = ''; ui.pago2Img = ''; ui.pago2ImgErr = false;
+    render();
+  } else if (action === 'pago2-img-quitar'){
+    ui.pago2Img = ''; ui.pago2ImgErr = false; render();
+  } else if (action === 'pago2-enviar'){
+    var p2Id = t.getAttribute('data-value');
+    ['pago2-op:pago2Op','pago2-monto:pago2Monto'].forEach(function(p){
+      var kv = p.split(':'), el = document.getElementById(kv[0]);
+      if (el) ui[kv[1]] = el.value;
+    });
+    var p2Monto = parseFloat(String(ui.pago2Monto !== '' ? ui.pago2Monto : 500).replace(',','.'));
+    var r2 = await asesoraLlamar('ec_pago2_registrar', { p_sep_id: p2Id, p_asesora_id: asesoraIdActual, p_pin: asesoraPin,
+      p_operacion: ui.pago2Op, p_monto: isNaN(p2Monto) ? null : p2Monto, p_imagen: ui.pago2Img || null });
+    if (r2.ok){
+      ui.pago2Op = ''; ui.pago2Monto = ''; ui.pago2Img = '';
+      ui.sepMsg = '¡Segunda boleta registrada! Esa venta quedó completa.';
+      await cargarMisVentas();
+    }
+    render();
   } else if (action === 'app-apagar-paso'){
     ui.apagarPaso = true; ui.apagarTxt = ''; ui.asesoraError = ''; render();
   } else if (action === 'app-apagar-cancelar'){
@@ -4200,6 +4231,7 @@ document.addEventListener('click', async function(ev){
     if (rSep.ok){
       ui.sepNombre = ''; ui.sepDni = ''; ui.sepOp = ''; ui.sepMonto = ''; ui.sepImg = '';
       ui.sepMsg = '¡Pago registrado! La casa quedó SEPARADA.' + (rSep.aviso === 'nombre_distinto' ? ' Ojo: ese DNI ya estaba registrado con otro nombre; puede que no pueda entrar con este.' : '');
+      ui.misVentas = null;
       await etapa5Refrescar(); await asesorCargarPanel();
       await cargarSepInfo(sepId);
     }
@@ -4348,6 +4380,8 @@ async function asesoraLlamar(fn, args){
       permiso_jefe: 'Este descuento lo definió jefatura: no se puede cambiar.',
       solo_tu_reserva: 'Primero separa la casa (1 hora) para poder aplicar un precio acordado.',
       operacion_repetida: 'Ese número de operación ya fue usado en otra separación.',
+      sin_separacion: 'No se encontró esa venta entre las tuyas.',
+      pago2_hecho: 'Esa venta ya tiene la segunda boleta registrada.',
       monto_bajo: 'Escribe el monto pagado (mayor que cero).',
       muchas_reservas: 'Ya tienes 3 casas separadas en proceso. Confirma o cancela alguna primero.',
       otro_proyecto: 'Esa casa es de otro proyecto.',
@@ -4409,11 +4443,11 @@ function descuentoPanelHtml(lote){
   var pf = di.precio ? fmtMoney(di.precio - (di.oferta||0) - (di.desc||0)) : '';
   var modo = ui.descModo || di.modo || 'cuotas';
   var maxM = (di.sullana && !esJefe()) ? (modo === 'contado' ? di.max_contado : di.max_cuotas) : di.max;
-  var h = box+'<label>💲 Precio acordado · descuento máximo '+fmtMoney(maxM)+'</label>';
+  var h = box+'<label>💲 Precio acordado</label>';
   if (di.sullana && !esJefe()) h += '<select class="text-input" data-ui="descModo" data-rerender="1" style="margin-bottom:8px;">'+
-    '<option value="contado"'+(modo==='contado'?' selected':'')+'>Cliente paga al contado (hasta '+fmtMoney(di.max_contado)+')</option>'+
-    '<option value="cuotas"'+(modo==='cuotas'?' selected':'')+'>Cliente paga en cuotas / fraccionado (hasta '+fmtMoney(di.max_cuotas)+')</option></select>';
-  if (di.oferta > 0) h += '<p class="sep-info" style="margin:0 0 6px;">La oferta vigente ya descuenta '+fmtMoney(di.oferta)+' (cuenta dentro del máximo).</p>';
+    '<option value="contado"'+(modo==='contado'?' selected':'')+'>Cliente paga al contado</option>'+
+    '<option value="cuotas"'+(modo==='cuotas'?' selected':'')+'>Cliente paga en cuotas / fraccionado</option></select>';
+  if (di.oferta > 0) h += '<p class="sep-info" style="margin:0 0 6px;">La oferta vigente ya descuenta '+fmtMoney(di.oferta)+'.</p>';
   if (!esJefe() && di.por_jefe && di.desc > 0){
     h += '<p class="sep-info">Descuento autorizado por jefatura: <strong>'+fmtMoney(di.desc)+'</strong>.'+(pf ? ' Precio acordado: <strong>'+pf+'</strong>.' : '')+'</p>';
   } else {
@@ -4471,6 +4505,20 @@ function comprimirImagen(file, cb){
 }
 document.addEventListener('change', function(ev){
   var el = ev.target;
+  if (!el || el.id !== 'pago2-img' || !el.files || !el.files[0]) return;
+  ui.pago2ImgBusy = true; ui.pago2ImgErr = false;
+  ['pago2-op:pago2Op','pago2-monto:pago2Monto'].forEach(function(p){
+    var kv = p.split(':'), e2 = document.getElementById(kv[0]);
+    if (e2) ui[kv[1]] = e2.value;
+  });
+  comprimirImagen(el.files[0], function(d){
+    ui.pago2ImgBusy = false;
+    if (d) ui.pago2Img = d; else ui.pago2ImgErr = true;
+    render();
+  });
+});
+document.addEventListener('change', function(ev){
+  var el = ev.target;
   if (!el || el.id !== 'sep-img' || !el.files || !el.files[0]) return;
   ui.sepImgBusy = true; ui.sepImgErr = false;
   ['sep-nombre:sepNombre','sep-dni:sepDni','sep-op:sepOp','sep-monto:sepMonto'].forEach(function(p){
@@ -4511,7 +4559,7 @@ function renderVentasMesHtml(){
   h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' · separaciones cobradas: <strong>'+fmtMoney(total)+'</strong>. Toca una venta para ver el detalle.</p>';
   vm.items.forEach(function(v){
     var abierta = String(ui.ventaAbierta) === String(v.id);
-    var chip = v.estado === 'comprada' ? 'Vendida' : 'Separada';
+    var chip = (v.estado === 'comprada' ? 'Vendida' : 'Separada') + (v.exige_pago2 ? (v.pago2_en ? ' · 2.ª boleta ✅' : ' · ⏳ falta 2.ª boleta') : '');
     h += '<div class="as-hist" style="cursor:pointer;" role="button" tabindex="0" data-action="venta-toggle" data-value="'+v.id+'">'+
       '<div class="as-hist-top"><span><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+chip+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
       '<div>Asesor: <b>'+esc(toTitleCase(v.asesor || '—'))+'</b></div>';
@@ -4521,6 +4569,7 @@ function renderVentasMesHtml(){
         '<div>Fecha y hora: <b>'+esc(fmtFechaHora(v.cuando))+'</b></div>'+
         '<div>Cliente: <b>'+esc(toTitleCase(v.cliente || '—'))+'</b> · DNI '+esc(v.dni || '—')+'</div>'+
         '<div>Separación pagada: <b>'+fmtMoney(v.monto)+'</b>'+(v.operacion ? ' · Op. '+esc(v.operacion) : '')+'</div>'+
+        (v.exige_pago2 ? '<div>2.ª boleta: '+(v.pago2_en ? '<b>'+fmtMoney(v.pago2_monto)+'</b>'+(v.pago2_op ? ' · Op. '+esc(v.pago2_op) : '')+' ✅' : '<b style="color:var(--danger,#b3261e);">Pendiente</b> · vence el '+esc(ultimoDiaMes(v.vence_pago2)))+'</div>' : '')+
         (v.precio_final ? '<div>Precio de lista '+fmtMoney(v.precio_lista)+' · Precio final <b>'+fmtMoney(v.precio_final)+'</b></div>' : '')+
         (Number(v.descuento) > 0 ? '<div>Descuento acordado: <b>'+fmtMoney(v.descuento)+'</b>'+(v.descuento_por ? ' (autorizó '+esc(toTitleCase(v.descuento_por))+')' : '')+'</div>' : '');
       if (v.tiene_img){
@@ -4529,6 +4578,77 @@ function renderVentasMesHtml(){
         else if (img) h += '<img src="'+img+'" alt="Comprobante" style="max-width:100%;margin-top:8px;border-radius:8px;border:1px solid var(--border);" />';
         else h += '<p class="as-err">No se pudo cargar el comprobante.</p>';
       } else h += '<div style="color:var(--ink-faint);margin-top:4px;">Sin imagen de comprobante (se registró con número de operación).</div>';
+      if (v.tiene_img2){
+        var img2 = ui.ventaImg2[v.id];
+        if (img2 === undefined) h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="venta-img2" data-value="'+v.id+'">🧾 Ver 2.ª boleta</button>';
+        else if (img2 === 'cargando') h += '<p class="sep-info">Cargando 2.ª boleta…</p>';
+        else if (img2) h += '<img src="'+img2+'" alt="2.ª boleta" style="max-width:100%;margin-top:8px;border-radius:8px;border:1px solid var(--border);" />';
+        else h += '<p class="as-err">No se pudo cargar la 2.ª boleta.</p>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  });
+  return h+'</div>';
+}
+
+// Mis ventas (cada asesor ve solo las suyas, con el recordatorio de la 2.ª boleta)
+async function cargarMisVentas(){
+  if (!asesoraPin || !asesoraIdActual) return false;
+  var res = await sb.rpc('ec_mis_ventas', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+  if (!res.error && res.data && res.data.ok){
+    var antes = JSON.stringify(ui.misVentas);
+    ui.misVentas = res.data; ui.misVentasId = String(asesoraIdActual); ui.misVentasErr = false;
+    return antes !== JSON.stringify(ui.misVentas);
+  }
+  ui.misVentasErr = true;
+  return false;
+}
+function ultimoDiaMes(venceIso){ try { return fmtFechaCorta(new Date(new Date(venceIso).getTime() - 3600000).toISOString()); } catch(e){ return ''; } }
+function renderMisVentasHtml(){
+  var mv = (ui.misVentas && ui.misVentasId === String(asesoraIdActual)) ? ui.misVentas : null;
+  if (!mv && !ui.misVentasErr && !ui._misCarg){ ui._misCarg = true; cargarMisVentas().then(function(){ ui._misCarg = false; renderSiLibre(); }); }
+  var mesTxt = '';
+  try { mesTxt = new Date(mv ? mv.mes : Date.now()).toLocaleDateString('es-PE', { month: 'long', year: 'numeric', timeZone: 'America/Lima' }); } catch(e){}
+  var h = '<div class="panel panel-flat" id="mis-ventas"><h4>🧾 Mis ventas de '+esc(mesTxt)+'</h4>'+
+    '<p class="sep-info" style="margin:0 0 8px;">⚠️ <strong>Recuerda:</strong> la separación de '+fmtMoney(sepMonto())+' queda sujeta a que el cliente complete otros <strong>'+fmtMoney(500)+'</strong> (mínimo <strong>'+fmtMoney(1000)+'</strong> en total) <strong>antes de que termine el mes</strong>. Si no subes la segunda boleta a tiempo, la casa se libera para el mes siguiente.</p>';
+  if (ui.misVentasErr && !mv) return h+'<p class="as-err">No se pudo cargar. Revisa tu conexión (o falta activar la actualización v7x en Supabase).</p></div>';
+  if (!mv) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Cargando…</p></div>';
+  if (!mv.items.length) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Todavía no tienes ventas este mes.</p></div>';
+  var activas = mv.items.filter(function(v){ return v.estado !== 'liberada'; });
+  var faltan = activas.filter(function(v){ return v.exige_pago2 && !v.pago2_en; }).length;
+  h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+activas.length+'</strong> venta'+(activas.length===1?'':'s')+(faltan ? ' · <strong style="color:var(--danger,#b3261e);">'+faltan+' con la 2.ª boleta pendiente</strong>' : '')+'. Toca una venta para ver el detalle.</p>';
+  if (ui.mvAbierta && ui.asesoraError) h += '<p class="as-err">'+esc(ui.asesoraError)+'</p>';
+  if (ui.mvAbierta && ui.sepMsg) h += '<p class="sep-info">'+esc(ui.sepMsg)+'</p>';
+  mv.items.forEach(function(v){
+    var abierta = String(ui.mvAbierta) === String(v.id);
+    var pend = v.estado !== 'liberada' && v.exige_pago2 && !v.pago2_en;
+    var chip = v.estado === 'liberada' ? 'Liberada' : (v.pago2_en ? 'Pago completo ✅' : (pend ? '⏳ Falta 2.ª boleta' : 'Separada'));
+    h += '<div class="as-hist"><div style="cursor:pointer;" role="button" tabindex="0" data-action="mv-toggle" data-value="'+v.id+'">'+
+      '<div class="as-hist-top"><span><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+chip+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
+      (pend ? '<div style="font-size:0.8rem;">Sube la 2.ª boleta hasta el <b>'+esc(ultimoDiaMes(v.vence_pago2))+'</b> o la casa se libera.</div>' : '')+
+      '</div>';
+    if (abierta){
+      h += '<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">'+
+        '<div>Cliente: <b>'+esc(toTitleCase(v.cliente || '—'))+'</b></div>'+
+        '<div>1.ª boleta (separación): <b>'+fmtMoney(v.monto)+'</b>'+(v.operacion ? ' · Op. '+esc(v.operacion) : '')+'</div>'+
+        (v.pago2_en ? '<div>2.ª boleta: <b>'+fmtMoney(v.pago2_monto)+'</b>'+(v.pago2_op ? ' · Op. '+esc(v.pago2_op) : '')+'</div>' : '')+
+        (v.precio_final ? '<div>Precio final <b>'+fmtMoney(v.precio_final)+'</b></div>' : '')+
+        (Number(v.descuento) > 0 ? '<div>Descuento acordado: <b>'+fmtMoney(v.descuento)+'</b></div>' : '');
+      if (pend){
+        h += '<div class="asesora-form" style="margin-top:8px;">'+
+          '<label>N.º de operación de la 2.ª boleta (opcional si subes la captura)</label>'+
+          '<input class="text-input" type="text" id="pago2-op" data-ui="pago2Op" autocomplete="off" placeholder="Ej. 00123456" value="'+esc(ui.pago2Op)+'" />'+
+          '<label style="margin-top:8px;">Captura de la 2.ª boleta</label>'+
+          (ui.pago2Img
+            ? '<div style="margin:4px 0;"><img src="'+ui.pago2Img+'" alt="Boleta" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border);" /></div>'+
+              '<button type="button" class="btn btn-secondary btn-block" data-action="pago2-img-quitar">Quitar imagen</button>'
+            : '<input class="text-input" type="file" id="pago2-img" accept="image/*" />'+(ui.pago2ImgBusy ? '<p class="sep-info">Preparando imagen…</p>' : '')+(ui.pago2ImgErr ? '<p class="as-err">No se pudo leer esa imagen. Prueba con otra captura.</p>' : ''))+
+          '<label style="margin-top:8px;">Monto pagado (S/)</label>'+
+          '<input class="text-input" type="number" id="pago2-monto" data-ui="pago2Monto" inputmode="decimal" value="'+esc(ui.pago2Monto !== '' ? ui.pago2Monto : 500)+'" />'+
+          '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="pago2-enviar" data-value="'+v.id+'"'+(ui.asesoraBusy?' disabled':'')+'>'+(ui.asesoraBusy?'Guardando…':'✅ Registrar 2.ª boleta')+'</button>'+
+        '</div>';
+      }
       h += '</div>';
     }
     h += '</div>';
