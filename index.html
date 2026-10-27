@@ -2122,19 +2122,22 @@ function renderAsesorPanelHtml(){
     }).join('')+'</div>';
   }
   if (!jefe){
-    var v = yo ? yo.ventas : 0, m = yo ? yo.meta : 0;
+    var vv = yo ? yo.ventas : 0, sp = yo ? (yo.separadas || 0) : 0, v = vv + sp, m = yo ? yo.meta : 0;
     var pct = m > 0 ? Math.min(100, Math.round(v/m*100)) : 0;
     h += '<div class="as-mes">Tus ventas · '+esc(mesTxt)+'</div>'+
       '<div class="as-big">'+v+' <small>/ '+(m > 0 ? m : '—')+' casas</small></div>'+
       '<div class="as-bar"><i style="width:'+pct+'%"></i></div>'+
+      (sp > 0 ? '<div class="as-note">'+vv+' venta'+(vv===1?'':'s')+' + '+sp+' separada'+(sp===1?'':'s')+'</div>' : '')+
       '<div class="as-note">'+(m > 0 ? (v >= m ? '🎉 ¡Meta cumplida!' : 'Te faltan '+(m-v)+' para tu meta') : 'Tu jefe de ventas aún no define tu meta de este mes')+'</div>';
   } else {
-    var tv = p.ranking.reduce(function(a,r){ return a + r.ventas; }, 0);
+    var tv = p.ranking.reduce(function(a,r){ return a + r.ventas + (r.separadas || 0); }, 0);
+    var tvv = p.ranking.reduce(function(a,r){ return a + r.ventas; }, 0);
     var tm = p.ranking.reduce(function(a,r){ return a + r.meta; }, 0);
     var tp = tm > 0 ? Math.min(100, Math.round(tv/tm*100)) : 0;
     h += '<div class="as-mes">Ventas de la sala · '+esc(mesTxt)+'</div>'+
       '<div class="as-big">'+tv+' <small>/ '+(tm > 0 ? tm : '—')+' casas</small></div>'+
-      '<div class="as-bar"><i style="width:'+tp+'%"></i></div>';
+      '<div class="as-bar"><i style="width:'+tp+'%"></i></div>'+
+      (tv > tvv ? '<div class="as-note">'+tvv+' ventas + '+(tv-tvv)+' separadas</div>' : '');
   }
   h += '</div>';
 
@@ -2142,12 +2145,14 @@ function renderAsesorPanelHtml(){
   h += '<div class="as-card"><h4>🏆 Ranking de la sala <small>'+esc(mesTxt)+'</small></h4>';
   if (!p.ranking.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);">Aún no hay asesoras en este proyecto.</p>';
   p.ranking.forEach(function(r, i){
-    var pct2 = r.meta > 0 ? Math.min(100, Math.round(r.ventas/r.meta*100)) : 0;
+    var rsp = r.separadas || 0, rtot = r.ventas + rsp;
+    var pct2 = r.meta > 0 ? Math.min(100, Math.round(rtot/r.meta*100)) : 0;
     h += '<div class="as-rank-row'+(String(r.id)===String(p.yo.id)?' me':'')+'">'+
-      '<span class="as-pos'+(i<3 && r.ventas>0 ? ' p'+(i+1) : '')+'">'+(i+1)+'</span>'+
+      '<span class="as-pos'+(i<3 && rtot>0 ? ' p'+(i+1) : '')+'">'+(i+1)+'</span>'+
       '<div style="min-width:0;"><div class="as-rank-name">'+esc(toTitleCase(r.nombre))+(String(r.id)===String(p.yo.id)?' (tú)':'')+'</div>'+
-      '<div class="as-bar as-bar-dark"><i style="width:'+pct2+'%"></i></div></div>'+
-      '<div class="as-rank-score">'+r.ventas+'<small> / '+(r.meta > 0 ? r.meta : '—')+'</small></div></div>';
+      '<div class="as-bar as-bar-dark"><i style="width:'+pct2+'%"></i></div>'+
+      (rsp > 0 ? '<div style="font-size:0.72rem;color:var(--ink-faint);margin-top:2px;">'+r.ventas+' venta'+(r.ventas===1?'':'s')+' · '+rsp+' separada'+(rsp===1?'':'s')+'</div>' : '')+'</div>'+
+      '<div class="as-rank-score">'+rtot+'<small> / '+(r.meta > 0 ? r.meta : '—')+'</small></div></div>';
   });
   h += '</div>';
 
