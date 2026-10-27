@@ -2230,6 +2230,26 @@ function renderHistorialHtml(){
   return h + '</div>';
 }
 
+function renderApagadoHtml(){
+  var h = '';
+  var nmYo = String((ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.nombre) || '').toLowerCase().replace(/ú/g,'u').trim();
+  if (!asesorSoloLectura && (nmYo === 'jesus blanco' || nmYo === 'marcelo blanco')){
+    h += '<div class="as-card" style="border:1.5px solid #c0392b;"><h4>🛑 Apagado de emergencia</h4>'+
+      '<p style="font-size:0.82rem;color:var(--ink-soft);margin:0 0 8px;">Bloquea la app para TODOS (asesores y clientes) al instante. Solo se vuelve a encender desde Supabase.</p>';
+    if (!ui.apagarPaso){
+      h += '<button type="button" class="btn btn-secondary btn-block" style="color:#c0392b;border-color:#c0392b;" data-action="app-apagar-paso">Apagar la app…</button>';
+    } else {
+      h += '<label style="font-size:0.8rem;">Para confirmar escribe <b>APAGAR</b></label>'+
+        '<input class="text-input" type="text" data-ui="apagarTxt" value="'+esc(ui.apagarTxt||'')+'" autocomplete="off" autocapitalize="characters" />'+
+        '<div style="display:flex;gap:8px;margin-top:8px;"><button type="button" class="btn btn-secondary btn-block" data-action="app-apagar-cancelar">Cancelar</button>'+
+        '<button type="button" class="btn btn-primary btn-block" style="background:#c0392b;border-color:#c0392b;" data-action="app-apagar-ok"'+(ui.asesoraBusy?' disabled':'')+'>Apagar ahora</button></div>'+
+        (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '');
+    }
+    h += '</div>';
+  }
+  return h;
+}
+
 function renderJefePanelHtml(p){
   var h = renderHistorialHtml();
   h += '<div class="as-card"><h4>🎯 Metas del mes <small>solo tú las defines</small></h4>';
@@ -2253,21 +2273,6 @@ function renderJefePanelHtml(p){
     '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="asesor-crear">Crear y generar contraseña</button>';
   if (ui.claveNueva) h += '<div class="as-clave">Contraseña de <strong>'+esc(toTitleCase(ui.claveNueva.nombre))+'</strong>: <b>'+esc(ui.claveNueva.clave)+'</b><br><span style="font-size:0.76rem;color:var(--ink-soft);">Anótala y entrégasela: no se vuelve a mostrar.</span></div>';
   h += '</div>';
-  var nmYo = String((ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.nombre) || '').toLowerCase().replace(/ú/g,'u').trim();
-  if (!asesorSoloLectura && (nmYo === 'jesus blanco' || nmYo === 'marcelo blanco')){
-    h += '<div class="as-card" style="border:1.5px solid #c0392b;"><h4>🛑 Apagado de emergencia</h4>'+
-      '<p style="font-size:0.82rem;color:var(--ink-soft);margin:0 0 8px;">Bloquea la app para TODOS (asesores y clientes) al instante. Solo se vuelve a encender desde Supabase.</p>';
-    if (!ui.apagarPaso){
-      h += '<button type="button" class="btn btn-secondary btn-block" style="color:#c0392b;border-color:#c0392b;" data-action="app-apagar-paso">Apagar la app…</button>';
-    } else {
-      h += '<label style="font-size:0.8rem;">Para confirmar escribe <b>APAGAR</b></label>'+
-        '<input class="text-input" type="text" data-ui="apagarTxt" value="'+esc(ui.apagarTxt||'')+'" autocomplete="off" autocapitalize="characters" />'+
-        '<div style="display:flex;gap:8px;margin-top:8px;"><button type="button" class="btn btn-secondary btn-block" data-action="app-apagar-cancelar">Cancelar</button>'+
-        '<button type="button" class="btn btn-primary btn-block" style="background:#c0392b;border-color:#c0392b;" data-action="app-apagar-ok"'+(ui.asesoraBusy?' disabled':'')+'>Apagar ahora</button></div>'+
-        (ui.asesoraError ? '<p class="as-err">'+esc(ui.asesoraError)+'</p>' : '');
-    }
-    h += '</div>';
-  }
   return h;
 }
 
@@ -2410,11 +2415,11 @@ function renderAsesorLoteAcciones(lote){
     }
   }
   // Jefes, gerentes, propietarios y equipo: devolver a la venta una casa separada, vendida o bloqueada
-  // Una asesora solo puede hacerlo con una casa que ella separó, dentro de las primeras 24 h (el servidor lo vuelve a validar)
-  var puedeReponer = esJefe() || !!(info && info.hay && info.liberable);
+  // Una asesora solo puede hacerlo con una casa SEPARADA por ella, hasta fin del mes en que la separó; una vendida, solo jefes y gerentes (el servidor lo vuelve a validar)
+  var puedeReponer = esJefe() || !!(info && info.hay && info.liberable && lote.e === 'SEPARADO');
   if (puedeReponer && lote.id && lote.e !== 'DISPONIBLE' && lote.e !== 'EN_ATENCION'){
     h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="lote-reponer" data-value="'+lote.id+'"'+busy+'>↩️ Volver a poner a la venta</button>'+
-      '<p class="sep-info" style="margin-top:6px;">'+(esJefe() ? 'Úsalo si se cayó la venta o la separación.' : 'Puedes liberarla porque la separaste tú hace menos de 24 horas.')+' La casa vuelve a estar disponible para todos y queda registrado quién la liberó.</p>';
+      '<p class="sep-info" style="margin-top:6px;">'+(esJefe() ? 'Úsalo si se cayó la venta o la separación.' : 'Puedes liberarla porque la separaste tú este mes. Si el cliente no completó el pago, tienes hasta fin de mes.')+' La casa vuelve a estar disponible para todos y queda registrado quién la liberó.</p>';
   }
   if (String(ui.descLote) === String(lote.id) && (lote.e === 'DISPONIBLE' || lote.e === 'EN_ATENCION')) h += descuentoPanelHtml(lote);
   h += (ui.sepMsg ? '<p class="sep-ok">'+esc(ui.sepMsg)+'</p>' : '')+
@@ -3662,6 +3667,7 @@ function renderInteresadoMapa(){
 
   if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml();
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml();
+  if (esAsesor) html += renderApagadoHtml();
   html += '</div>';
   if (!esAsesor) html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
@@ -4393,7 +4399,7 @@ async function asesoraLlamar(fn, args){
       no_reserva: 'No hay una separación en proceso que cancelar.',
       no_jefe: 'Solo el jefe de ventas puede hacer esto.',
       permiso: 'Tu cuenta no puede apagar la app.',
-      solo_propia_24h: 'Solo puedes liberar una casa que tú separaste, dentro de las primeras 24 horas. Pídele a tu jefe de ventas.',
+      solo_propia_24h: 'Solo puedes liberar una casa separada por ti, hasta el fin del mes en que la separaste. Una casa vendida solo la libera tu jefe de ventas o el gerente.',
       ya_disponible: 'Esa casa ya está disponible.',
       fecha: 'Elige una fecha de fin válida (entre mañana y 120 días).',
       valor: 'Valor no válido. Revisa el monto que escribiste.',
