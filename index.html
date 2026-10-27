@@ -4625,7 +4625,7 @@ function renderMisVentasHtml(){
     '<p class="sep-info" style="margin:0 0 8px;">⚠️ <strong>Recuerda:</strong> la separación de '+fmtMoney(sepMonto())+' queda sujeta a que el cliente complete otros <strong>'+fmtMoney(500)+'</strong> (mínimo <strong>'+fmtMoney(1000)+'</strong> en total) <strong>antes de que termine el mes</strong>. Si no subes la segunda boleta a tiempo, la casa se libera para el mes siguiente.</p>';
   if (ui.misVentasErr && !mv) return h+'<p class="as-err">No se pudo cargar. Revisa tu conexión (o falta activar la actualización v7x en Supabase).</p></div>';
   if (!mv) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Cargando…</p></div>';
-  if (!mv.items.length) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Todavía no tienes ventas este mes.</p></div>';
+  if (!mv.items.length) return h+'</div>';
   var activas = mv.items.filter(function(v){ return v.estado !== 'liberada'; });
   var faltan = activas.filter(function(v){ return v.exige_pago2 && !v.pago2_en; }).length;
   h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+activas.length+'</strong> venta'+(activas.length===1?'':'s')+(faltan ? ' · <strong style="color:var(--danger,#b3261e);">'+faltan+' con la 2.ª boleta pendiente</strong>' : '')+'. Toca una venta para ver el detalle.</p>';
