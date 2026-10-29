@@ -1061,10 +1061,18 @@ function saveClienteNombre(nombre){
   try { localStorage.setItem('ec_cliente_nombre_v1', nombre); } catch(e){}
 }
 
-var ADMIN_DNI = '76011940';
+var adminOk = false, adminCheckToken = null;
 function esAdmin(){
-  if (!clienteDniVerificado) return false;
-  return clienteDniVerificado.replace(/^0+/,'') === ADMIN_DNI.replace(/^0+/,'');
+  return adminOk && !!sessionToken && adminCheckToken === sessionToken;
+}
+function checkAdmin(){
+  var t = sessionToken;
+  if (!t){ adminOk = false; return; }
+  sb.rpc('ec_soy_admin', { p_token: t }).then(function(r){
+    adminOk = !r.error && r.data === true;
+    adminCheckToken = t;
+    if (adminOk) render();
+  });
 }
 
 var clienteDniVerificado = null;
@@ -1735,7 +1743,8 @@ function renderMiCasa(){
   if (esSullana){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Recorre tu casa en 3D</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Camina por dentro de tu vivienda y prueba colores y muebles.</p>'+
-      '<a class="btn btn-primary btn-block" href="casa3d/">Entrar a mi casa 3D →</a></div>';
+      '<a class="btn btn-primary btn-block" href="casa3d_ampliacion/">Entrar a mi casa 3D →</a>'+
+      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="casa3d_ampliacion/?modo=ampliada">✨ Cómo podría quedar tu casa</a></div>';
   }
 
   if (esSullana && etapaTienePlano(etapaNum)){
@@ -2113,7 +2122,7 @@ function renderAsesorPanelHtml(){
     '<div class="as-hero-top"><div><div class="as-hello">Hola, '+esc(primerNombre(p.yo.nombre))+' 👋</div>'+
     '<div class="as-sub">'+esc(p.proyecto_nombre || PROY_NOMBRES[p.yo.proyecto] || '')+' · '+esc(p.yo.cargo || (jefe ? 'Jefe de ventas' : 'Asesora de ventas'))+'</div></div>'+salir+'</div>';
   if (asesorSoloLectura){
-    h += '<div class="as-demo">👁️ Cuenta de prueba · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">Ver marketplace</button></div>';
+    h += '<div class="as-demo">👁️ Cuenta de vista · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">Ver marketplace</button></div>';
   }
   var cuentas = asesorCuentas();
   if (cuentas.length > 1){
@@ -2368,7 +2377,7 @@ function ofertaLoteHtml(lote){
 
 function renderAsesorLoteAcciones(lote){
   if (!modoAsesor()) return '';
-  if (asesorSoloLectura) return '<div class="lote-detail-section"><div class="lote-detail-section-title">👁️ Cuenta de prueba</div>'+
+  if (asesorSoloLectura) return '<div class="lote-detail-section"><div class="lote-detail-section-title">👁️ Cuenta de vista</div>'+
     '<p class="sep-info">Solo lectura: puedes ver precios y planos y simular cuotas, pero no separar ni modificar nada.</p></div>';
   var busy = ui.asesoraBusy ? ' disabled' : '';
   var info = ui.sepInfo[lote.id];
@@ -3719,7 +3728,7 @@ function renderApp(){
   else body = renderHome();
 
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
-  if (demoMarket) html = '<div class="demo-banner">👁️ Cuenta de prueba · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">← Volver a la vista de asesor</button></div>' + html;
+  if (demoMarket) html = '<div class="demo-banner">👁️ Cuenta de vista · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">← Volver a la vista de asesor</button></div>' + html;
   var app = document.getElementById('app');
   app.innerHTML = html;
   initEtapa5ZoomDrag();
@@ -3778,10 +3787,10 @@ document.addEventListener('click', async function(ev){
   var action = t.getAttribute('data-action');
   var value = t.getAttribute('data-value');
 
-  // Cuenta de prueba mirando el marketplace: solo se puede mirar
+  // Cuenta de vista mirando el marketplace: solo se puede mirar
   if (modoAsesor() && asesorSoloLectura && ui.demoMarket){
     var permitidas = ['nav','open','set-proyecto','set-cat','set-etapa','set-precio','toggle-filters','demo-market-toggle','faq-toggle','skip-etapa-prompt'];
-    if (permitidas.indexOf(action) === -1 || (action === 'nav' && value !== 'home')){ toast('Cuenta de prueba: solo lectura'); return; }
+    if (permitidas.indexOf(action) === -1 || (action === 'nav' && value !== 'home')){ toast('Cuenta de vista: solo lectura'); return; }
   }
   if (action === 'demo-market-toggle'){
     ui.demoMarket = !ui.demoMarket; ui.view = 'home'; render();
@@ -3873,8 +3882,8 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'admin-del-svc'){
     var idAdminDel = t.getAttribute('data-id');
     if (esAdmin() && confirm('¿Eliminar este servicio como administrador? Esta acción no se puede deshacer.')){
-      var delA = await sb.rpc('ec_admin_borrar_servicio', { p_dni: clienteDniVerificado, p_servicio_id: idAdminDel });
-      if (delA.error) toast('No se pudo borrar. Intenta de nuevo.');
+      var delA = await sb.rpc('ec_admin_borrar_servicio', { p_token: sessionToken, p_servicio_id: idAdminDel });
+      if (delA.error){ if (!handleSessionError(delA.error)) toast('No se pudo borrar. Intenta de nuevo.'); }
       else { toast('Servicio eliminado.'); ui.view = 'home'; }
       await refreshServicios();
       render();
@@ -3882,8 +3891,8 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'admin-del-resena'){
     var ridAdminDel = t.getAttribute('data-rid');
     if (esAdmin() && confirm('¿Eliminar esta reseña como administrador?')){
-      var delAR = await sb.rpc('ec_admin_borrar_resena', { p_dni: clienteDniVerificado, p_resena_id: ridAdminDel });
-      if (delAR.error) toast('No se pudo borrar. Intenta de nuevo.');
+      var delAR = await sb.rpc('ec_admin_borrar_resena', { p_token: sessionToken, p_resena_id: ridAdminDel });
+      if (delAR.error){ if (!handleSessionError(delAR.error)) toast('No se pudo borrar. Intenta de nuevo.'); }
       else toast('Reseña eliminada.');
       await refreshServicios();
       render();
@@ -4366,7 +4375,7 @@ async function asesoraLlamar(fn, args){
   ui.asesoraBusy = false;
   var d = res.data;
   if (res.error && /solo lectura/i.test(res.error.message || '')){
-    ui.asesoraError = 'Cuenta de prueba: solo lectura (no puede modificar nada).';
+    ui.asesoraError = 'Cuenta de vista: solo lectura (no puede modificar nada).';
     return {ok:false};
   }
   if (res.error || !d){
@@ -5144,7 +5153,7 @@ document.addEventListener('submit', async function(ev){
   var form = ev.target.closest('form[data-form]');
   if (!form) return;
   ev.preventDefault();
-  if (modoAsesor() && asesorSoloLectura){ toast('Cuenta de prueba: solo lectura'); return; }
+  if (modoAsesor() && asesorSoloLectura){ toast('Cuenta de vista: solo lectura'); return; }
   var kind = form.getAttribute('data-form');
   var fd = new FormData(form);
 
@@ -5262,9 +5271,10 @@ document.addEventListener('submit', async function(ev){
     if (!isValidPeruCel(lTelefono)){ ui.authErrors = {telefono:'Ingresa un WhatsApp válido (9 dígitos, empieza con 9).'}; render(); return; }
     ui.authBusy = true; render();
     var loginRes = await sb.rpc('ec_login', { p_telefono: lDigits, p_password: lPassword });
-    if (loginRes.error){
+    if (loginRes.error || !loginRes.data || !loginRes.data.length){
       ui.authBusy = false;
-      ui.authErrors = {password:'Teléfono o contraseña incorrectos.'};
+      var tooMany = loginRes.error && /demasiados_intentos/.test(loginRes.error.message||'');
+      ui.authErrors = {password: tooMany ? 'Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.' : 'Teléfono o contraseña incorrectos.'};
       render(); return;
     }
     var loginRow = loginRes.data[0];
@@ -5277,6 +5287,7 @@ document.addEventListener('submit', async function(ev){
     }
     identity = row;
     sessionToken = loginRow.token;
+    checkAdmin();
     saveSession(loginRow.id, loginRow.token);
     ui.authErrors = {};
     ui.fProyecto = String(row.proyectoId);
@@ -5419,6 +5430,7 @@ async function init(){
       if (row){
         identity = row;
         sessionToken = saved.token;
+        checkAdmin();
         ui.fProyecto = String(row.proyectoId);
         ui.fEtapa = String(row.etapa||'');
         ui.showEtapaPrompt = false;
