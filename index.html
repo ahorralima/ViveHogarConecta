@@ -5039,6 +5039,11 @@ function genProximasSvg(){
     out += '<polygon points="'+ps+'" fill="'+(vend ? COLOR_PLOMO : COLOR_ARENA)+'" fill-opacity="'+(vend ? '0.8' : '0.72')+'" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
       (vend ? '' : '<polygon points="'+ps+'" fill="url(#gen-hatch)" stroke="none"/>');
   });
+  ABAJO_VENDIDAS.forEach(function(k){
+    var p = CASTILLA_ABAJO[k], A = 0, cx = 0, cy = 0;
+    p.forEach(function(a, i){ var b = p[(i+1)%p.length], c = a[0]*b[1]-b[0]*a[1]; A += c; cx += (a[0]+b[0])*c; cy += (a[1]+b[1])*c; });
+    out += '<text class="gen-et-vend" x="'+(cx/(3*A)).toFixed(1)+'" y="'+(cy/(3*A)).toFixed(1)+'" style="font-size:'+Math.round(w*0.02)+'px;">ETAPA '+k+'</text>';
+  });
   return '<svg class="mapa-gen-sel" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="gen-hatch" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="16" stroke="#1d2f45" stroke-opacity="0.22" stroke-width="1.2"/></pattern></defs>'+out+'</svg>';
 }
 // Etapa a la venta (sin seleccionar): verde llamativo
