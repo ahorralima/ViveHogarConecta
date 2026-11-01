@@ -415,6 +415,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-gen-sel text.gen-et-vend{fill:#0f2a4a;font-weight:800;stroke:none;paint-order:normal;text-anchor:middle;dominant-baseline:central;font-family:inherit;}
 .mapa-gen-sel text.gen-et-prox{fill:#fff;font-weight:800;stroke:#6b4410;stroke-width:4px;paint-order:stroke;text-anchor:middle;dominant-baseline:central;font-family:inherit;}
 .mapa-gen-sel text.gen-et-disp{fill:#fff;font-weight:800;stroke:#0b4a26;stroke-width:5px;paint-order:stroke;text-anchor:middle;dominant-baseline:central;font-family:inherit;}
+.mapa-gen-sel polygon.gen-disp-halo{animation:genPulso 1.6s ease-in-out infinite;}
+@keyframes genPulso{0%,100%{stroke-opacity:.95;}50%{stroke-opacity:.15;}}
+.mapa-gen-sel text.gen-et-venta{letter-spacing:1px;}
 .mapa-gen-sel text{font-family:inherit;font-weight:800;font-size:21px;letter-spacing:0.4px;text-anchor:middle;dominant-baseline:central;fill:#fff;stroke:#0b2a45;stroke-width:5px;paint-order:stroke;stroke-linejoin:round;}
 .mapa-gen{background:#dfe3e8 !important;}
 .mapa-gen-leyenda{position:absolute;left:8px;bottom:8px;z-index:30;display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.94);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:0.72rem;font-weight:600;color:#1f2933;box-shadow:0 2px 8px rgba(0,0,0,0.2);pointer-events:none;}
@@ -2747,8 +2750,8 @@ var MAPA_GENERAL_DIM = [1369,1041];
 var MAPA_GENERAL_ETAPAS = {"1":[[53.4,17.29],[79.18,31.51],[78.67,37.66],[53.69,37.37]],"2":[[53.69,37.56],[66.33,37.75],[66.47,54.95],[64.65,54.95],[64.65,52.83],[53.91,52.83]],"3":[[53.91,52.83],[64.65,52.83],[64.65,54.95],[66.47,54.95],[66.47,62.25],[53.91,62.25]],"4":[[66.62,37.85],[78.67,37.85],[78.09,46.88],[72.75,47.07],[72.61,49.57],[66.62,49.38]],"5":[[66.62,49.38],[72.61,49.66],[72.75,46.88],[79.11,46.78],[79.11,62.25],[66.62,62.25]]};
 var CASTILLA_GENERAL = {
   img:'planos/castilla-general.jpg', dim:[1000,1414],
-  etapas:{"16":[[23.14, 68.45], [43.28, 64.64], [41.89, 75.23], [21.13, 79.37]]},
-  labels:{"16":[32.36,71.92]},
+  etapas:{"16":[[37.9,76.99],[38.6,73.12],[37.49,73.34],[38.79,66.17],[21.59,69.46],[19.3,80.57]]},
+  labels:{"16":[29.30,73.41]},
   vendido:true
 };
 function genCfg(){
@@ -4993,27 +4996,20 @@ function genSeleccionSvg(){
     '<svg class="mapa-gen-sel" '+vb+'><polygon points="'+pp+'" fill="none" stroke="#2f80ff" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
     (lb ? '<text x="'+(lb[0]*w/100).toFixed(1)+'" y="'+(lb[1]*h/100).toFixed(1)+'" style="font-size:'+Math.round(w*(cfg.vendido?0.021:0.0154))+'px;stroke-width:'+Math.round(w*(cfg.vendido?0.0055:0.0037))+'px;">ETAPA '+esc(n)+'</text>' : '')+'</svg>';
 }
-// Zona ya vendida (Castilla I): 10 etapas de colores suaves (como Sullana), sin clic. Se reparten en una grilla de 2 x 5 dentro del cuadrilátero vendido
-var VENDIDO_COLORES = ['#9db6cc','#d9ccae','#b6c8d9','#8fa3b6','#e3d8bf','#a9bfd2','#c9d6e2','#d3c6a6','#98b0c6','#bccddc'];
+// Zona de arriba de Castilla (etapas 1 a 8 y 10, según el plano de ingeniería): colores suaves como Sullana, sin clic
+var COLOR_PLOMO = '#98a6b4', COLOR_ARENA = '#e3d8bf';  // plomo = vendida, arena = próxima
+var ABAJO_VENDIDAS = ['11','12','13','14','15'];
 // Geometría del terreno sobre la foto satélite (píxeles del plano de 1000 de ancho). La avenida principal separa lo vendido (arriba) de lo que viene (abajo)
-function genQuadPt(q, u, v){
-  var tx = q[0][0]+(q[1][0]-q[0][0])*u, ty = q[0][1]+(q[1][1]-q[0][1])*u;
-  var bx = q[3][0]+(q[2][0]-q[3][0])*u, by = q[3][1]+(q[2][1]-q[3][1])*u;
-  return [tx+(bx-tx)*v, ty+(by-ty)*v];
-}
-function genPoly(q, u0, u1, v0, v1){ return [genQuadPt(q,u0,v0), genQuadPt(q,u1,v0), genQuadPt(q,u1,v1), genQuadPt(q,u0,v1)]; }
 function genPts(ps){ return ps.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' '); }
+var CASTILLA_ARRIBA = {"1":[[782.0,688.0],[799.3,557.0],[823.4,372.9],[673.9,412.8],[664.6,483.8],[653.4,486.7],[644.5,555.3],[655.7,552.2],[650.9,588.4],[639.8,591.4],[626.4,693.3],[637.7,690.2],[632.6,728.1]],"2":[[488.8,766.9],[632.6,728.1],[637.7,690.2],[626.4,693.3],[639.8,591.4],[650.9,588.4],[655.7,552.2],[644.5,555.3],[653.4,486.7],[664.6,483.8],[673.9,412.8],[529.8,451.1],[520.5,522.2],[509.4,525.2],[501.2,588.5],[512.3,585.5],[507.0,627.0],[495.7,630.1],[483.2,726.7],[494.4,723.7]],"3":[[868.0,34.4],[799.3,557.0],[782.1,688.0],[869.0,27.0],[719.2,66.5],[715.0,98.4],[703.7,101.4],[694.8,170.2],[705.9,167.2],[701.2,203.7],[690.0,206.7],[676.7,309.0],[687.9,306.0],[673.9,412.8],[823.4,372.9]],"4":[[667.5,80.1],[574.7,104.5],[570.6,136.5],[559.4,139.4],[551.1,203.1],[562.5,200.1],[556.9,241.9],[545.8,244.8],[533.2,341.8],[544.4,339.0],[529.8,451.1],[673.9,412.8],[687.9,306.0],[676.7,309.0],[690.0,206.7],[701.2,203.7],[705.9,167.2],[694.8,170.2],[703.7,101.4],[715.0,98.4],[719.2,66.5]],"5":[[574.7,104.5],[431.2,142.4],[427.1,174.3],[415.8,177.3],[406.9,246.3],[418.1,243.3],[413.4,279.8],[402.2,282.8],[388.9,385.2],[400.3,382.4],[382.7,518.8],[465.8,496.7],[466.2,493.6],[526.3,477.6],[544.4,339.0],[533.2,341.8],[545.8,244.8],[556.9,241.9],[562.5,200.1],[551.1,203.1],[559.4,139.4],[570.6,136.5]],"6":[[277.0,183.0],[222.0,561.7],[382.7,518.8],[400.3,382.4],[388.9,385.2],[402.2,282.8],[413.4,279.8],[418.1,243.3],[406.9,246.3],[415.8,177.3],[427.1,174.3],[431.2,142.4]],"7":[[406.9,788.9],[488.8,766.9],[494.4,723.7],[483.2,726.7],[495.7,630.1],[507.0,627.0],[512.3,585.5],[374.2,622.5],[350.7,804.1]],"8":[[501.2,588.5],[509.4,525.2],[520.5,522.2],[526.3,477.6],[466.2,493.6],[465.8,496.7],[222.0,561.7],[193.5,757.4],[212.3,760.6],[223.1,686.5],[245.8,680.6],[247.3,670.7],[372.3,637.2],[374.2,622.5]],"10":[[406.9,789.0],[350.7,804.1],[374.2,622.5],[372.3,637.2],[247.3,670.7],[245.8,680.6],[223.1,686.5],[212.3,760.6],[193.5,757.4],[222.0,561.7],[180.0,850.0]]};
+var CASTILLA_ARRIBA_LABELS = {"1":[725,552],"2":[575,591],"3":[769,219],"4":[619,260],"5":[474,312],"6":[325,355],"7":[429,696],"8":[351,586],"10":[281,746]};
 function genVendidoSvg(){
   var cfg = genCfg(); if (!cfg.vendido) return '';
-  var w = cfg.dim[0], h = cfg.dim[1], out = '', n = 0;
-  var U = [[277,183],[869,27],[820,420],[224,545]];     // bloque de arriba: etapas 1 a 8
-  var B = [[224,545],[820,420],[782,688],[180,850]];    // franja hasta la avenida principal
-  var cel = [[U,0,.25,0,.5,1],[U,.25,.52,0,.5,2],[U,.52,.77,0,.5,3],[U,.77,1,0,.5,4],[U,0,.25,.5,1,5],[U,.25,.52,.5,1,6],[U,.52,.77,.5,1,7],[U,.77,1,.5,1,8],
-             [B,0,.24,0,1,11],[B,.24,.47,0,1,12],[B,.47,.735,0,1,9],[B,.735,1,0,1,10]];
-  cel.forEach(function(k, idx){
-    var ps = genPoly(k[0],k[1],k[2],k[3],k[4]), m = genQuadPt(k[0],(k[1]+k[2])/2,(k[3]+k[4])/2);
-    out += '<polygon points="'+genPts(ps)+'" fill="'+VENDIDO_COLORES[idx%VENDIDO_COLORES.length]+'" fill-opacity="0.78" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
-      '<text class="gen-et-vend" x="'+m[0].toFixed(1)+'" y="'+m[1].toFixed(1)+'" style="font-size:'+Math.round(w*0.02)+'px;">ETAPA '+k[5]+'</text>';
+  var w = cfg.dim[0], h = cfg.dim[1], out = '';
+  Object.keys(CASTILLA_ARRIBA).forEach(function(n){
+    var ps = CASTILLA_ARRIBA[n], lb = CASTILLA_ARRIBA_LABELS[n];
+    out += '<polygon points="'+genPts(ps)+'" fill="'+COLOR_PLOMO+'" fill-opacity="0.8" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      '<text class="gen-et-vend" x="'+lb[0]+'" y="'+lb[1]+'" style="font-size:'+Math.round(w*0.02)+'px;">ETAPA '+n+'</text>';
   });
   return '<svg class="mapa-gen-sel" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+out+'</svg>';
 }
@@ -5027,27 +5023,15 @@ function genTerrenoSvg(){
     '<polygon points="'+pp+'" fill="none" stroke="#0b2a45" stroke-width="7" stroke-linejoin="round" vector-effect="non-scaling-stroke" opacity="0.55"/>'+
     '<polygon points="'+pp+'" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="10 6" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
 }
+var CASTILLA_ABAJO = {"strip":[[175.5,851.3],[237.4,834.6],[215.8,982.2],[161.3,1356.1],[106.6,1371.5]],"15":[[403.5,899.0],[392.3,901.9],[406.9,789.0],[237.4,834.6],[215.9,982.2],[399.1,932.6]],"13":[[392.3,901.9],[403.5,899.0],[399.1,932.6],[577.8,884.3],[582.2,850.5],[571.0,853.7],[585.7,740.8],[406.9,789.0]],"11":[[507.5,761.8],[585.7,740.8],[571.0,853.7],[582.2,850.5],[577.8,884.3],[762.7,834.3],[782.0,688.0]],"16":[[379.0,1088.6],[386.0,1033.9],[374.9,1037.0],[387.9,935.7],[215.9,982.2],[193.0,1139.2]],"14":[[399.1,932.7],[387.9,935.7],[374.9,1037.0],[386.0,1033.9],[379.0,1088.6],[557.5,1040.1],[564.6,985.5],[553.5,988.6],[566.6,887.5]],"12":[[577.7,884.5],[566.6,887.5],[553.5,988.6],[564.6,985.5],[557.5,1040.1],[742.3,989.9],[762.7,834.3]],"19":[[193.0,1139.2],[172.4,1280.9],[361.0,1227.9],[365.8,1189.7],[354.7,1192.7],[367.8,1091.6]],"18":[[539.5,1177.9],[544.3,1141.1],[533.2,1144.1],[546.3,1043.2],[367.8,1091.6],[354.7,1192.7],[365.8,1189.7],[361.0,1227.9]],"17":[[742.3,989.9],[546.3,1043.2],[533.2,1144.1],[544.3,1141.1],[539.5,1177.9],[724.4,1126.0]],"R":[[361.0,1227.9],[172.4,1280.9],[161.3,1356.1],[351.3,1302.6]],"22":[[539.5,1177.9],[361.0,1227.9],[351.3,1302.6],[529.8,1252.1]],"20":[[539.5,1177.9],[724.4,1126.0],[714.6,1200.0],[529.8,1252.1]]};
 function genProximasSvg(){
   var cfg = genCfg(); if (!cfg.vendido) return '';
-  var w = cfg.dim[0], h = cfg.dim[1], out = '', n = 0;
-  var COL = ['#cfdcea','#ece3d0','#b7cadb','#e3d8bf','#c3d2e0'];
-  function poli(ps){
-    n++;
-    return '<polygon points="'+genPts(ps)+'" fill="'+COL[n%COL.length]+'" fill-opacity="0.72" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
-      '<polygon points="'+genPts(ps)+'" fill="url(#gen-hatch)" stroke="none"/>';
-  }
-  out += poli([[180,850],[249,832],[179,1371],[100,1394]]);               // franja a la izquierda de la calle vertical: una sola
-  // bloques de abajo: cruce de calles verticales (E, F, G, borde derecho) con horizontales (avenida, calles 7, 8, 6 y borde de abajo)
-  function cruce(a, b){
-    var d = (a[0][0]-a[1][0])*(b[0][1]-b[1][1]) - (a[0][1]-a[1][1])*(b[0][0]-b[1][0]);
-    var A = a[0][0]*a[1][1]-a[0][1]*a[1][0], B = b[0][0]*b[1][1]-b[0][1]*b[1][0];
-    return [(A*(b[0][0]-b[1][0])-(a[0][0]-a[1][0])*B)/d, (A*(b[0][1]-b[1][1])-(a[0][1]-a[1][1])*B)/d];
-  }
-  var V = [[[249,832],[179,1371]], [[444,793],[401,1257]], [[624,789],[585,1257]], [[782,688],[720,1221]]];
-  var H = [[[249,832],[782,688]], [[257,961],[796,817]], [[262,1108],[783,961]], [[230,1251],[764,1097]], [[179,1371],[720,1221]]];
-  for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++)
-    out += poli([cruce(V[c],H[r]), cruce(V[c+1],H[r]), cruce(V[c+1],H[r+1]), cruce(V[c],H[r+1])]);   // grupo de abajo: 9 etapas iguales (la Etapa 16 se dibuja encima de la suya)
-  out += poli([cruce(V[0],H[3]), cruce(V[3],H[3]), cruce(V[3],H[4]), cruce(V[0],H[4])]);   // frente a la carretera: un solo bloque
+  var w = cfg.dim[0], h = cfg.dim[1], out = '';
+  Object.keys(CASTILLA_ABAJO).forEach(function(k){
+    var ps = genPts(CASTILLA_ABAJO[k]), vend = ABAJO_VENDIDAS.indexOf(k) >= 0;
+    out += '<polygon points="'+ps+'" fill="'+(vend ? COLOR_PLOMO : COLOR_ARENA)+'" fill-opacity="'+(vend ? '0.8' : '0.72')+'" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      (vend ? '' : '<polygon points="'+ps+'" fill="url(#gen-hatch)" stroke="none"/>');
+  });
   return '<svg class="mapa-gen-sel" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="gen-hatch" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="16" stroke="#1d2f45" stroke-opacity="0.22" stroke-width="1.2"/></pattern></defs>'+out+'</svg>';
 }
 // Etapa a la venta (sin seleccionar): verde llamativo
@@ -5057,8 +5041,11 @@ function genDisponibleSvg(){
   Object.keys(cfg.etapas).forEach(function(n){
     if (String(ui.interesadoEtapaSel) === n) return;
     var pp = cfg.etapas[n].map(function(p){ return (p[0]*w/100).toFixed(1)+','+(p[1]*h/100).toFixed(1); }).join(' '), lb = cfg.labels[n];
-    o += '<polygon points="'+pp+'" fill="#2fa75e" fill-opacity="0.72" stroke="#0f4d2a" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
-      '<text class="gen-et-disp" x="'+(lb[0]*w/100).toFixed(1)+'" y="'+(lb[1]*h/100).toFixed(1)+'" style="font-size:'+Math.round(w*0.021)+'px;stroke-width:'+Math.round(w*0.0055)+'px;">ETAPA '+n+'</text>';
+    var lx = lb[0]*w/100, ly = lb[1]*h/100;
+    o += '<polygon class="gen-disp-halo" points="'+pp+'" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      '<polygon points="'+pp+'" fill="#5fd068" fill-opacity="0.88" stroke="#0a3d20" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      '<text class="gen-et-disp" x="'+lx.toFixed(1)+'" y="'+(ly-w*0.008).toFixed(1)+'" style="font-size:'+Math.round(w*0.021)+'px;stroke-width:'+Math.round(w*0.005)+'px;">ETAPA '+n+'</text>'+
+      '<text class="gen-et-disp gen-et-venta" x="'+lx.toFixed(1)+'" y="'+(ly+w*0.014).toFixed(1)+'" style="font-size:'+Math.round(w*0.0125)+'px;stroke-width:'+Math.round(w*0.0038)+'px;">A LA VENTA</text>';
   });
   return '<svg class="mapa-gen-sel" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+o+'</svg>';
 }
@@ -5084,7 +5071,7 @@ function renderMapaGeneralVisor(){
           zonas+
         '</div>'+
       '</div>'+
-      '<div class="mapa-gen-leyenda"><span><i style="background:#1f5f8c;"></i>Etapa seleccionada</span>'+(cfg.vendido ? '<span><i style="background:#2fa75e;"></i>A la venta</span><span><i style="background:#8fa3b6;"></i>Etapas vendidas</span><span><i style="background:#cfdcea;"></i>Próximas etapas</span>' : '<span><i style="background:#b4c4d2;"></i>Otras etapas</span>')+'</div>'+
+      '<div class="mapa-gen-leyenda"><span><i style="background:#1f5f8c;"></i>Etapa seleccionada</span>'+(cfg.vendido ? '<span><i style="background:#5fd068;"></i>A la venta</span><span><i style="background:#98a6b4;"></i>Etapas vendidas</span><span><i style="background:#e3d8bf;"></i>Próximas etapas</span>' : '<span><i style="background:#b4c4d2;"></i>Otras etapas</span>')+'</div>'+
       '<div class="mapa-zoom-controls">'+
         '<button type="button" class="mapa-zoom-btn" data-action="gen-zoom" data-value="in" title="Acercar">+</button>'+
         '<button type="button" class="mapa-zoom-btn" data-action="gen-zoom" data-value="out" title="Alejar">−</button>'+
