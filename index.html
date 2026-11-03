@@ -1754,14 +1754,7 @@ function renderMiCasa(){
     '</div>'+
   '</div>';
 
-  if (esSullana){
-    html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Recorre tu casa en 3D</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Camina por dentro de tu vivienda y prueba colores y muebles.</p>'+
-      '<a class="btn btn-primary btn-block" href="casa3d_ampliacion/">Entrar a mi casa 3D →</a>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="casa3d_ampliacion/?modo=ampliada">✨ Así puede quedar tu casa</a></div>';
-  }
-
-  if (proySlugPref() === 'castilla'){
+  if (proySlugPref() === 'castilla' || esSullana){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Así puede quedar tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda con un segundo piso. Ejemplo referencial.</p>'+
       '<a class="btn btn-primary btn-block" href="casa3d_ampliacion/?modo=ampliada&ver=1">✨ Ver cómo puede quedar →</a></div>';
