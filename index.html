@@ -1761,6 +1761,12 @@ function renderMiCasa(){
       '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="casa3d_ampliacion/?modo=ampliada">✨ Así puede quedar tu casa</a></div>';
   }
 
+  if (proySlugPref() === 'castilla'){
+    html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Así puede quedar tu casa</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda con un segundo piso. Ejemplo referencial.</p>'+
+      '<a class="btn btn-primary btn-block" href="casa3d_ampliacion/?modo=ampliada&ver=1">✨ Ver cómo puede quedar →</a></div>';
+  }
+
   if (esSullana && etapaTienePlano(etapaNum)){
     html += '<div class="panel">'+renderMapaEtapa5Html(String(etapaNum))+'</div>';
   } else if (!esSullana && etapaNum === '11'){

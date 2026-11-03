@@ -56,6 +56,11 @@ body.placing #modes,body.placing #cap,body.placing #lvbtn{display:none}
 #b360{position:fixed;right:12px;top:calc(172px + env(safe-area-inset-top));display:none;padding:8px 12px;font-size:13px}
 body:not(.amp) #b360{display:block}
 body.placing #b360{display:none}
+body.ver #stick,body.ver #modes,body.ver #lvbtn,body.ver #b360,body.ver #mini,body.ver #bpanel,body.ver #hint,body.ver #ret{display:none!important}
+#vbar{display:none;position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));padding:0 12px;gap:8px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+body.ver #vbar{display:flex}
+#vbar .chip{flex:0 0 auto;padding:9px 14px;font-size:13.5px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#vbar .chip.on{background:#e8590c;color:#fff}
 #v360{position:fixed;inset:0;background:#111;display:none;z-index:50}
 #v360.open{display:block}
 #c360{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
@@ -81,6 +86,7 @@ body.placing #b360{display:none}
 <button class="btn" id="lvbtn">⬆ Piso 2</button>
 <button class="btn" id="b360">✨ Se puede ver así</button>
 <div id="v360"><canvas id="c360"></canvas><div id="v360bar"></div><div id="v360hs"></div><div id="v360hint">Tu casa se puede ver así (ejemplo decorado) · arrastra para mirar y toca los círculos para pasar de cuarto</div><div id="v360ld">Cargando…</div></div>
+<div id="vbar"></div>
 <div id="fade"></div>
 <canvas id="mini" width="208" height="208"></canvas>
 <div id="ret"></div>
@@ -1056,6 +1062,31 @@ $('lvbtn').onclick=function(){
 };
 setMode(/modo=ampliada/.test(location.search));
 
+/* ---------- vista guiada (solo mirar): ?modo=ampliada&ver=1 ---------- */
+var VER=/[?&]ver=1/.test(location.search);
+if(VER){
+ document.body.classList.add('ver');
+ var vb=$('vbar'),tour=null,vchips=[];
+ function vGo(i){
+  vchips.forEach(function(c,j){c.classList.toggle('on',j===i+1);});
+  $('fade').style.opacity=1;
+  setTimeout(function(){setSpot(spotsAmp[i]);$('fade').style.opacity=0;},320);
+ }
+ function vStop(){if(tour){clearInterval(tour);tour=null;vchips[0].textContent='▶ Recorrido';}}
+ var bt=document.createElement('button');bt.className='chip';bt.textContent='▶ Recorrido';vchips.push(bt);vb.appendChild(bt);
+ spotsAmp.forEach(function(sp,i){
+  var b=document.createElement('button');b.className='chip';b.textContent=sp.n;
+  b.onclick=function(){vStop();vGo(i);};
+  vchips.push(b);vb.appendChild(b);
+ });
+ bt.onclick=function(){
+  if(tour){vStop();return;}
+  var k=0;bt.textContent='⏸ Detener';vGo(0);
+  tour=setInterval(function(){k=(k+1)%spotsAmp.length;vGo(k);},5000);
+ };
+ vGo(0);
+}
+
 
 /* ---------- entradas ---------- */
 /* ---------- vista 360° (renders del estudio) ---------- */
@@ -1142,7 +1173,7 @@ cv.addEventListener('pointermove',function(e){
 });
 function endLook(e){if(e.pointerId===lookId)lookId=null;}
 cv.addEventListener('pointerup',function(e){
- if(e.pointerId===lookId&&Math.hypot(e.clientX-dX,e.clientY-dY)<8&&performance.now()-dT<450)tapAt(e.clientX,e.clientY);
+ if(e.pointerId===lookId&&Math.hypot(e.clientX-dX,e.clientY-dY)<8&&performance.now()-dT<450&&!VER)tapAt(e.clientX,e.clientY);
  endLook(e);
 });cv.addEventListener('pointercancel',endLook);
 // joystick
@@ -1219,6 +1250,7 @@ function loop(t){
  if(keys.KeyW||keys.ArrowUp)f+=1;if(keys.KeyS||keys.ArrowDown)f-=1;
  if(keys.KeyD)s+=1;if(keys.KeyA)s-=1;
  if(keys.ArrowLeft||keys.KeyQ)P.yaw+=1.6*dt;if(keys.ArrowRight||keys.KeyE)P.yaw-=1.6*dt;
+ if(VER){f=s=0;}
  var m=Math.sqrt(f*f+s*s);if(m>1){f/=m;s/=m;}
  var sp=1.5*dt,fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),rx=Math.cos(P.yaw),rz=-Math.sin(P.yaw);
  if(m>0)move((fx*f+rx*s)*sp,(fz*f+rz*s)*sp);
