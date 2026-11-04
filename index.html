@@ -1756,8 +1756,10 @@ function renderMiCasa(){
 
   if (proySlugPref() === 'castilla' || esSullana){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Así puede quedar tu casa</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda con un segundo piso. Ejemplo referencial.</p>'+
-      '<a class="btn btn-primary btn-block" href="casa3d_ampliacion/?modo=ampliada&ver=1">✨ Ver cómo puede quedar →</a></div>';
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda. Imágenes referenciales.</p>'+
+      galeriaCasaHtml()+
+      '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a>'+
+      '<p style="font-size:0.78rem;color:var(--ink-faint);margin-top:6px;text-align:center;">Recorre la casa por dentro, cuarto por cuarto.</p></div>';
   }
 
   if (esSullana && etapaTienePlano(etapaNum)){
@@ -2982,6 +2984,18 @@ var VISTA_RENDER_MAP = {
   'Lateral Parque': ['Parque y zona de ejercicios', 'Fachada de las viviendas'],
   'Pasaje': ['Calle y avenida principal', 'Fachada de las viviendas']
 };
+var CASA_RENDERS_NUEVOS = [
+  {src:'casas/render1.jpg', t:'Fachada con terraza'},
+  {src:'casas/render2.jpg', t:'Casa con jardín en la azotea'},
+  {src:'casas/render3.jpg', t:'Vista lateral y escalera'},
+  {src:'casas/render4.jpg', t:'Fachada con balcones'}
+];
+function galeriaCasaHtml(){
+  var items = CASA_RENDERS_NUEVOS.slice();
+  return '<div class="renders-gallery">'+items.map(function(it){
+    return '<div class="renders-gallery-item"><div class="media-img-wrap"><a href="'+(it.go||it.src)+'"'+(it.go?'':' target="_blank" rel="noopener"')+'><img src="'+it.src+'" alt="'+esc(it.t)+'" loading="lazy" /></a><span class="media-badge media-badge-render">🏠 Así puede quedar tu casa</span>'+(it.go?'<span class="media-badge" style="top:auto;bottom:8px;left:8px;background:rgba(232,89,12,0.95);color:#fff;">🚶 Toca para recorrer</span>':'')+'</div><span class="media-caption">'+esc(it.t)+(it.go?' · recorrido 3D':'')+'</span></div>';
+  }).join('')+'</div>';
+}
 function rendersParaVista(vista){
   var labels = VISTA_RENDER_MAP[vista] || ['Fachada de las viviendas'];
   return labels.map(function(lbl){
@@ -3774,6 +3788,11 @@ function renderInteresadoMapa(){
   if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml();
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml();
   if (esAsesor) html += renderApagadoHtml();
+  if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
+    html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">🏠 Así puede quedar tu casa</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Para mostrarle al cliente su casa en potencia. Imágenes referenciales.</p>'+galeriaCasaHtml()+
+      '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a></div>';
+  }
   html += '</div>';
   if (!esAsesor) html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
