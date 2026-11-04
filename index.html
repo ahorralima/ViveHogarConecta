@@ -1378,18 +1378,24 @@ function houseMarkSvg(){
   return '<img class="brand-mark" src="' + ICON_MARK_DATAURI + '" alt="" width="52" height="27" />';
 }
 
+// Cliente verificado: solo ve el marketplace de su proyecto
+function proyBloqueadoId(){
+  return (appGate === 'cliente' && clienteNombreVerificado && localPref && localPref.proyectoId) ? String(localPref.proyectoId) : null;
+}
 function renderHeader(){
+  var lockP = proyBloqueadoId();
+  if (lockP) ui.fProyecto = lockP;
   return '<div class="header"><div class="header-row">'+
     '<div class="brand">'+houseMarkSvg()+
       '<div class="brand-text"><span class="brand-name"><span class="n1">Vive</span><span class="n2">Hogar</span><span class="n3">Conecta</span></span><span class="brand-tag">Marketplace vecinal</span></div>'+
     '</div>'+
-    '<div class="proyecto-switch">'+
+    (lockP ? '<div class="proyecto-switch"><button type="button" class="active" disabled>'+esc(proyById(parseInt(lockP,10)).nombre.replace('Vive Hogar ',''))+'</button></div>' : '<div class="proyecto-switch">'+
       '<button type="button" data-action="set-proyecto" data-value="all" class="'+(ui.fProyecto==='all'?'active':'')+'">Todos</button>'+
       '<button type="button" data-action="set-proyecto" data-value="1" class="'+(ui.fProyecto==='1'?'active':'')+'">Castilla</button>'+
       '<button type="button" data-action="set-proyecto" data-value="2" class="'+(ui.fProyecto==='2'?'active':'')+'">Sullana</button>'+
       '<button type="button" data-action="set-proyecto" data-value="3" class="'+(ui.fProyecto==='3'?'active':'')+'">Ejidos</button>'+
       '<button type="button" data-action="set-proyecto" data-value="4" class="'+(ui.fProyecto==='4'?'active':'')+'">Lambayeque</button>'+
-    '</div>'+
+    '</div>')+
   '</div></div>';
 }
 
@@ -3948,6 +3954,7 @@ document.addEventListener('click', async function(ev){
     window.scrollTo(0,0);
     render();
   } else if (action === 'set-proyecto'){
+    if (proyBloqueadoId()) return;
     ui.fProyecto = value;
     render();
   } else if (action === 'pick-icono'){
