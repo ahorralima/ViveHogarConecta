@@ -1379,8 +1379,16 @@ function houseMarkSvg(){
 }
 
 // Cliente verificado: solo ve el marketplace de su proyecto
+// Cuenta de demostración del cliente (sin datos reales): ve todos los proyectos
+function clienteEsDemo(){ return clienteNombreVerificado === 'Prueba 123'; }
+var DEMO_ETAPA_POR_PROY = {sullana:'5', castilla:'11', ejidos:'1', lambayeque:'1'};
+function miProySlug(){
+  if (clienteEsDemo() && ui.fProyecto && ui.fProyecto !== 'all') return PROY_SLUG_POR_ID[parseInt(ui.fProyecto,10)] || proySlugPref();
+  return proySlugPref();
+}
 function proyBloqueadoId(){
-  return (appGate === 'cliente' && clienteNombreVerificado && localPref && localPref.proyectoId) ? String(localPref.proyectoId) : null;
+  if (clienteEsDemo()) return null;
+  return (appGate === 'cliente-verificado' && clienteNombreVerificado && localPref && localPref.proyectoId) ? String(localPref.proyectoId) : null;
 }
 function renderHeader(){
   var lockP = proyBloqueadoId();
@@ -1746,9 +1754,10 @@ function renderMiCasa(){
       '<button type="button" class="btn btn-primary" style="margin-top:12px;" data-action="gate-cliente">Verificar que soy cliente</button></div>';
     return html;
   }
-  var proyNombre = PROY_NOMBRES[proySlugPref()];
-  var esSullana = proySlugPref() === 'sullana';
+  var proyNombre = PROY_NOMBRES[miProySlug()];
+  var esSullana = miProySlug() === 'sullana';
   var etapaNum = (localPref && localPref.etapa) ? String(localPref.etapa) : '';
+  if (clienteEsDemo()) etapaNum = DEMO_ETAPA_POR_PROY[miProySlug()] || '1';
   html += '<div class="panel panel-flat">'+
     '<div class="benefit-row" style="padding-top:0;">'+
       '<span class="benefit-icon">🏠</span>'+
@@ -1760,7 +1769,7 @@ function renderMiCasa(){
     '</div>'+
   '</div>';
 
-  if (proySlugPref() === 'castilla' || esSullana){
+  if (miProySlug() === 'castilla' || esSullana){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Así puede quedar tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda. Imágenes referenciales.</p>'+
       galeriaCasaHtml()+
@@ -5345,6 +5354,15 @@ document.addEventListener('submit', async function(ev){
     if (vNombre.length < 4) vErrs.nombre = 'Ingresa tu nombre completo.';
     if (!/^\d{5,8}$/.test(vDni)) vErrs.dni = 'Ingresa un DNI válido.';
     if (Object.keys(vErrs).length){ ui.clienteErrors = vErrs; render(); return; }
+    if (vNombre.toLowerCase() === 'prueba 123' && vDni === '12345678'){
+      // Cuenta de demostración: no consulta datos reales de clientes
+      ui.fProyecto = 'all'; ui.fEtapa = ''; ui.showEtapaPrompt = false;
+      saveLocalPref(2, '5'); saveClienteNombre('Prueba 123'); saveClienteDni(vDni);
+      saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', '');
+      ui.cuotasData = null; ui.cuotasError = '';
+      setGate('cliente-verificado'); render(); toast('Cuenta de demostración: ves todos los proyectos.');
+      return;
+    }
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
     var verRes;
     try {
