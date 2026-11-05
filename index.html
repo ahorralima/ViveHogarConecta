@@ -1756,8 +1756,11 @@ function renderMiCasa(){
   }
   var proyNombre = PROY_NOMBRES[miProySlug()];
   var esSullana = miProySlug() === 'sullana';
+  // El plano siempre sale del proyecto del cliente (antes podia quedar el de otro proyecto de una visita anterior)
+  ui.interesadoProyecto = miProySlug();
   var etapaNum = (localPref && localPref.etapa) ? String(localPref.etapa) : '';
   if (clienteEsDemo()) etapaNum = DEMO_ETAPA_POR_PROY[miProySlug()] || '1';
+  var planoCastilla = (miProySlug() === 'castilla' && ETAPAS_PLANO_PROY.castilla) ? (ETAPAS_PLANO_PROY.castilla[etapaNum] ? etapaNum : '16') : '';
   html += '<div class="panel panel-flat">'+
     '<div class="benefit-row" style="padding-top:0;">'+
       '<span class="benefit-icon">🏠</span>'+
@@ -1779,8 +1782,8 @@ function renderMiCasa(){
 
   if (esSullana && etapaTienePlano(etapaNum)){
     html += '<div class="panel">'+renderMapaEtapa5Html(String(etapaNum))+'</div>';
-  } else if (!esSullana && etapaNum === '11'){
-    html += '<div class="panel"><h4 style="margin-bottom:10px;">Mapa de tu manzana</h4>'+renderMapaCastilla11Html()+'</div>';
+  } else if (planoCastilla){
+    html += '<div class="panel">'+renderMapaEtapa5Html(planoCastilla)+'</div>';
   } else {
     html += '<div class="panel panel-flat"><div class="construction-box">'+
       '<span class="construction-box-icon">🚧</span>'+
@@ -3002,7 +3005,6 @@ var VISTA_RENDER_MAP = {
 var CASA_RENDERS_NUEVOS = [
   {src:'casas/render1.jpg', t:'Fachada con terraza'},
   {src:'casas/render2.jpg', t:'Casa con jardín en la azotea'},
-  {src:'casas/render3.jpg', t:'Vista lateral y escalera'},
   {src:'casas/render4.jpg', t:'Fachada con balcones'},
   {src:'casas/render5.jpg', t:'Fachada con balcón y celosía'},
   {src:'casas/render6.jpg', t:'Terraza con pérgola'}
