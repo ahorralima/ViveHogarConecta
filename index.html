@@ -5313,7 +5313,8 @@ function generarCotizacionPDF(mz, loteNum){
   var doc = new window.jspdf.jsPDF();
   var y = 20;
   doc.setFontSize(18); doc.setTextColor(57,126,173);
-  doc.text('Vive Hogar Sullana', 14, y);
+  var nombreProyPdf = PROY_NOMBRES[planoProy()] || 'Vive Hogar Sullana';
+  doc.text(nombreProyPdf, 14, y);
   y += 7; doc.setFontSize(12); doc.setTextColor(120,120,120);
   doc.text('Cotización referencial - Etapa '+ETAPA_ACTUAL, 14, y);
   y += 12; doc.setDrawColor(220,220,220); doc.line(14, y, 196, y);
@@ -5351,13 +5352,10 @@ function generarCotizacionPDF(mz, loteNum){
   y += 14; doc.setDrawColor(220,220,220); doc.line(14, y, 196, y);
   y += 8; doc.setFontSize(8.5); doc.setTextColor(140,140,140);
   var disclaimer = 'Simulación referencial, sin intereses. No constituye una separación ni una venta. '+
-    'Precios y disponibilidad sujetos a confirmación con una asesora de Vive Hogar Sullana. '+
+    'Precios y disponibilidad sujetos a confirmación con una asesora de '+nombreProyPdf+'. '+
     'Generado el '+new Date().toLocaleDateString('es-PE')+'.';
   var lines = doc.splitTextToSize(disclaimer, 182);
   doc.text(lines, 14, y);
-  y += lines.length*4 + 6;
-  doc.setTextColor(57,126,173); doc.setFontSize(10);
-  doc.text('WhatsApp: +'+VHS_WHATSAPP, 14, y);
 
   doc.save('Cotizacion_'+mz+'_Lote'+loteNum+'.pdf');
 }
