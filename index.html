@@ -5362,7 +5362,7 @@ document.addEventListener('submit', async function(ev){
       saveLocalPref(2, '5'); saveClienteNombre('Prueba 123'); saveClienteDni(vDni);
       saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', '');
       ui.cuotasData = null; ui.cuotasError = '';
-      setGate('cliente-verificado'); render(); toast('Cuenta de demostración: ves todos los proyectos.');
+      ui.view = 'home'; window.scrollTo(0,0); setGate('cliente-verificado'); render(); toast('Cuenta de demostración: ves todos los proyectos.');
       return;
     }
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
@@ -5400,6 +5400,7 @@ document.addEventListener('submit', async function(ev){
     // mismo cliente de antes, para nunca arrastrar datos de otra persona.
     ui.cuotasData = null;
     ui.cuotasError = '';
+    ui.view = 'home'; window.scrollTo(0,0);
     setGate('cliente-verificado');
     render();
     toast('¡Verificado! Bienvenido de nuevo.');
