@@ -34,13 +34,14 @@ var HS={
  dorm2:[{to:'sala',u:.21,v:.52,t:'Salir a la sala'}],
  bano:[{to:'sala',u:.69,v:.52,t:'Salir a la sala'}]
 };
-var START={sala:270,dorm1:180,dorm2:180,bano:180};
+var START={sala:312,dorm1:180,dorm2:180,bano:180};
+var START_LAT={sala:-10};
 var cv=document.getElementById('c'),ld=document.getElementById('ld'),hsBox=document.getElementById('hs');
 var r=new THREE.WebGLRenderer({canvas:cv,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio||1,2));
 var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(75,1,0.1,100);
 var geo=new THREE.SphereGeometry(10,64,40);geo.scale(-1,1,1);
 var mat=new THREE.MeshBasicMaterial({color:0xffffff});sc.add(new THREE.Mesh(geo,mat));
-var lon=270,lat=0,fov=90,cache={},cur=null,tl=new THREE.TextureLoader(),hsEls=[];
+var lon=270,lat=0,fov=100,cache={},cur=null,tl=new THREE.TextureLoader(),hsEls=[];
 function dir(u,v){var th=2*Math.PI*u,ph=Math.PI*v;return new THREE.Vector3(Math.cos(th)*Math.sin(ph),Math.cos(ph),Math.sin(th)*Math.sin(ph));}
 function buildHS(k){
  hsBox.innerHTML='';hsEls=[];
@@ -58,7 +59,7 @@ function go(k,from){
 function show(k,startLon){
  [].forEach.call(document.querySelectorAll('.b'),function(b){b.classList.toggle('on',b.dataset.k===k);});
  ld.style.opacity=1;hsBox.style.display='none';
- function done(t){mat.map=t;mat.needsUpdate=true;cur=k;lon=(startLon===undefined?START[k]:startLon);lat=0;buildHS(k);hsBox.style.display='';ld.style.opacity=0;}
+ function done(t){mat.map=t;mat.needsUpdate=true;cur=k;lon=(startLon===undefined?START[k]:startLon);lat=(startLon===undefined?(START_LAT[k]||0):0);buildHS(k);hsBox.style.display='';ld.style.opacity=0;}
  if(cache[k])return setTimeout(function(){done(cache[k]);},180);
  tl.load(k+'.jpg',function(t){t.anisotropy=8;t.minFilter=THREE.LinearFilter;cache[k]=t;done(t);},undefined,function(){ld.textContent='No se pudo cargar la imagen';});
 }

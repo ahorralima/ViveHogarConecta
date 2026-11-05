@@ -602,6 +602,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
 .lote-summary-grid span{display:block;font-size:0.72rem;color:var(--ink-faint);}
 .lote-summary-grid strong{font-size:1rem;color:var(--ink);}
+.lb-ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;touch-action:pan-y;}
+.lb-ov img{max-width:100%;max-height:82vh;object-fit:contain;user-select:none;-webkit-user-drag:none;}
+.lb-btn{position:absolute;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:28px;line-height:1;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lb-prev{left:10px;top:50%;transform:translateY(-50%);}
+.lb-next{right:10px;top:50%;transform:translateY(-50%);}
+.lb-close{right:12px;top:calc(12px + env(safe-area-inset-top));font-size:22px;}
+.lb-cap{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom));text-align:center;color:#fff;font-size:14px;padding:0 60px;}
 .renders-gallery{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
 .renders-gallery-item{flex:none;width:240px;scroll-snap-align:start;}
 .renders-gallery-item .media-img-wrap{position:relative;}
@@ -4837,6 +4844,43 @@ async function cargarSepInfo(loteId){
   if (!res.error && res.data && res.data.ok) ui.sepInfo[loteId] = res.data;
 }
 
+// Visor de fotos: al tocar una foto de la galería se abre grande y se pasa de foto en foto (deslizando o con las flechas)
+(function(){
+  var ov=null, list=[], idx=0, sx=null;
+  function paint(){
+    ov.querySelector('img').src=list[idx].src;
+    ov.querySelector('.lb-cap').textContent=list[idx].t+'  ·  '+(idx+1)+' de '+list.length;
+  }
+  function go(d){ idx=(idx+d+list.length)%list.length; paint(); }
+  function close(){ if(ov){ ov.remove(); ov=null; } }
+  function open(){
+    close();
+    ov=document.createElement('div'); ov.className='lb-ov';
+    ov.innerHTML='<img alt="" /><button type="button" class="lb-btn lb-close" aria-label="Cerrar">✕</button>'+
+      '<button type="button" class="lb-btn lb-prev" aria-label="Foto anterior">‹</button>'+
+      '<button type="button" class="lb-btn lb-next" aria-label="Foto siguiente">›</button><div class="lb-cap"></div>';
+    ov.querySelector('.lb-close').onclick=close;
+    ov.querySelector('.lb-prev').onclick=function(e){ e.stopPropagation(); go(-1); };
+    ov.querySelector('.lb-next').onclick=function(e){ e.stopPropagation(); go(1); };
+    ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+    ov.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; },{passive:true});
+    ov.addEventListener('touchend',function(e){ if(sx===null) return; var dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>40) go(dx<0?1:-1); },{passive:true});
+    document.body.appendChild(ov); paint();
+  }
+  document.addEventListener('click',function(e){
+    var a=e.target.closest && e.target.closest('.renders-gallery-item a');
+    if(!a) return;
+    e.preventDefault(); e.stopPropagation();
+    var g=a.closest('.renders-gallery');
+    var as=[].slice.call(g.querySelectorAll('.renders-gallery-item a'));
+    list=as.map(function(x){ var im=x.querySelector('img'); return {src:im.getAttribute('src'), t:im.alt||''}; });
+    idx=as.indexOf(a); open();
+  },true);
+  document.addEventListener('keydown',function(e){
+    if(!ov) return;
+    if(e.key==='Escape') close(); else if(e.key==='ArrowRight') go(1); else if(e.key==='ArrowLeft') go(-1);
+  });
+})();
 document.addEventListener('keydown', function(ev){
   if (ev.key !== 'Enter' && ev.key !== ' ') return;
   var el = ev.target;
