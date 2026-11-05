@@ -1625,7 +1625,7 @@ function authForm(){
     html += '<h3 style="margin-bottom:4px;">Iniciar sesión</h3>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Accede a tu cuenta de Vive Hogar Conecta.</p>'+
       '<form data-form="login">'+
-        '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" placeholder="987654321" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
+        '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
         '<div class="form-field"><label>Contraseña</label><input class="text-input" type="password" name="password" placeholder="Tu contraseña" />'+(e.password?'<span class="err">'+esc(e.password)+'</span>':'')+'</div>'+
         '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Entrando…':'Iniciar sesión')+'</button>'+
       '</form>'+
@@ -1634,14 +1634,14 @@ function authForm(){
     html += '<h3 style="margin-bottom:4px;">Crea tu cuenta</h3>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px;">Únete a Vive Hogar Conecta y conecta con tu comunidad. Esta cuenta es para publicar y reseñar servicios; es distinta de la verificación de tu vivienda.</p>'+
       '<form data-form="registro">'+
-        '<div class="form-row"><div class="form-field"><label>Nombre</label><input class="text-input" type="text" name="nombre" placeholder="María" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
-        '<div class="form-field"><label>Apellido</label><input class="text-input" type="text" name="apellido" placeholder="López" />'+(e.apellido?'<span class="err">'+esc(e.apellido)+'</span>':'')+'</div></div>'+
-        '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" placeholder="987654321" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
+        '<div class="form-row"><div class="form-field"><label>Nombre</label><input class="text-input" type="text" name="nombre" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
+        '<div class="form-field"><label>Apellido</label><input class="text-input" type="text" name="apellido" />'+(e.apellido?'<span class="err">'+esc(e.apellido)+'</span>':'')+'</div></div>'+
+        '<div class="form-field"><label>WhatsApp (9 dígitos)</label><input class="text-input" type="tel" name="telefono" />'+(e.telefono?'<span class="err">'+esc(e.telefono)+'</span>':'')+'</div>'+
         '<div class="form-row"><div class="form-field"><label>Tu proyecto</label><select name="proyectoId">'+
           PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+(ui.fProyecto===String(p.id)?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
         '</select></div>'+
         '<div class="form-field"><label>Etapa</label><input class="text-input" type="number" min="1" max="99" name="etapa" placeholder="Ej. 5" value="'+esc(ui.fEtapa)+'" />'+(e.etapa?'<span class="err">'+esc(e.etapa)+'</span>':'')+'</div></div>'+
-        '<div class="form-field"><label>Mz./Lote o referencia (opcional)</label><input class="text-input" type="text" name="direccion" placeholder="Ej. Mz. A Lote 5" /><span class="hint">Para que la gente encuentre tus servicios en el mapa.</span></div>'+
+        '<div class="form-field"><label>Mz./Lote o referencia (opcional)</label><input class="text-input" type="text" name="direccion" /><span class="hint">Para que la gente encuentre tus servicios en el mapa.</span></div>'+
         '<div class="form-row"><div class="form-field"><label>Contraseña</label><input class="text-input" type="password" name="password" placeholder="Mínimo 6 caracteres" />'+(e.password?'<span class="err">'+esc(e.password)+'</span>':'')+'</div>'+
         '<div class="form-field"><label>Confirmar contraseña</label><input class="text-input" type="password" name="password2" placeholder="Repite tu contraseña" />'+(e.password2?'<span class="err">'+esc(e.password2)+'</span>':'')+'</div></div>'+
         '<button type="submit" class="btn btn-primary btn-block"'+busyAttr+'>'+(ui.authBusy?'Creando cuenta…':'Crear cuenta')+'</button>'+
@@ -1829,7 +1829,7 @@ function renderPerfil(){
       PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+(identity.proyectoId===p.id?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
     '</select></div>'+
     '<div class="form-field"><label>Etapa</label><input class="text-input" type="number" min="1" max="99" name="etapa" value="'+esc(identity.etapa)+'" />'+(pe.etapa?'<span class="err">'+esc(pe.etapa)+'</span>':'')+'</div></div>'+
-    '<div class="form-field"><label>Mz./Lote o referencia (opcional)</label><input class="text-input" type="text" name="direccion" placeholder="Ej. Mz. A Lote 5" value="'+esc(identity.direccion||'')+'" /><span class="hint">Para que la gente encuentre tus servicios en el mapa.</span></div>'+
+    '<div class="form-field"><label>Mz./Lote o referencia (opcional)</label><input class="text-input" type="text" name="direccion" value="'+esc(identity.direccion||'')+'" /><span class="hint">Para que la gente encuentre tus servicios en el mapa.</span></div>'+
     '<button type="submit" class="btn btn-primary btn-block">Guardar cambios</button>'+
   '</form></div>';
 
