@@ -4212,6 +4212,8 @@ document.addEventListener('click', async function(ev){
       if (dr.ok){ ui.descMonto = ''; await cargarDescInfo(dId); ui.sepMsg = dMonto > 0 ? 'Precio acordado aplicado.' : 'Descuento quitado.'; }
       render();
     }
+  } else if (action === 'ventas-excel'){
+    exportarVentasMesExcel();
   } else if (action === 'venta-toggle'){
     var vId = t.getAttribute('data-value');
     ui.ventaAbierta = String(ui.ventaAbierta) === String(vId) ? null : vId;
@@ -4859,6 +4861,38 @@ async function cargarVentasMes(){
   ui.ventasErr = true;
   return false;
 }
+function exportarVentasMesExcel(){
+  var vm = ui.ventasMes; if (!vm || !vm.items || !vm.items.length) return;
+  function q(x){ x = (x === null || x === undefined) ? '' : String(x); return '"' + x.replace(/"/g, '""') + '"'; }
+  function lima(iso, hora){
+    try { return new Date(iso).toLocaleString('es-PE', hora ? {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Lima'} : {day:'2-digit', month:'2-digit', year:'numeric', timeZone:'America/Lima'}); } catch(e){ return ''; }
+  }
+  function n(x){ return (x === null || x === undefined || x === '') ? '' : Number(x); }
+  var cols = ['Fecha','Hora','Asesor','Etapa','Manzana','Lote','Cliente','DNI','Estado','Separación (S/)','N.º operación','2.ª boleta requerida','2.ª boleta pagada','2.ª boleta (S/)','Op. 2.ª boleta','Precio de lista (S/)','Precio final (S/)','Descuento (S/)','Autorizó descuento'];
+  var filas = [cols.map(q).join(',')];
+  vm.items.forEach(function(v){
+    filas.push([
+      lima(v.cuando,false), lima(v.cuando,true), toTitleCase(v.asesor || ''), v.etapa, v.m, v.l,
+      toTitleCase(v.cliente || ''), v.dni || '', v.estado === 'comprada' ? 'Vendida' : 'Separada',
+      n(v.monto), v.operacion || '', v.exige_pago2 ? 'Sí' : 'No', v.exige_pago2 ? (v.pago2_en ? 'Sí' : 'No') : '',
+      n(v.pago2_monto), v.pago2_op || '', n(v.precio_lista), n(v.precio_final), n(v.descuento), toTitleCase(v.descuento_por || '')
+    ].map(function(x){ return typeof x === 'number' ? String(x) : q(x); }).join(','));
+  });
+  var csv = '﻿sep=,\r\n' + filas.join('\r\n');
+  var mes = ''; try { mes = new Date(vm.mes).toLocaleDateString('en-CA', { year:'numeric', month:'2-digit', timeZone:'America/Lima' }); } catch(e){}
+  var nombre = 'Ventas_ViveHogar_' + (mes || 'mes') + '.csv';
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  try {
+    var file = new File([blob], nombre, { type: 'text/csv' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
+      navigator.share({ files: [file], title: nombre }).catch(function(){});
+      return;
+    }
+  } catch(e){}
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+}
 function renderVentasMesHtml(){
   var vm = (ui.ventasMes && ui.ventasMesId === String(asesoraIdActual)) ? ui.ventasMes : null;
   if (!vm && !ui.ventasErr && !ui._ventasCarg){ ui._ventasCarg = true; cargarVentasMes().then(function(){ ui._ventasCarg = false; renderSiLibre(); }); }
@@ -4870,7 +4904,8 @@ function renderVentasMesHtml(){
   if (!vm) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Cargando…</p></div>';
   if (!vm.items.length) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Todavía no hay ventas este mes.</p></div>';
   var total = 0; vm.items.forEach(function(v){ total += Number(v.monto) || 0; });
-  h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' · separaciones cobradas: <strong>'+fmtMoney(total)+'</strong>. Toca una venta para ver el detalle.</p>';
+  h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' · separaciones cobradas: <strong>'+fmtMoney(total)+'</strong>. Toca una venta para ver el detalle.</p>'+
+    '<button type="button" class="btn btn-secondary btn-block" style="margin:0 0 10px;" data-action="ventas-excel">📊 Exportar a Excel</button>';
   vm.items.forEach(function(v){
     var abierta = String(ui.ventaAbierta) === String(v.id);
     var chip = (v.estado === 'comprada' ? 'Vendida' : 'Separada') + (v.exige_pago2 ? (v.pago2_en ? ' · 2.ª boleta ✅' : ' · ⏳ falta 2.ª boleta') : '');
