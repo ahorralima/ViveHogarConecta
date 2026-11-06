@@ -4861,29 +4861,74 @@ async function cargarVentasMes(){
   ui.ventasErr = true;
   return false;
 }
+function xlsxCrc32(u8){
+  var t = xlsxCrc32.t;
+  if (!t){ t = xlsxCrc32.t = []; for (var n = 0; n < 256; n++){ var c = n; for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; } }
+  var crc = 0xFFFFFFFF;
+  for (var i = 0; i < u8.length; i++) crc = t[(crc ^ u8[i]) & 255] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function xlsxZip(files){
+  var enc = new TextEncoder(), partes = [], central = [], offset = 0;
+  function u16(v){ return [v & 255, (v >>> 8) & 255]; }
+  function u32(v){ return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+  files.forEach(function(f){
+    var nom = enc.encode(f.name), dat = enc.encode(f.data), crc = xlsxCrc32(dat);
+    var h = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(dat.length), u32(dat.length), u16(nom.length), u16(0));
+    partes.push(new Uint8Array(h), nom, dat);
+    var c = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(dat.length), u32(dat.length), u16(nom.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset));
+    central.push(new Uint8Array(c), nom);
+    offset += h.length + nom.length + dat.length;
+  });
+  var csize = 0; central.forEach(function(x){ csize += x.length; });
+  var fin = [].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(csize), u32(offset), u16(0));
+  return new Blob(partes.concat(central, [new Uint8Array(fin)]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+function xlsxBlob(cols, filas, anchos){
+  function x(t){ return String(t).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function ref(c, r){ return String.fromCharCode(65 + c) + r; }
+  var rows = '<row r="1">' + cols.map(function(t, c){ return '<c r="'+ref(c,1)+'" s="1" t="inlineStr"><is><t>'+x(t)+'</t></is></c>'; }).join('') + '</row>';
+  filas.forEach(function(f, i){
+    var r = i + 2;
+    rows += '<row r="'+r+'">' + f.map(function(v, c){
+      if (v === '' || v === null || v === undefined) return '';
+      if (typeof v === 'number' && isFinite(v)) return '<c r="'+ref(c,r)+'"><v>'+v+'</v></c>';
+      return '<c r="'+ref(c,r)+'" t="inlineStr"><is><t xml:space="preserve">'+x(v)+'</t></is></c>';
+    }).join('') + '</row>';
+  });
+  var colsXml = '<cols>' + anchos.map(function(w, c){ return '<col min="'+(c+1)+'" max="'+(c+1)+'" width="'+w+'" customWidth="1"/>'; }).join('') + '</cols>';
+  var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  var NS = 'http://schemas.openxmlformats.org/';
+  return xlsxZip([
+    { name: '[Content_Types].xml', data: H+'<Types xmlns="'+NS+'package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>' },
+    { name: '_rels/.rels', data: H+'<Relationships xmlns="'+NS+'package/2006/relationships"><Relationship Id="rId1" Type="'+NS+'officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+    { name: 'xl/workbook.xml', data: H+'<workbook xmlns="'+NS+'spreadsheetml/2006/main" xmlns:r="'+NS+'officeDocument/2006/relationships"><sheets><sheet name="Ventas" sheetId="1" r:id="rId1"/></sheets></workbook>' },
+    { name: 'xl/_rels/workbook.xml.rels', data: H+'<Relationships xmlns="'+NS+'package/2006/relationships"><Relationship Id="rId1" Type="'+NS+'officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="'+NS+'officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+    { name: 'xl/styles.xml', data: H+'<styleSheet xmlns="'+NS+'spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>' },
+    { name: 'xl/worksheets/sheet1.xml', data: H+'<worksheet xmlns="'+NS+'spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'+colsXml+'<sheetData>'+rows+'</sheetData></worksheet>' }
+  ]);
+}
 function exportarVentasMesExcel(){
   var vm = ui.ventasMes; if (!vm || !vm.items || !vm.items.length) return;
-  function q(x){ x = (x === null || x === undefined) ? '' : String(x); return '"' + x.replace(/"/g, '""') + '"'; }
   function lima(iso, hora){
     try { return new Date(iso).toLocaleString('es-PE', hora ? {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Lima'} : {day:'2-digit', month:'2-digit', year:'numeric', timeZone:'America/Lima'}); } catch(e){ return ''; }
   }
   function n(x){ return (x === null || x === undefined || x === '') ? '' : Number(x); }
   var cols = ['Fecha','Hora','Asesor','Etapa','Manzana','Lote','Cliente','DNI','Estado','Separación (S/)','N.º operación','2.ª boleta requerida','2.ª boleta pagada','2.ª boleta (S/)','Op. 2.ª boleta','Precio de lista (S/)','Precio final (S/)','Descuento (S/)','Autorizó descuento'];
-  var filas = [cols.map(q).join(',')];
-  vm.items.forEach(function(v){
-    filas.push([
+  var anchos = [12,8,26,7,10,7,30,12,11,15,15,19,17,15,15,18,17,15,24];
+  var filas = vm.items.map(function(v){
+    return [
       lima(v.cuando,false), lima(v.cuando,true), toTitleCase(v.asesor || ''), v.etapa, v.m, v.l,
       toTitleCase(v.cliente || ''), v.dni || '', v.estado === 'comprada' ? 'Vendida' : 'Separada',
       n(v.monto), v.operacion || '', v.exige_pago2 ? 'Sí' : 'No', v.exige_pago2 ? (v.pago2_en ? 'Sí' : 'No') : '',
       n(v.pago2_monto), v.pago2_op || '', n(v.precio_lista), n(v.precio_final), n(v.descuento), toTitleCase(v.descuento_por || '')
-    ].map(function(x){ return typeof x === 'number' ? String(x) : q(x); }).join(','));
+    ].map(function(c){ return (c === null || c === undefined) ? '' : c; });
   });
-  var csv = '﻿sep=,\r\n' + filas.join('\r\n');
   var mes = ''; try { mes = new Date(vm.mes).toLocaleDateString('en-CA', { year:'numeric', month:'2-digit', timeZone:'America/Lima' }); } catch(e){}
-  var nombre = 'Ventas_ViveHogar_' + (mes || 'mes') + '.csv';
-  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  var nombre = 'Ventas_ViveHogar_' + (mes || 'mes') + '.xlsx';
+  var blob = xlsxBlob(cols, filas, anchos);
   try {
-    var file = new File([blob], nombre, { type: 'text/csv' });
+    var file = new File([blob], nombre, { type: blob.type });
     if (navigator.canShare && navigator.canShare({ files: [file] })){
       navigator.share({ files: [file], title: nombre }).catch(function(){});
       return;
