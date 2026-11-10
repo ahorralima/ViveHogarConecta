@@ -2581,7 +2581,7 @@ function asesorIniciarRelojes(){
     if (modoAsesor() && !document.hidden) asesorCargarPanel();
     if (modoAsesor() && esJefe() && ui.histAbierto && !document.hidden) cargarHistorial().then(function(){ renderSiLibre(); });
     if (modoAsesor() && esJefe() && !document.hidden) cargarVentasMes().then(function(cambio){ if (cambio) renderSiLibre(); });
-    if (modoAsesor() && esJefe() && !document.hidden) cargarVentas2nf().then(function(cambio){ if (cambio) renderSiLibre(); });
+    if (modoAsesor() && !document.hidden) cargarVentas2nf().then(function(cambio){ if (cambio) renderSiLibre(); });
     if (modoAsesor() && !document.hidden) Object.keys(ui.descInfo).forEach(function(k){ cargarDescInfo(k); });
     if (modoAsesor() && ui.presupuestoTxt && ui.presupAlcance !== 'etapa' && !document.hidden && document.getElementById('presupuesto-input')) cargarPresupTodas().then(function(){ renderSiLibre(); });
   }, 8000);
@@ -3961,7 +3961,7 @@ function renderInteresadoMapa(){
   }
 
   if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml() + renderVentas2nfHtml() + renderVentasManualesJefeHtml();
-  else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentaManualAsesorHtml();
+  else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentas2nfHtml() + renderVentaManualAsesorHtml();
   if (esAsesor) html += renderApagadoHtml();
   if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">🏠 Así puede quedar tu casa</h4>'+
@@ -5041,7 +5041,8 @@ function exportarVentasMesExcel(){
 async function cargarVentas2nf(){
   if (!asesoraPin || !asesoraIdActual) return false;
   try {
-    var res = await sb.rpc('ec_ventas_2nf_mes', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin });
+    var res = esJefe() ? await sb.rpc('ec_ventas_2nf_mes', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin })
+                       : await sb.rpc('ec_ventas_2nf_asesora', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
     if (!res.error && res.data && res.data.ok){
       var antes = JSON.stringify(ui.ventas2nf);
       ui.ventas2nf = res.data; ui.ventas2nfId = String(asesoraIdActual);
@@ -5076,7 +5077,7 @@ function renderVentas2nfHtml(){
     }
     h += '</div>';
   });
-  if (vm.actualizado){ h += '<p style="font-size:0.75rem;color:var(--ink-faint);margin:8px 0 0;">Datos del 2NF al '+esc(fmtFechaHora(vm.actualizado))+'.</p>'; }
+  if (vm.actualizado){ h += '<p style="font-size:0.75rem;color:var(--ink-faint);margin:8px 0 0;">Datos del 2NF al '+esc(fmtFechaCorta(vm.actualizado))+'</p>'; }
   return h+'</div>';
 }
 function renderVentasMesHtml(){
