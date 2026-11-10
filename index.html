@@ -2006,6 +2006,12 @@ function asesorCargarPanel(){
         });
       }
     } catch(e){}
+    // La cuenta de prueba de Google Play no debe verse en el ranking de las asesoras (solo la ve ella misma)
+    if (res.data.ranking){
+      res.data.ranking = res.data.ranking.filter(function(r){
+        return String(r.nombre || '').trim().toLowerCase() !== 'revisor google' || String(r.id) === String(asesoraIdActual);
+      });
+    }
     var nuevo = JSON.stringify(res.data);
     var cambio = nuevo !== ui._panelJson;
     ui._panelJson = nuevo;
