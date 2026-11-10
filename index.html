@@ -1906,7 +1906,7 @@ ui.sepOp = '';
 ui.sepMonto = '';
 ui.sepImg = '';
 ui.descLote = null; ui.descInfo = {}; ui._descCarg = {}; ui.descMonto = '';
-ui.ventasMes = null; ui.ventasMesId = null; ui.ventasErr = false; ui.ventaAbierta = null; ui.ventaImg = {}; ui.ventaImg2 = {};
+ui.ventas2nf = null; ui.ventas2nfId = null; ui.v2nfAbierta = null; ui.ventasMes = null; ui.ventasMesId = null; ui.ventasErr = false; ui.ventaAbierta = null; ui.ventaImg = {}; ui.ventaImg2 = {};
 ui.misVentas = null; ui.misVentasId = null; ui.misVentasErr = false; ui.mvAbierta = null;
 ui.pago2Op = ''; ui.pago2Monto = ''; ui.pago2Img = ''; ui.pago2ImgBusy = false; ui.pago2ImgErr = false;
 ui.vmAbierto = false; ui.vmEtapa = ''; ui.vmMz = ''; ui.vmLote = ''; ui.vmNombre = ''; ui.vmDni = ''; ui.vmOp = ''; ui.vmImg = ''; ui.vmImgBusy = false; ui.vmImgErr = false;
@@ -2570,6 +2570,7 @@ function asesorIniciarRelojes(){
     if (modoAsesor() && !document.hidden) asesorCargarPanel();
     if (modoAsesor() && esJefe() && ui.histAbierto && !document.hidden) cargarHistorial().then(function(){ renderSiLibre(); });
     if (modoAsesor() && esJefe() && !document.hidden) cargarVentasMes().then(function(cambio){ if (cambio) renderSiLibre(); });
+    if (modoAsesor() && esJefe() && !document.hidden) cargarVentas2nf().then(function(cambio){ if (cambio) renderSiLibre(); });
     if (modoAsesor() && !document.hidden) Object.keys(ui.descInfo).forEach(function(k){ cargarDescInfo(k); });
     if (modoAsesor() && ui.presupuestoTxt && ui.presupAlcance !== 'etapa' && !document.hidden && document.getElementById('presupuesto-input')) cargarPresupTodas().then(function(){ renderSiLibre(); });
   }, 8000);
@@ -3948,7 +3949,7 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
-  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml() + renderVentasManualesJefeHtml();
+  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml() + renderVentas2nfHtml() + renderVentasManualesJefeHtml();
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentaManualAsesorHtml();
   if (esAsesor) html += renderApagadoHtml();
   if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
@@ -4255,6 +4256,10 @@ document.addEventListener('click', async function(ev){
       if (dr.ok){ ui.descMonto = ''; await cargarDescInfo(dId); ui.sepMsg = dMonto > 0 ? 'Precio acordado aplicado.' : 'Descuento quitado.'; }
       render();
     }
+  } else if (action === 'v2nf-toggle'){
+    var v2Id = t.getAttribute('data-value');
+    ui.v2nfAbierta = String(ui.v2nfAbierta) === String(v2Id) ? null : v2Id;
+    render();
   } else if (action === 'ventas-excel'){
     exportarVentasMesExcel();
   } else if (action === 'venta-toggle'){
@@ -5020,6 +5025,48 @@ function exportarVentasMesExcel(){
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
   setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+}
+// Ventas hechas en el 2NF que todavía no están en la app (solo se muestra si el servidor ya las envió)
+async function cargarVentas2nf(){
+  if (!asesoraPin || !asesoraIdActual) return false;
+  try {
+    var res = await sb.rpc('ec_ventas_2nf_mes', { p_jefe_id: asesoraIdActual, p_pin: asesoraPin });
+    if (!res.error && res.data && res.data.ok){
+      var antes = JSON.stringify(ui.ventas2nf);
+      ui.ventas2nf = res.data; ui.ventas2nfId = String(asesoraIdActual);
+      return antes !== JSON.stringify(ui.ventas2nf);
+    }
+  } catch(e){}
+  return false;
+}
+function renderVentas2nfHtml(){
+  var vm = (ui.ventas2nf && ui.ventas2nfId === String(asesoraIdActual)) ? ui.ventas2nf : null;
+  if (!vm && !ui._v2nfCarg){ ui._v2nfCarg = true; cargarVentas2nf().then(function(){ ui._v2nfCarg = false; renderSiLibre(); }); }
+  if (!vm) return '';   // todavía no cargó o la actualización v14 aún no está en Supabase: no se muestra nada
+  var mesTxt = '';
+  try { mesTxt = new Date(vm.mes).toLocaleDateString('es-PE', { month: 'long', year: 'numeric', timeZone: 'America/Lima' }); } catch(e){}
+  var nomProy = (ui.asesorPanel && ui.asesorPanel.proyecto_nombre) || '';
+  var h = '<div class="panel panel-flat" id="ventas-2nf"><h4>🏢 Ventas hechas en el 2NF <small style="font-weight:600;color:var(--ink-faint);">'+esc(nomProy)+'</small></h4>';
+  if (!vm.items.length) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">No hay ventas de '+esc(mesTxt)+' en el 2NF que falten en la app.</p></div>';
+  var total = 0; vm.items.forEach(function(v){ total += Number(v.monto) || 0; });
+  h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' de '+esc(mesTxt)+' registrada'+(vm.items.length===1?'':'s')+' en el 2NF que aún no aparece'+(vm.items.length===1?'':'n')+' en la app · separaciones: <strong>'+fmtMoney(total)+'</strong>. Si la casa ya está en la app, no se repite aquí. Toca una venta para ver el detalle.</p>';
+  vm.items.forEach(function(v){
+    var abierta = String(ui.v2nfAbierta) === String(v.id);
+    h += '<div class="as-hist" style="cursor:pointer;" role="button" tabindex="0" data-action="v2nf-toggle" data-value="'+esc(v.id)+'">'+
+      '<div class="as-hist-top"><span><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+esc(v.estatus_desc || '')+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
+      '<div>Asesor: <b>'+esc(toTitleCase(v.asesor || '—'))+'</b> · Separación <b>'+(v.monto != null ? fmtMoney(v.monto) : '—')+'</b></div>';
+    if (abierta){
+      h += '<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">'+
+        '<div>Fecha y hora: <b>'+esc(fmtFechaHora(v.cuando))+'</b></div>'+
+        '<div>Cliente: <b>'+esc(toTitleCase(v.cliente || '—'))+'</b>'+(v.dni ? ' · DNI '+esc(v.dni) : '')+'</div>'+
+        (v.monto_inicial != null ? '<div>Cuota inicial: <b>'+fmtMoney(v.monto_inicial)+'</b></div>' : '')+
+        (v.monto_venta != null ? '<div>Monto de venta: <b>'+fmtMoney(v.monto_venta)+'</b>'+(v.monto_saldo != null ? ' · Saldo '+fmtMoney(v.monto_saldo) : '')+'</div>' : '')+
+        '<div style="color:var(--ink-faint);margin-top:4px;">Registrada en el 2NF · Nº '+esc(v.id)+'</div></div>';
+    }
+    h += '</div>';
+  });
+  if (vm.actualizado){ h += '<p style="font-size:0.75rem;color:var(--ink-faint);margin:8px 0 0;">Datos del 2NF al '+esc(fmtFechaHora(vm.actualizado))+'.</p>'; }
+  return h+'</div>';
 }
 function renderVentasMesHtml(){
   var vm = (ui.ventasMes && ui.ventasMesId === String(asesoraIdActual)) ? ui.ventasMes : null;
