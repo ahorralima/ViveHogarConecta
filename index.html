@@ -1978,7 +1978,7 @@ function renderSiLibre(){
 var CASTILLA_ETAPAS_VISIBLES = ['16'];
 function asesorCargarPanel(){
   if (!asesoraPin || !asesoraIdActual) return Promise.resolve();
-  return sb.rpc('ec_panel_asesor', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(function(res){
+  return sb.rpc('ec_panel_asesor', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(async function(res){
     if (res.error){
       ui.asesorPanelError = (res.error.code === 'PGRST202') ? 'sin_v7' : 'red';
       if (!ui.asesorPanel) render();
@@ -1995,6 +1995,17 @@ function asesorCargarPanel(){
       res.data.etapas = (res.data.etapas || []).filter(soloCastilla);
       if (res.data.ofertas) res.data.ofertas = res.data.ofertas.filter(soloCastilla);
     }
+    // Ventas hechas en el 2NF que aún no están en la app: también suman en el ranking por asesora
+    try {
+      var r2 = await sb.rpc('ec_ranking_2nf', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+      if (!r2.error && r2.data && r2.data.ok && res.data.ranking){
+        var ex = {}; (r2.data.items || []).forEach(function(x){ ex[String(x.asesora_id)] = x; });
+        res.data.ranking.forEach(function(r){ var x = ex[String(r.id)]; if (x){ r.ventas += (x.ventas || 0); r.separadas = (r.separadas || 0) + (x.separadas || 0); } });
+        res.data.ranking.sort(function(p1, p2){
+          return ((p2.ventas + (p2.separadas || 0)) - (p1.ventas + (p1.separadas || 0))) || (p2.ventas - p1.ventas) || String(p1.nombre).localeCompare(String(p2.nombre));
+        });
+      }
+    } catch(e){}
     var nuevo = JSON.stringify(res.data);
     var cambio = nuevo !== ui._panelJson;
     ui._panelJson = nuevo;
