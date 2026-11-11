@@ -2051,6 +2051,7 @@ function asesorCargarPanel(){
     var cambio = nuevo !== ui._panelJson;
     ui._panelJson = nuevo;
     ui.asesorPanel = res.data;
+    cobranzaPuede();
     if (asesorSoloLecturaId !== String(asesoraIdActual)){
       asesorSoloLecturaId = String(asesoraIdActual);
       sb.rpc('ec_asesora_solo_lectura', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
@@ -2065,19 +2066,29 @@ function asesorCargarPanel(){
 }
 
 // ---------- Cobranza: dashboard de cartera para cobradoras y jefatura ----------
-ui.cob = null; ui.cobErr = ''; ui.cobGestora = ''; ui.cobNivel = 'todos'; ui.cobEtapa = ''; ui.cobAdmin = false; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {};
+ui.cob = null; ui.cobErr = ''; ui.cobGestora = ''; ui.cobNivel = 'todos'; ui.cobEtapa = ''; ui.cobAdmin = false; ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cobProy = 'sullana'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {};
 function esCobranza(){
+  if (ui.cobVer && ui.cobPuede) return true;
   var c = asesorCuentas().filter(function(x){ return String(x.id) === String(asesoraIdActual); })[0];
   return !!(c && (c.rol === 'cobradora' || c.rol === 'jefa_cobranza'));
 }
 function cobS(n){ return 'S/ ' + Number(n || 0).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
 function cobF(iso){ if (!iso) return '—'; var p = String(iso).slice(0, 10).split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '—'; }
 function cobKey(c){ return String(c.dni) + '|' + String(c.manzana) + '|' + String(c.lote); }
+function cobranzaPuede(){
+  if (!asesoraPin || !asesoraIdActual || ui.cobPuedeId === String(asesoraIdActual)) return;
+  var id = String(asesoraIdActual); ui.cobPuedeId = id;
+  sb.rpc('ec_cobranza_puede', { p_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
+    if (String(asesoraIdActual) !== id) return;
+    var ok = !r.error && r.data === true;
+    if (ok !== ui.cobPuede){ ui.cobPuede = ok; render(); }
+  });
+}
 function cobranzaCargar(){
   if (ui.cobAdmin ? !sessionToken : (!asesoraPin || !asesoraIdActual)) return Promise.resolve();
   var llamada = ui.cobAdmin
-    ? sb.rpc('ec_cobranza_cartera_admin', { p_token: sessionToken, p_gestora: ui.cobGestora || null })
-    : sb.rpc('ec_cobranza_cartera', { p_id: asesoraIdActual, p_pin: asesoraPin, p_gestora: ui.cobGestora || null });
+    ? sb.rpc('ec_cobranza_cartera_admin', { p_token: sessionToken, p_gestora: ui.cobGestora || null, p_proyecto: ui.cobProy })
+    : sb.rpc('ec_cobranza_cartera', { p_id: asesoraIdActual, p_pin: asesoraPin, p_gestora: ui.cobGestora || null, p_proyecto: ui.cobProy });
   return llamada.then(function(res){
     if (res.error){ ui.cobErr = (res.error.code === 'PGRST202') ? 'sin_v18' : 'red'; renderSiLibre(); return; }
     if (!res.data || !res.data.ok){
@@ -2095,15 +2106,15 @@ function cobranzaAbrirCliente(key){
   if (ui.cobDet[key]) return;
   var p = key.split('|');
   var det = ui.cobAdmin
-    ? sb.rpc('ec_cobranza_detalle_admin', { p_token: sessionToken, p_dni: p[0], p_manzana: p[1] })
-    : sb.rpc('ec_cobranza_detalle', { p_id: asesoraIdActual, p_pin: asesoraPin, p_dni: p[0], p_manzana: p[1] });
+    ? sb.rpc('ec_cobranza_detalle_admin', { p_token: sessionToken, p_dni: p[0], p_manzana: p[1], p_proyecto: ui.cobProy })
+    : sb.rpc('ec_cobranza_detalle', { p_id: asesoraIdActual, p_pin: asesoraPin, p_dni: p[0], p_manzana: p[1], p_proyecto: ui.cobProy });
   det.then(function(res){
     ui.cobDet[key] = (res.data && res.data.ok) ? res.data.cuotas : 'error';
     render();
   });
 }
 function renderCobranzaHtml(){
-  var salir = ui.cobAdmin ? '<button type="button" class="as-salir" data-action="cob-cerrar">Volver</button>' : '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
+  var salir = (ui.cobAdmin || ui.cobVer) ? '<button type="button" class="as-salir" data-action="cob-cerrar">Volver</button>' : '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
   var nombre = ui.cobAdmin ? ((identity && (identity.nombre || identity.name)) || '') : (asesoraNombreActual || '');
   if (!ui.cob){
     var msg = ui.cobErr === 'sin_v18' ? 'Falta activar la actualización de cobranza en Supabase.' : (ui.cobErr === 'red' ? 'Sin conexión. Revisa tu internet.' : 'Cargando tu cartera…');
@@ -2114,7 +2125,14 @@ function renderCobranzaHtml(){
   var pct = function(n){ return tot ? Math.round(n * 100 / tot) : 0; };
   var seg = [['Al día', r.al_dia, '#2e8b57'], ['1 mes', r.m1, '#e0a100'], ['2 meses', r.m2, '#e07b00'], ['3+ meses', r.m3, '#c0392b']];
   var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola'+(primerNombre(d.nombre || nombre) ? ', '+esc(primerNombre(d.nombre || nombre)) : '')+' 👋</div>'+
-    '<div class="as-sub">Cobranza · Vive Hogar Sullana'+(jefa ? ' · Todas las carteras' : '')+'</div></div>'+salir+'</div></div>';
+    '<div class="as-sub">Cobranza · '+esc(PROY_NOMBRES[d.proyecto || 'sullana'] || 'Vive Hogar Sullana')+(jefa ? ' · Todas las carteras' : '')+'</div></div>'+salir+'</div></div>';
+  if (ui.cobVer || ui.cobAdmin){
+    h += '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
+      return '<button type="button" class="cob-chip'+(ui.cobProy === p ? ' on' : '')+'" data-action="cob-proy" data-value="'+p+'">'+esc(toTitleCase(p))+'</button>'; }).join('')+'</div>';
+  }
+  if (!tot){
+    return h + '<div class="cob-card"><div class="cob-tit">Sin cartera de cobranza</div><p class="cob-vacio">Todavía no hay clientes con cobradora asignada en este proyecto.</p></div>';
+  }
   if (jefa && d.gestoras && d.gestoras.length){
     h += '<div class="cob-chips">'+
       '<button type="button" class="cob-chip'+(!ui.cobGestora ? ' on' : '')+'" data-action="cob-gestora" data-value="">Todas</button>'+
@@ -2219,6 +2237,7 @@ async function asesorLogin(){
 }
 
 function salirAsesorTotal(msg){
+  ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cob = null;
   salirModoAsesora();
   ui.asesorPanel = null; ui._panelJson = ''; ui.asesorCuentas = null;
   ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null; ui.sepMsg = ''; ui.asesoraError = '';
@@ -2370,7 +2389,7 @@ function renderAsesorPanelHtml(){
   if (cuentas.length > 1){
     h += '<div class="as-cuentas">'+cuentas.map(function(c){
       return '<button type="button" class="as-cuenta'+(String(c.id)===String(p.yo.id)?' on':'')+'" data-action="asesor-cuenta" data-value="'+c.id+'">'+esc(toTitleCase(c.proyecto))+'</button>';
-    }).join('')+'</div>';
+    }).join('')+(ui.cobPuede ? '<button type="button" class="as-cuenta" data-action="cob-ver">💰 Cobranza</button>' : '')+'</div>';
   }
   if (!jefe){
     var vv = yo ? yo.ventas : 0, sp = yo ? (yo.separadas || 0) : 0, v = vv + sp, m = yo ? yo.meta : 0;
@@ -4412,9 +4431,13 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'cob-etapa'){
     ui.cobEtapa = t.getAttribute('data-value') || ''; ui.cobAbierto = null; render();
   } else if (action === 'cob-abrir'){
-    ui.cobAdmin = true; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
+    ui.cobAdmin = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
+  } else if (action === 'cob-proy'){
+    ui.cobProy = t.getAttribute('data-value') || 'sullana'; ui.cobGestora = ''; ui.cobEtapa = ''; ui.cobNivel = 'todos'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {}; ui.cob = null; render(); cobranzaCargar();
+  } else if (action === 'cob-ver'){
+    ui.cobVer = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
   } else if (action === 'cob-cerrar'){
-    ui.cobAdmin = false; ui.cob = null; render();
+    ui.cobAdmin = false; ui.cobVer = false; ui.cob = null; render(); if (modoAsesor()) asesorCargarPanel();
   } else if (action === 'cob-nivel'){
     ui.cobNivel = t.getAttribute('data-value') || 'todos'; ui.cobAbierto = null; render();
   } else if (action === 'cob-gestora'){
