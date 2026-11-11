@@ -2125,7 +2125,7 @@ function renderCobranzaHtml(){
   var pct = function(n){ return tot ? Math.round(n * 100 / tot) : 0; };
   var seg = [['Al día', r.al_dia, '#2e8b57'], ['1 mes', r.m1, '#e0a100'], ['2 meses', r.m2, '#e07b00'], ['3+ meses', r.m3, '#c0392b']];
   var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola'+(primerNombre(d.nombre || nombre) ? ', '+esc(primerNombre(d.nombre || nombre)) : '')+' 👋</div>'+
-    '<div class="as-sub">Cobranza · '+esc(PROY_NOMBRES[d.proyecto || 'sullana'] || 'Vive Hogar Sullana')+(jefa ? ' · Todas las carteras' : '')+'</div></div>'+salir+'</div></div>';
+    '<div class="as-sub">'+((ui.cobVer || ui.cobAdmin) ? 'Cobranza · '+esc(PROY_NOMBRES[d.proyecto || 'sullana'] || 'Vive Hogar Sullana')+' · Todas las carteras' : (jefa ? 'Jefe de Cobranza' : 'Asesora de Cobranza'))+'</div></div>'+salir+'</div></div>';
   if (ui.cobVer || ui.cobAdmin){
     h += '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
       return '<button type="button" class="cob-chip'+(ui.cobProy === p ? ' on' : '')+'" data-action="cob-proy" data-value="'+p+'">'+esc(toTitleCase(p))+'</button>'; }).join('')+'</div>';
