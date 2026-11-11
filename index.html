@@ -1457,6 +1457,7 @@ function renderHeader(){
       '<button type="button" data-action="set-proyecto" data-value="2" class="'+(ui.fProyecto==='2'?'active':'')+'">Sullana</button>'+
       '<button type="button" data-action="set-proyecto" data-value="3" class="'+(ui.fProyecto==='3'?'active':'')+'">Ejidos</button>'+
       '<button type="button" data-action="set-proyecto" data-value="4" class="'+(ui.fProyecto==='4'?'active':'')+'">Lambayeque</button>'+
+      (esAdmin() ? '<button type="button" data-action="cob-abrir" class="'+(ui.cobAdmin?'active':'')+'">Cobranza</button>' : '')+
     '</div>')+
   '</div></div>';
 }
@@ -2064,7 +2065,7 @@ function asesorCargarPanel(){
 }
 
 // ---------- Cobranza: dashboard de cartera para cobradoras y jefatura ----------
-ui.cob = null; ui.cobErr = ''; ui.cobGestora = ''; ui.cobNivel = 'todos'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {};
+ui.cob = null; ui.cobErr = ''; ui.cobGestora = ''; ui.cobNivel = 'todos'; ui.cobEtapa = ''; ui.cobAdmin = false; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {};
 function esCobranza(){
   var c = asesorCuentas().filter(function(x){ return String(x.id) === String(asesoraIdActual); })[0];
   return !!(c && (c.rol === 'cobradora' || c.rol === 'jefa_cobranza'));
@@ -2073,11 +2074,14 @@ function cobS(n){ return 'S/ ' + Number(n || 0).toLocaleString('es-PE', {minimum
 function cobF(iso){ if (!iso) return '—'; var p = String(iso).slice(0, 10).split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '—'; }
 function cobKey(c){ return String(c.dni) + '|' + String(c.manzana) + '|' + String(c.lote); }
 function cobranzaCargar(){
-  if (!asesoraPin || !asesoraIdActual) return Promise.resolve();
-  return sb.rpc('ec_cobranza_cartera', { p_id: asesoraIdActual, p_pin: asesoraPin, p_gestora: ui.cobGestora || null }).then(function(res){
+  if (ui.cobAdmin ? !sessionToken : (!asesoraPin || !asesoraIdActual)) return Promise.resolve();
+  var llamada = ui.cobAdmin
+    ? sb.rpc('ec_cobranza_cartera_admin', { p_token: sessionToken, p_gestora: ui.cobGestora || null })
+    : sb.rpc('ec_cobranza_cartera', { p_id: asesoraIdActual, p_pin: asesoraPin, p_gestora: ui.cobGestora || null });
+  return llamada.then(function(res){
     if (res.error){ ui.cobErr = (res.error.code === 'PGRST202') ? 'sin_v18' : 'red'; renderSiLibre(); return; }
     if (!res.data || !res.data.ok){
-      if (res.data && res.data.error === 'codigo') salirAsesorTotal('Tu sesión venció. Ingresa de nuevo.');
+      if (res.data && res.data.error === 'codigo'){ if (ui.cobAdmin){ ui.cobAdmin = false; render(); toast('No tienes acceso a cobranza.'); } else salirAsesorTotal('Tu sesión venció. Ingresa de nuevo.'); }
       return;
     }
     var antes = JSON.stringify(ui.cob);
@@ -2090,14 +2094,17 @@ function cobranzaAbrirCliente(key){
   ui.cobAbierto = key; render();
   if (ui.cobDet[key]) return;
   var p = key.split('|');
-  sb.rpc('ec_cobranza_detalle', { p_id: asesoraIdActual, p_pin: asesoraPin, p_dni: p[0], p_manzana: p[1] }).then(function(res){
+  var det = ui.cobAdmin
+    ? sb.rpc('ec_cobranza_detalle_admin', { p_token: sessionToken, p_dni: p[0], p_manzana: p[1] })
+    : sb.rpc('ec_cobranza_detalle', { p_id: asesoraIdActual, p_pin: asesoraPin, p_dni: p[0], p_manzana: p[1] });
+  det.then(function(res){
     ui.cobDet[key] = (res.data && res.data.ok) ? res.data.cuotas : 'error';
     render();
   });
 }
 function renderCobranzaHtml(){
-  var salir = '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
-  var nombre = asesoraNombreActual || '';
+  var salir = ui.cobAdmin ? '<button type="button" class="as-salir" data-action="cob-cerrar">Volver</button>' : '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
+  var nombre = ui.cobAdmin ? ((identity && (identity.nombre || identity.name)) || '') : (asesoraNombreActual || '');
   if (!ui.cob){
     var msg = ui.cobErr === 'sin_v18' ? 'Falta activar la actualización de cobranza en Supabase.' : (ui.cobErr === 'red' ? 'Sin conexión. Revisa tu internet.' : 'Cargando tu cartera…');
     return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">'+esc(msg)+'</div></div>'+salir+'</div></div>';
@@ -2106,8 +2113,8 @@ function renderCobranzaHtml(){
   var tot = r.clientes || 0;
   var pct = function(n){ return tot ? Math.round(n * 100 / tot) : 0; };
   var seg = [['Al día', r.al_dia, '#2e8b57'], ['1 mes', r.m1, '#e0a100'], ['2 meses', r.m2, '#e07b00'], ['3+ meses', r.m3, '#c0392b']];
-  var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola, '+esc(primerNombre(d.nombre || nombre))+' 👋</div>'+
-    '<div class="as-sub">Cobranza · Vive Hogar Sullana'+(jefa ? ' · Jefatura' : '')+'</div></div>'+salir+'</div></div>';
+  var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola'+(primerNombre(d.nombre || nombre) ? ', '+esc(primerNombre(d.nombre || nombre)) : '')+' 👋</div>'+
+    '<div class="as-sub">Cobranza · Vive Hogar Sullana'+(jefa ? ' · Todas las carteras' : '')+'</div></div>'+salir+'</div></div>';
   if (jefa && d.gestoras && d.gestoras.length){
     h += '<div class="cob-chips">'+
       '<button type="button" class="cob-chip'+(!ui.cobGestora ? ' on' : '')+'" data-action="cob-gestora" data-value="">Todas</button>'+
@@ -2122,7 +2129,10 @@ function renderCobranzaHtml(){
     '<div class="cob-mora">Deuda vencida total: <b>'+cobS(r.mora)+'</b></div></div>';
   // lista
   var q = String(ui.cobBusca || '').trim().toLowerCase();
+  var etapas = []; (d.clientes || []).forEach(function(c){ var e = String(c.etapa || '').trim(); if (e && etapas.indexOf(e) < 0) etapas.push(e); });
+  etapas.sort(function(a, b){ return (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0); });
   var lista = (d.clientes || []).filter(function(c){
+    if (ui.cobEtapa && String(c.etapa || '').trim() !== ui.cobEtapa) return false;
     if (ui.cobNivel === '1' && c.vencidas !== 1) return false;
     if (ui.cobNivel === '2' && c.vencidas !== 2) return false;
     if (ui.cobNivel === '3' && c.vencidas < 3) return false;
@@ -2133,6 +2143,8 @@ function renderCobranzaHtml(){
   h += '<div class="cob-tit" style="margin:14px 2px 6px">Tus clientes ('+lista.length+')</div>'+
     '<div class="cob-chips">'+[['todos','Todos'],['3','3+ meses'],['2','2 meses'],['1','1 mes'],['0','Al día']].map(function(f){
       return '<button type="button" class="cob-chip'+(ui.cobNivel === f[0] ? ' on' : '')+'" data-action="cob-nivel" data-value="'+f[0]+'">'+f[1]+'</button>'; }).join('')+'</div>'+
+    (etapas.length > 1 ? '<div class="cob-chips"><button type="button" class="cob-chip'+(!ui.cobEtapa ? ' on' : '')+'" data-action="cob-etapa" data-value="">Todas las etapas</button>'+
+      etapas.map(function(e){ return '<button type="button" class="cob-chip'+(ui.cobEtapa === e ? ' on' : '')+'" data-action="cob-etapa" data-value="'+esc(e)+'">Etapa '+esc(e)+'</button>'; }).join('')+'</div>' : '')+
     '<input class="cob-busca" type="search" placeholder="Buscar por nombre, DNI o manzana…" value="'+esc(ui.cobBusca || '')+'" data-ui="cobBusca" data-rerender="1" />';
   if (!lista.length) h += '<p class="cob-vacio">No hay clientes con ese filtro.</p>';
   lista.slice(0, 300).forEach(function(c){
@@ -2143,7 +2155,7 @@ function renderCobranzaHtml(){
       '<button type="button" class="cob-cli-top" data-action="cob-cliente" data-value="'+esc(k)+'">'+
         '<span class="cob-dot" style="background:'+col+'"></span>'+
         '<span class="cob-cli-main"><b>'+esc(toTitleCase(c.nombre || ''))+'</b>'+
-        '<small>Mz '+esc(c.manzana)+' · Lt '+esc(c.lote)+' · DNI '+esc(c.dni)+(jefa && c.gestora ? ' · '+esc(primerNombre(toTitleCase(c.gestora))) : '')+'</small></span>'+
+        '<small>'+(c.etapa ? 'Etapa '+esc(c.etapa)+' · ' : '')+'Mz '+esc(c.manzana)+' · Lt '+esc(c.lote)+' · DNI '+esc(c.dni)+(jefa && c.gestora ? ' · '+esc(primerNombre(toTitleCase(c.gestora))) : '')+'</small></span>'+
         '<span class="cob-cli-der"><b style="color:'+col+'">'+et+'</b>'+(c.vencidas ? '<small>'+cobS(c.mora)+'</small>' : '<small>Último pago '+cobF(c.ultimo_pago)+'</small>')+'</span>'+
       '</button>';
     if (abierto){
@@ -4167,6 +4179,7 @@ function renderApp(){
   else if (ui.view === 'cuotas') body = renderCuotas();
   else body = renderHome();
 
+  if (ui.cobAdmin && esAdmin()) body = '<div class="interesado-screen">'+renderCobranzaHtml()+'</div>';
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
   if (demoMarket) html = '<div class="demo-banner">👁️ Cuenta de vista · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">← Volver a la vista de asesor</button></div>' + html;
   var app = document.getElementById('app');
@@ -4226,6 +4239,7 @@ document.addEventListener('click', async function(ev){
   if (!t) return;
   var action = t.getAttribute('data-action');
   var value = t.getAttribute('data-value');
+  if (ui.cobAdmin && (action === 'set-proyecto' || action === 'nav')){ ui.cobAdmin = false; ui.cob = null; }
 
   // Cuenta de vista mirando el marketplace: solo se puede mirar
   if (modoAsesor() && asesorSoloLectura && ui.demoMarket){
@@ -4395,6 +4409,12 @@ document.addEventListener('click', async function(ev){
     if (confirm('¿Salir de tu cuenta de asesor?')){ salirAsesorTotal(); }
   } else if (action === 'cob-cliente'){
     cobranzaAbrirCliente(t.getAttribute('data-value'));
+  } else if (action === 'cob-etapa'){
+    ui.cobEtapa = t.getAttribute('data-value') || ''; ui.cobAbierto = null; render();
+  } else if (action === 'cob-abrir'){
+    ui.cobAdmin = true; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
+  } else if (action === 'cob-cerrar'){
+    ui.cobAdmin = false; ui.cob = null; render();
   } else if (action === 'cob-nivel'){
     ui.cobNivel = t.getAttribute('data-value') || 'todos'; ui.cobAbierto = null; render();
   } else if (action === 'cob-gestora'){
