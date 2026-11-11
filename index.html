@@ -765,6 +765,39 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .as-login-logo{display:block;width:150px;max-width:60%;margin:0 auto;}
 .as-err{color:var(--danger);font-size:0.82rem;margin-top:10px;font-weight:600;}
 .as-hero{background:linear-gradient(135deg,#397EAD,#27608c);color:#fff;border-radius:18px;padding:16px;margin:12px 0 14px;box-shadow:0 10px 24px -12px rgba(20,60,100,0.6);}
+.cob-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 12px;}
+.cob-kpi{background:#fff;border:2px solid #d9e2ea;border-radius:12px;padding:8px 2px;text-align:center;}
+.cob-kpi b{display:block;font-size:1.25rem;line-height:1.1;color:#1f3b52;}
+.cob-kpi span{display:block;font-size:0.64rem;color:#5b6b78;margin-top:2px;}
+.cob-card{background:#fff;border:1px solid #d9e2ea;border-radius:14px;padding:12px;margin-bottom:6px;}
+.cob-tit{font-weight:700;color:#1f3b52;font-size:0.95rem;margin-bottom:8px;}
+.cob-bar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#eef2f6;}
+.cob-bar i{display:block;height:100%;}
+.cob-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:0.74rem;color:#44525e;}
+.cob-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;}
+.cob-mora{margin-top:10px;font-size:0.85rem;color:#44525e;}
+.cob-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;}
+.cob-chip{border:1px solid #c5d2dd;background:#fff;color:#1f3b52;border-radius:999px;padding:6px 12px;font-size:0.8rem;cursor:pointer;}
+.cob-chip.on{background:#397EAD;border-color:#397EAD;color:#fff;}
+.cob-busca{width:100%;box-sizing:border-box;border:1px solid #c5d2dd;border-radius:10px;padding:10px 12px;font-size:0.9rem;margin-bottom:8px;}
+.cob-cli{background:#fff;border:1px solid #d9e2ea;border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.cob-cli-top{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:10px 12px;text-align:left;cursor:pointer;font:inherit;}
+.cob-dot{width:10px;height:10px;border-radius:50%;flex:none;}
+.cob-cli-main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.cob-cli-main b{font-size:0.88rem;color:#1f3b52;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cob-cli-main small,.cob-cli-der small{font-size:0.72rem;color:#5b6b78;}
+.cob-cli-der{display:flex;flex-direction:column;align-items:flex-end;text-align:right;flex:none;}
+.cob-cli-der b{font-size:0.78rem;}
+.cob-det{border-top:1px solid #e4ebf1;padding:8px 12px 10px;background:#f7fafc;max-height:380px;overflow:auto;}
+.cob-det-res{font-size:0.78rem;color:#44525e;margin-bottom:8px;}
+.cob-cuota{border-bottom:1px solid #e4ebf1;padding:6px 0;}
+.cob-cuota.venc{background:#fdecea;margin:0 -12px;padding:6px 12px;}
+.cob-cuota-t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:0.8rem;}
+.cob-cuota-t span{color:#5b6b78;}
+.cob-cuota-t em{margin-left:auto;font-style:normal;font-weight:700;font-size:0.74rem;color:#44525e;}
+.cob-cuota.venc em{color:#c0392b;}
+.cob-cuota-m{font-size:0.74rem;color:#5b6b78;margin-top:2px;}
+.cob-vacio{font-size:0.82rem;color:#5b6b78;margin:8px 2px;}
 .as-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 .as-hello{font-size:1.2rem;font-weight:800;line-height:1.2;}
 .as-sub{font-size:0.8rem;opacity:0.88;margin-top:3px;}
@@ -1978,6 +2011,7 @@ function renderSiLibre(){
 var CASTILLA_ETAPAS_VISIBLES = ['16'];
 function asesorCargarPanel(){
   if (!asesoraPin || !asesoraIdActual) return Promise.resolve();
+  if (esCobranza()) return cobranzaCargar();
   return sb.rpc('ec_panel_asesor', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(async function(res){
     if (res.error){
       ui.asesorPanelError = (res.error.code === 'PGRST202') ? 'sin_v7' : 'red';
@@ -2027,6 +2061,113 @@ function asesorCargarPanel(){
     try { localStorage.setItem('ec_asesor_proy_v1', res.data.yo.proyecto); } catch(e){}
     if (cambio || ui.renderPendiente) renderSiLibre();
   });
+}
+
+// ---------- Cobranza: dashboard de cartera para cobradoras y jefatura ----------
+ui.cob = null; ui.cobErr = ''; ui.cobGestora = ''; ui.cobNivel = 'todos'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {};
+function esCobranza(){
+  var c = asesorCuentas().filter(function(x){ return String(x.id) === String(asesoraIdActual); })[0];
+  return !!(c && (c.rol === 'cobradora' || c.rol === 'jefa_cobranza'));
+}
+function cobS(n){ return 'S/ ' + Number(n || 0).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function cobF(iso){ if (!iso) return '—'; var p = String(iso).slice(0, 10).split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '—'; }
+function cobKey(c){ return String(c.dni) + '|' + String(c.manzana) + '|' + String(c.lote); }
+function cobranzaCargar(){
+  if (!asesoraPin || !asesoraIdActual) return Promise.resolve();
+  return sb.rpc('ec_cobranza_cartera', { p_id: asesoraIdActual, p_pin: asesoraPin, p_gestora: ui.cobGestora || null }).then(function(res){
+    if (res.error){ ui.cobErr = (res.error.code === 'PGRST202') ? 'sin_v18' : 'red'; renderSiLibre(); return; }
+    if (!res.data || !res.data.ok){
+      if (res.data && res.data.error === 'codigo') salirAsesorTotal('Tu sesión venció. Ingresa de nuevo.');
+      return;
+    }
+    var antes = JSON.stringify(ui.cob);
+    ui.cobErr = ''; ui.cob = res.data;
+    if (antes !== JSON.stringify(ui.cob) || ui.renderPendiente) renderSiLibre();
+  });
+}
+function cobranzaAbrirCliente(key){
+  if (ui.cobAbierto === key){ ui.cobAbierto = null; render(); return; }
+  ui.cobAbierto = key; render();
+  if (ui.cobDet[key]) return;
+  var p = key.split('|');
+  sb.rpc('ec_cobranza_detalle', { p_id: asesoraIdActual, p_pin: asesoraPin, p_dni: p[0], p_manzana: p[1] }).then(function(res){
+    ui.cobDet[key] = (res.data && res.data.ok) ? res.data.cuotas : 'error';
+    render();
+  });
+}
+function renderCobranzaHtml(){
+  var salir = '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
+  var nombre = asesoraNombreActual || '';
+  if (!ui.cob){
+    var msg = ui.cobErr === 'sin_v18' ? 'Falta activar la actualización de cobranza en Supabase.' : (ui.cobErr === 'red' ? 'Sin conexión. Revisa tu internet.' : 'Cargando tu cartera…');
+    return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">'+esc(msg)+'</div></div>'+salir+'</div></div>';
+  }
+  var d = ui.cob, r = d.resumen || {}, jefa = d.rol === 'jefa_cobranza';
+  var tot = r.clientes || 0;
+  var pct = function(n){ return tot ? Math.round(n * 100 / tot) : 0; };
+  var seg = [['Al día', r.al_dia, '#2e8b57'], ['1 mes', r.m1, '#e0a100'], ['2 meses', r.m2, '#e07b00'], ['3+ meses', r.m3, '#c0392b']];
+  var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola, '+esc(primerNombre(d.nombre || nombre))+' 👋</div>'+
+    '<div class="as-sub">Cobranza · Vive Hogar Sullana'+(jefa ? ' · Jefatura' : '')+'</div></div>'+salir+'</div></div>';
+  if (jefa && d.gestoras && d.gestoras.length){
+    h += '<div class="cob-chips">'+
+      '<button type="button" class="cob-chip'+(!ui.cobGestora ? ' on' : '')+'" data-action="cob-gestora" data-value="">Todas</button>'+
+      d.gestoras.map(function(g){ return '<button type="button" class="cob-chip'+(ui.cobGestora === g ? ' on' : '')+'" data-action="cob-gestora" data-value="'+esc(g)+'">'+esc(primerNombre(toTitleCase(g)))+'</button>'; }).join('')+'</div>';
+  }
+  h += '<div class="cob-kpis">'+
+    '<div class="cob-kpi"><b>'+tot+'</b><span>Clientes</span></div>'+
+    seg.map(function(s){ return '<div class="cob-kpi" style="border-color:'+s[2]+'"><b style="color:'+s[2]+'">'+(s[1] || 0)+'</b><span>'+s[0]+'</span></div>'; }).join('')+'</div>';
+  h += '<div class="cob-card"><div class="cob-tit">Morosidad de la cartera</div>'+
+    '<div class="cob-bar">'+seg.map(function(s){ var w = tot ? ((s[1] || 0) * 100 / tot) : 0; return w > 0 ? '<i style="width:'+w+'%;background:'+s[2]+'"></i>' : ''; }).join('')+'</div>'+
+    '<div class="cob-leg">'+seg.map(function(s){ return '<span><i style="background:'+s[2]+'"></i>'+s[0]+' '+pct(s[1] || 0)+'%</span>'; }).join('')+'</div>'+
+    '<div class="cob-mora">Deuda vencida total: <b>'+cobS(r.mora)+'</b></div></div>';
+  // lista
+  var q = String(ui.cobBusca || '').trim().toLowerCase();
+  var lista = (d.clientes || []).filter(function(c){
+    if (ui.cobNivel === '1' && c.vencidas !== 1) return false;
+    if (ui.cobNivel === '2' && c.vencidas !== 2) return false;
+    if (ui.cobNivel === '3' && c.vencidas < 3) return false;
+    if (ui.cobNivel === '0' && c.vencidas !== 0) return false;
+    if (q && (String(c.nombre || '') + ' ' + c.dni + ' ' + c.manzana + c.lote).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  h += '<div class="cob-tit" style="margin:14px 2px 6px">Tus clientes ('+lista.length+')</div>'+
+    '<div class="cob-chips">'+[['todos','Todos'],['3','3+ meses'],['2','2 meses'],['1','1 mes'],['0','Al día']].map(function(f){
+      return '<button type="button" class="cob-chip'+(ui.cobNivel === f[0] ? ' on' : '')+'" data-action="cob-nivel" data-value="'+f[0]+'">'+f[1]+'</button>'; }).join('')+'</div>'+
+    '<input class="cob-busca" type="search" placeholder="Buscar por nombre, DNI o manzana…" value="'+esc(ui.cobBusca || '')+'" data-ui="cobBusca" data-rerender="1" />';
+  if (!lista.length) h += '<p class="cob-vacio">No hay clientes con ese filtro.</p>';
+  lista.slice(0, 300).forEach(function(c){
+    var k = cobKey(c), abierto = ui.cobAbierto === k;
+    var col = c.vencidas >= 3 ? '#c0392b' : (c.vencidas === 2 ? '#e07b00' : (c.vencidas === 1 ? '#e0a100' : '#2e8b57'));
+    var et = c.vencidas === 0 ? 'Al día' : (c.vencidas + (c.vencidas === 1 ? ' cuota' : ' cuotas') + ' vencida' + (c.vencidas === 1 ? '' : 's'));
+    h += '<div class="cob-cli'+(abierto ? ' open' : '')+'">'+
+      '<button type="button" class="cob-cli-top" data-action="cob-cliente" data-value="'+esc(k)+'">'+
+        '<span class="cob-dot" style="background:'+col+'"></span>'+
+        '<span class="cob-cli-main"><b>'+esc(toTitleCase(c.nombre || ''))+'</b>'+
+        '<small>Mz '+esc(c.manzana)+' · Lt '+esc(c.lote)+' · DNI '+esc(c.dni)+(jefa && c.gestora ? ' · '+esc(primerNombre(toTitleCase(c.gestora))) : '')+'</small></span>'+
+        '<span class="cob-cli-der"><b style="color:'+col+'">'+et+'</b>'+(c.vencidas ? '<small>'+cobS(c.mora)+'</small>' : '<small>Último pago '+cobF(c.ultimo_pago)+'</small>')+'</span>'+
+      '</button>';
+    if (abierto){
+      var det = ui.cobDet[k];
+      h += '<div class="cob-det">';
+      if (!det) h += '<p class="cob-vacio">Cargando pagos…</p>';
+      else if (det === 'error') h += '<p class="cob-vacio">No se pudo cargar el detalle.</p>';
+      else {
+        h += '<div class="cob-det-res">Más antigua vencida: <b>'+cobF(c.mas_antigua)+'</b> · Próxima cuota: <b>'+cobF(c.proxima)+'</b></div>';
+        var hoy = d.hoy;
+        h += det.map(function(q2){
+          var venc = q2.saldo > 0 && q2.vence && String(q2.vence) < String(hoy) && !/BFH/i.test(q2.forma || '');
+          var pag = !(q2.saldo > 0);
+          return '<div class="cob-cuota'+(venc ? ' venc' : '')+'"><div class="cob-cuota-t"><b>'+esc(q2.tipo || 'Cuota')+'</b><span>Vence '+cobF(q2.vence)+'</span>'+
+            '<em>'+(pag ? 'Pagada' + (q2.fecha_pago ? ' ' + cobF(q2.fecha_pago) : '') : (venc ? 'Vencida' : 'Pendiente'))+'</em></div>'+
+            '<div class="cob-cuota-m">Monto '+cobS(q2.monto)+' · Pagado '+cobS(q2.pagado)+' · Saldo '+cobS(q2.saldo)+'</div></div>';
+        }).join('');
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  });
+  if (lista.length > 300) h += '<p class="cob-vacio">Se muestran los 300 primeros. Usa el buscador.</p>';
+  return h;
 }
 
 async function asesorLogin(){
@@ -2191,6 +2332,7 @@ function renderAsesorLogin(){
 }
 
 function renderAsesorPanelHtml(){
+  if (esCobranza()) return renderCobranzaHtml();
   var p = ui.asesorPanel;
   var salir = '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
   if (!p){
@@ -3844,6 +3986,7 @@ function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var esAsesor = modoAsesor();
   var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
+  if (esAsesor && esCobranza()) return '<div class="interesado-screen" style="padding-bottom:64px;">'+renderCobranzaHtml()+'</div>';
   var html = '<div class="interesado-screen" style="padding-bottom:64px;">';
   if (esAsesor){
     html += renderAsesorPanelHtml();
@@ -4250,6 +4393,12 @@ document.addEventListener('click', async function(ev){
     asesorLogin();
   } else if (action === 'asesor-salir'){
     if (confirm('¿Salir de tu cuenta de asesor?')){ salirAsesorTotal(); }
+  } else if (action === 'cob-cliente'){
+    cobranzaAbrirCliente(t.getAttribute('data-value'));
+  } else if (action === 'cob-nivel'){
+    ui.cobNivel = t.getAttribute('data-value') || 'todos'; ui.cobAbierto = null; render();
+  } else if (action === 'cob-gestora'){
+    ui.cobGestora = t.getAttribute('data-value') || ''; ui.cobAbierto = null; ui.cob = null; render(); cobranzaCargar();
   } else if (action === 'asesor-cuenta'){
     asesorCambiarCuenta(t.getAttribute('data-value'));
   } else if (action === 'asesor-etapa-toggle'){
