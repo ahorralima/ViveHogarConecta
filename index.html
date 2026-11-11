@@ -761,11 +761,14 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .as-login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 18px;box-shadow:0 14px 34px -14px rgba(15,40,70,0.35);}
 .as-login-card h2{font-size:1.35rem;font-weight:800;color:var(--ink);margin:10px 0 2px;text-align:center;}
 .as-login-card p.as-login-sub{font-size:0.86rem;color:var(--ink-soft);text-align:center;margin-bottom:14px;}
+/* iPhone: un campo con letra menor a 16px hace zoom al tocarlo y la pantalla queda ampliada y cortada despues de entrar */
+.as-login-card .text-input,.as-login-card input,.cob-busca{font-size:16px;}
 .as-login-card label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink-soft);margin:10px 0 4px;}
 .as-login-logo{display:block;width:150px;max-width:60%;margin:0 auto;}
 .as-err{color:var(--danger);font-size:0.82rem;margin-top:10px;font-weight:600;}
 .as-hero{background:linear-gradient(135deg,#397EAD,#27608c);color:#fff;border-radius:18px;padding:16px;margin:12px 0 14px;box-shadow:0 10px 24px -12px rgba(20,60,100,0.6);}
-.cob-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 12px;}
+.cob-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 12px;}
+.cob-wrap{overflow-x:hidden;box-sizing:border-box;}
 .cob-kpi{background:#fff;border:2px solid #d9e2ea;border-radius:12px;padding:8px 2px;text-align:center;}
 .cob-kpi b{display:block;font-size:1.25rem;line-height:1.1;color:#1f3b52;}
 .cob-kpi span{display:block;font-size:0.64rem;color:#5b6b78;margin-top:2px;}
@@ -781,12 +784,12 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cob-chip.on{background:#397EAD;border-color:#397EAD;color:#fff;}
 .cob-busca{width:100%;box-sizing:border-box;border:1px solid #c5d2dd;border-radius:10px;padding:10px 12px;font-size:0.9rem;margin-bottom:8px;}
 .cob-cli{background:#fff;border:1px solid #d9e2ea;border-radius:12px;margin-bottom:8px;overflow:hidden;}
-.cob-cli-top{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:10px 12px;text-align:left;cursor:pointer;font:inherit;}
+.cob-cli-top{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;max-width:100%;box-sizing:border-box;background:none;border:0;padding:10px 12px;text-align:left;cursor:pointer;font:inherit;}
 .cob-dot{width:10px;height:10px;border-radius:50%;flex:none;}
-.cob-cli-main{flex:1;min-width:0;display:flex;flex-direction:column;}
-.cob-cli-main b{font-size:0.88rem;color:#1f3b52;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cob-cli-main{min-width:0;display:flex;flex-direction:column;overflow-wrap:anywhere;}
+.cob-cli-main b{font-size:0.88rem;color:#1f3b52;white-space:normal;overflow-wrap:anywhere;}
 .cob-cli-main small,.cob-cli-der small{font-size:0.72rem;color:#5b6b78;}
-.cob-cli-der{display:flex;flex-direction:column;align-items:flex-end;text-align:right;flex:none;}
+.cob-cli-der{display:flex;flex-direction:column;align-items:flex-end;text-align:right;max-width:46vw;}
 .cob-cli-der b{font-size:0.78rem;}
 .cob-det{border-top:1px solid #e4ebf1;padding:8px 12px 10px;background:#f7fafc;max-height:380px;overflow:auto;}
 .cob-det-res{font-size:0.78rem;color:#44525e;margin-bottom:8px;}
@@ -4017,7 +4020,7 @@ function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var esAsesor = modoAsesor();
   var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
-  if (esAsesor && esCobranza()) return '<div class="interesado-screen" style="padding-bottom:64px;">'+renderCobranzaHtml()+'</div>';
+  if (esAsesor && esCobranza()) return '<div class="interesado-screen cob-wrap" style="padding-bottom:64px;">'+renderCobranzaHtml()+'</div>';
   var html = '<div class="interesado-screen" style="padding-bottom:64px;">';
   if (esAsesor){
     html += renderAsesorPanelHtml();
@@ -4198,7 +4201,7 @@ function renderApp(){
   else if (ui.view === 'cuotas') body = renderCuotas();
   else body = renderHome();
 
-  if (ui.cobAdmin && esAdmin()) body = '<div class="interesado-screen">'+renderCobranzaHtml()+'</div>';
+  if (ui.cobAdmin && esAdmin()) body = '<div class="interesado-screen cob-wrap">'+renderCobranzaHtml()+'</div>';
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
   if (demoMarket) html = '<div class="demo-banner">👁️ Cuenta de vista · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">← Volver a la vista de asesor</button></div>' + html;
   var app = document.getElementById('app');
