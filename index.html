@@ -2115,6 +2115,7 @@ function cobranzaCargar(){
       return;
     }
     var antes = JSON.stringify(ui.cob);
+    if (res.data.fijo && res.data.proyecto) ui.cobProy = res.data.proyecto;
     ui.cobErr = ''; ui.cob = res.data;
     if (antes !== JSON.stringify(ui.cob) || ui.renderPendiente) renderSiLibre();
   });
@@ -2158,7 +2159,7 @@ function renderCobranzaHtml(){
   var seg = [['Al día', r.al_dia, '#2e8b57'], ['1 mes', r.m1, '#e0a100'], ['2 meses', r.m2, '#e07b00'], ['3+ meses', r.m3, '#c0392b']];
   var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola'+(primerNombre(d.nombre || nombre) ? ', '+esc(primerNombre(d.nombre || nombre)) : '')+' 👋</div>'+
     '<div class="as-sub">'+((ui.cobVer || ui.cobAdmin) ? 'Cobranza · '+esc(PROY_NOMBRES[d.proyecto || 'sullana'] || 'Vive Hogar Sullana')+' · Todas las carteras' : (jefa ? 'Jefe de Cobranza' : 'Asesora de Cobranza'))+'</div></div>'+salir+'</div>'+
-    ((ui.cobVer || ui.cobAdmin) ? '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
+    (((ui.cobVer || ui.cobAdmin) && !d.fijo) ? '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
       return '<button type="button" class="cob-chip'+(ui.cobProy === p ? ' on' : '')+'" data-action="cob-proy" data-value="'+p+'">'+esc(toTitleCase(p))+'</button>'; }).join('')+'</div>' : '')+
     '</div>';
   if (!tot){
