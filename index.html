@@ -782,6 +782,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cob-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;}
 .cob-chip{border:1px solid #c5d2dd;background:#fff;color:#1f3b52;border-radius:999px;padding:6px 12px;font-size:0.8rem;cursor:pointer;}
 .cob-chip.on{background:#397EAD;border-color:#397EAD;color:#fff;}
+.as-hero .cob-chips{margin:12px 0 0;}
+.as-hero .cob-chip{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.35);color:#fff;}
+.as-hero .cob-chip.on{background:#fff;border-color:#fff;color:#27608c;font-weight:600;}
 .cob-busca{width:100%;box-sizing:border-box;border:1px solid #c5d2dd;border-radius:10px;padding:10px 12px;font-size:0.9rem;margin-bottom:8px;}
 .cob-cli{background:#fff;border:1px solid #d9e2ea;border-radius:12px;margin-bottom:8px;overflow:hidden;}
 .cob-cli-top{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;max-width:100%;box-sizing:border-box;background:none;border:0;padding:10px 12px;text-align:left;cursor:pointer;font:inherit;}
@@ -2128,11 +2131,10 @@ function renderCobranzaHtml(){
   var pct = function(n){ return tot ? Math.round(n * 100 / tot) : 0; };
   var seg = [['Al día', r.al_dia, '#2e8b57'], ['1 mes', r.m1, '#e0a100'], ['2 meses', r.m2, '#e07b00'], ['3+ meses', r.m3, '#c0392b']];
   var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Hola'+(primerNombre(d.nombre || nombre) ? ', '+esc(primerNombre(d.nombre || nombre)) : '')+' 👋</div>'+
-    '<div class="as-sub">'+((ui.cobVer || ui.cobAdmin) ? 'Cobranza · '+esc(PROY_NOMBRES[d.proyecto || 'sullana'] || 'Vive Hogar Sullana')+' · Todas las carteras' : (jefa ? 'Jefe de Cobranza' : 'Asesora de Cobranza'))+'</div></div>'+salir+'</div></div>';
-  if (ui.cobVer || ui.cobAdmin){
-    h += '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
-      return '<button type="button" class="cob-chip'+(ui.cobProy === p ? ' on' : '')+'" data-action="cob-proy" data-value="'+p+'">'+esc(toTitleCase(p))+'</button>'; }).join('')+'</div>';
-  }
+    '<div class="as-sub">'+((ui.cobVer || ui.cobAdmin) ? 'Cobranza · '+esc(PROY_NOMBRES[d.proyecto || 'sullana'] || 'Vive Hogar Sullana')+' · Todas las carteras' : (jefa ? 'Jefe de Cobranza' : 'Asesora de Cobranza'))+'</div></div>'+salir+'</div>'+
+    ((ui.cobVer || ui.cobAdmin) ? '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
+      return '<button type="button" class="cob-chip'+(ui.cobProy === p ? ' on' : '')+'" data-action="cob-proy" data-value="'+p+'">'+esc(toTitleCase(p))+'</button>'; }).join('')+'</div>' : '')+
+    '</div>';
   if (!tot){
     return h + '<div class="cob-card"><div class="cob-tit">Sin cartera de cobranza</div><p class="cob-vacio">Todavía no hay clientes con cobradora asignada en este proyecto.</p></div>';
   }
@@ -2148,6 +2150,16 @@ function renderCobranzaHtml(){
     '<div class="cob-bar">'+seg.map(function(s){ var w = tot ? ((s[1] || 0) * 100 / tot) : 0; return w > 0 ? '<i style="width:'+w+'%;background:'+s[2]+'"></i>' : ''; }).join('')+'</div>'+
     '<div class="cob-leg">'+seg.map(function(s){ return '<span><i style="background:'+s[2]+'"></i>'+s[0]+' '+pct(s[1] || 0)+'%</span>'; }).join('')+'</div>'+
     '<div class="cob-mora">Deuda vencida total: <b>'+cobS(r.mora)+'</b></div></div>';
+  if (ui.cobEtapa){
+    var ce = (d.clientes || []).filter(function(c){ return String(c.etapa || '').trim() === ui.cobEtapa; });
+    var te = ce.length, me = 0, ne = [0, 0, 0, 0];
+    ce.forEach(function(c){ me += Number(c.mora) || 0; ne[c.vencidas >= 3 ? 3 : (c.vencidas || 0)]++; });
+    var ordenSeg = [0, 1, 2, 3];
+    h += '<div class="cob-card"><div class="cob-tit">Morosidad · Etapa '+esc(ui.cobEtapa)+' <span style="font-weight:400;color:#6b7a88">('+te+' clientes)</span></div>'+
+      '<div class="cob-bar">'+ordenSeg.map(function(i){ var w = te ? ne[i] * 100 / te : 0; return w > 0 ? '<i style="width:'+w+'%;background:'+seg[i][2]+'"></i>' : ''; }).join('')+'</div>'+
+      '<div class="cob-leg">'+ordenSeg.map(function(i){ return '<span><i style="background:'+seg[i][2]+'"></i>'+seg[i][0]+' '+(te ? Math.round(ne[i] * 100 / te) : 0)+'% ('+ne[i]+')</span>'; }).join('')+'</div>'+
+      '<div class="cob-mora">Deuda vencida de la etapa: <b>'+cobS(me)+'</b></div></div>';
+  }
   // lista
   var q = String(ui.cobBusca || '').trim().toLowerCase();
   var etapas = []; (d.clientes || []).forEach(function(c){ var e = String(c.etapa || '').trim(); if (e && etapas.indexOf(e) < 0) etapas.push(e); });
