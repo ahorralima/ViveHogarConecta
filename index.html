@@ -779,6 +779,19 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cob-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:0.74rem;color:#44525e;}
 .cob-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;}
 .cob-mora{margin-top:10px;font-size:0.85rem;color:#44525e;}
+.cob-dona{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;}
+.cob-dona svg{width:150px;height:150px;flex:none;}
+.cob-dona-c{font-weight:700;fill:#1f3b52;}
+.cob-dona-l{flex:1;min-width:150px;display:flex;flex-direction:column;gap:7px;}
+.cob-dona-l div{display:flex;align-items:center;gap:8px;font-size:0.84rem;color:#44525e;}
+.cob-dona-l i{width:11px;height:11px;border-radius:50%;flex:none;}
+.cob-dona-l b{margin-left:auto;color:#1f3b52;}
+.cob-dona-l em{font-style:normal;color:#6b7a88;min-width:38px;text-align:right;}
+.cob-etp{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:5px 0;cursor:pointer;font:inherit;color:#1f3b52;}
+.cob-etp span{width:62px;text-align:left;font-size:0.8rem;flex:none;}
+.cob-etp .cob-bar{flex:1;height:12px;}
+.cob-etp em{font-style:normal;font-size:0.78rem;min-width:44px;text-align:right;color:#44525e;}
+.cob-etp.on span{font-weight:700;}
 .cob-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px;}
 .cob-chip{border:1px solid #c5d2dd;background:#fff;color:#1f3b52;border-radius:999px;padding:6px 12px;font-size:0.8rem;cursor:pointer;}
 .cob-chip.on{background:#397EAD;border-color:#397EAD;color:#fff;}
@@ -2119,6 +2132,19 @@ function cobranzaAbrirCliente(key){
     render();
   });
 }
+function cobDona(vals, cols, labs, tot){
+  var R = 42, C = 2 * Math.PI * R, off = 0, arcs = '';
+  vals.forEach(function(v, i){
+    if (!v || !tot) return;
+    var len = C * v / tot;
+    arcs += '<circle cx="60" cy="60" r="'+R+'" fill="none" stroke="'+cols[i]+'" stroke-width="18" stroke-dasharray="'+len.toFixed(2)+' '+(C - len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 60 60)"/>';
+    off += len;
+  });
+  var svg = '<svg viewBox="0 0 120 120" role="img" aria-label="Morosidad"><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="#eef2f6" stroke-width="18"/>'+arcs+
+    '<text class="cob-dona-c" x="60" y="62" text-anchor="middle" font-size="22">'+tot+'</text><text x="60" y="78" text-anchor="middle" font-size="9" fill="#6b7a88">clientes</text></svg>';
+  var leg = labs.map(function(l, i){ return '<div><i style="background:'+cols[i]+'"></i>'+l+'<b>'+(vals[i] || 0)+'</b><em>'+(tot ? Math.round((vals[i] || 0) * 100 / tot) : 0)+'%</em></div>'; }).join('');
+  return '<div class="cob-dona">'+svg+'<div class="cob-dona-l">'+leg+'</div></div>';
+}
 function renderCobranzaHtml(){
   var salir = (ui.cobAdmin || ui.cobVer) ? '<button type="button" class="as-salir" data-action="cob-cerrar">Volver</button>' : '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
   var nombre = ui.cobAdmin ? ((identity && (identity.nombre || identity.name)) || '') : (asesoraNombreActual || '');
@@ -2146,18 +2172,26 @@ function renderCobranzaHtml(){
   h += '<div class="cob-kpis">'+
     '<div class="cob-kpi"><b>'+tot+'</b><span>Clientes</span></div>'+
     seg.map(function(s){ return '<div class="cob-kpi" style="border-color:'+s[2]+'"><b style="color:'+s[2]+'">'+(s[1] || 0)+'</b><span>'+s[0]+'</span></div>'; }).join('')+'</div>';
+  var cols = seg.map(function(x){ return x[2]; }), labs = seg.map(function(x){ return x[0]; });
   h += '<div class="cob-card"><div class="cob-tit">Morosidad de la cartera</div>'+
-    '<div class="cob-bar">'+seg.map(function(s){ var w = tot ? ((s[1] || 0) * 100 / tot) : 0; return w > 0 ? '<i style="width:'+w+'%;background:'+s[2]+'"></i>' : ''; }).join('')+'</div>'+
-    '<div class="cob-leg">'+seg.map(function(s){ return '<span><i style="background:'+s[2]+'"></i>'+s[0]+' '+pct(s[1] || 0)+'%</span>'; }).join('')+'</div>'+
+    cobDona([r.al_dia, r.m1, r.m2, r.m3], cols, labs, tot)+
     '<div class="cob-mora">Deuda vencida total: <b>'+cobS(r.mora)+'</b></div></div>';
+  var etps = []; (d.clientes || []).forEach(function(c){ var e = String(c.etapa || '').trim(); if (e && etps.indexOf(e) < 0) etps.push(e); });
+  etps.sort(function(a, b){ return (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0); });
+  if (etps.length > 1){
+    h += '<div class="cob-card"><div class="cob-tit">Morosidad por etapa</div>'+etps.map(function(e){
+      var ce = (d.clientes || []).filter(function(c){ return String(c.etapa || '').trim() === e; }), te = ce.length, ne = [0, 0, 0, 0];
+      ce.forEach(function(c){ ne[c.vencidas >= 3 ? 3 : (c.vencidas || 0)]++; });
+      return '<button type="button" class="cob-etp'+(ui.cobEtapa === e ? ' on' : '')+'" data-action="cob-etapa" data-value="'+esc(e)+'"><span>Etapa '+esc(e)+'</span>'+
+        '<div class="cob-bar">'+[0,1,2,3].map(function(i){ var w = te ? ne[i] * 100 / te : 0; return w > 0 ? '<i style="width:'+w+'%;background:'+cols[i]+'"></i>' : ''; }).join('')+'</div>'+
+        '<em>'+(te ? Math.round((te - ne[0]) * 100 / te) : 0)+'% mora</em></button>'; }).join('')+
+      '<div class="cob-leg">'+seg.map(function(x){ return '<span><i style="background:'+x[2]+'"></i>'+x[0]+'</span>'; }).join('')+'</div></div>';
+  }
   if (ui.cobEtapa){
     var ce = (d.clientes || []).filter(function(c){ return String(c.etapa || '').trim() === ui.cobEtapa; });
     var te = ce.length, me = 0, ne = [0, 0, 0, 0];
     ce.forEach(function(c){ me += Number(c.mora) || 0; ne[c.vencidas >= 3 ? 3 : (c.vencidas || 0)]++; });
-    var ordenSeg = [0, 1, 2, 3];
-    h += '<div class="cob-card"><div class="cob-tit">Morosidad · Etapa '+esc(ui.cobEtapa)+' <span style="font-weight:400;color:#6b7a88">('+te+' clientes)</span></div>'+
-      '<div class="cob-bar">'+ordenSeg.map(function(i){ var w = te ? ne[i] * 100 / te : 0; return w > 0 ? '<i style="width:'+w+'%;background:'+seg[i][2]+'"></i>' : ''; }).join('')+'</div>'+
-      '<div class="cob-leg">'+ordenSeg.map(function(i){ return '<span><i style="background:'+seg[i][2]+'"></i>'+seg[i][0]+' '+(te ? Math.round(ne[i] * 100 / te) : 0)+'% ('+ne[i]+')</span>'; }).join('')+'</div>'+
+    h += '<div class="cob-card"><div class="cob-tit">Morosidad · Etapa '+esc(ui.cobEtapa)+'</div>'+cobDona(ne, cols, labs, te)+
       '<div class="cob-mora">Deuda vencida de la etapa: <b>'+cobS(me)+'</b></div></div>';
   }
   // lista
