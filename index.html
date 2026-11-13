@@ -2692,7 +2692,7 @@ function renderAsesorLoteAcciones(lote){
     '<p class="sep-info">Solo lectura: puedes ver precios y planos y simular cuotas, pero no separar ni modificar nada.</p></div>';
   var busy = ui.asesoraBusy ? ' disabled' : '';
   var info = ui.sepInfo[lote.id];
-  var h = '<div class="lote-detail-section"><div class="lote-detail-section-title js-desc-secreto" data-lote="'+lote.id+'" style="user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;">👨‍💼 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
+  var h = '<div class="lote-detail-section"><div class="lote-detail-section-title js-desc-secreto" data-lote="'+lote.id+'" style="user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;">👨🏽‍💻 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
   if (lote.e === 'DISPONIBLE'){
     h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>1 hora</strong>.</p>'+
       '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (1 hora)</button>';
@@ -2854,8 +2854,8 @@ function renderGate(){
       '</div>'+
       '<div class="gate-v2-bottom">'+
         '<div class="gate-v2-badge">🏡 +3,500 viviendas entregadas</div>'+
-        '<button type="button" class="gate-v2-cta-primary" data-action="gate-asesor">👨‍💼 Soy Asesor</button>'+
-        '<button type="button" class="gate-v2-cta-primary" style="margin-top:12px;" data-action="gate-cliente">🏠 Soy Cliente Vive Hogar</button>'+
+        '<button type="button" class="gate-v2-cta-primary" data-action="gate-cliente">🏠 Soy Cliente Vive Hogar</button>'+
+        '<button type="button" class="gate-v2-cta-primary" style="margin-top:12px;" data-action="gate-asesor">👨🏽‍💻 Soy Asesor</button>'+
       '</div>'+
     '</div>'+
   '</div>';
