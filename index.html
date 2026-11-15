@@ -2471,7 +2471,7 @@ function renderAsesorPanelHtml(){
       '<span class="as-pos'+(i<3 && rtot>0 ? ' p'+(i+1) : '')+'">'+(i+1)+'</span>'+
       '<div style="min-width:0;"><div class="as-rank-name">'+esc(toTitleCase(r.nombre))+(String(r.id)===String(p.yo.id)?' (tú)':'')+'</div>'+
       '<div class="as-bar as-bar-dark"><i style="width:'+pct2+'%"></i></div>'+
-      (rsp > 0 ? '<div style="font-size:0.72rem;color:var(--ink-faint);margin-top:2px;">'+r.ventas+' venta'+(r.ventas===1?'':'s')+' · '+rsp+' separada'+(rsp===1?'':'s')+'</div>' : '')+'</div>'+
+      '<div style="font-size:0.72rem;color:var(--ink-faint);margin-top:2px;">'+r.ventas+' venta'+(r.ventas===1?'':'s')+' · '+rsp+' separada'+(rsp===1?'':'s')+'</div></div>'+
       '<div class="as-rank-score">'+rtot+'<small> / '+(r.meta > 0 ? r.meta : '—')+'</small></div></div>';
   });
   h += '</div>';
