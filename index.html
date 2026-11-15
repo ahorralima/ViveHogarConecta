@@ -226,6 +226,36 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .icono-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;margin-top:6px;}
 .icono-opt{height:48px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
 .icono-opt.sel{border-color:var(--paprika);background:var(--surface-2);color:var(--paprika);box-shadow:0 0 0 2px rgba(57,126,173,0.25);}
+.cob-prob{border:1px solid var(--border);border-left-width:4px;border-radius:10px;padding:10px 12px;margin:8px 0;background:#fff;}
+.cob-prob-top{display:flex;justify-content:space-between;gap:8px;font-size:0.82rem;font-weight:700;}
+.cob-prob-bar{height:8px;background:#eef2f6;border-radius:999px;overflow:hidden;margin:6px 0;}
+.cob-prob-bar i{display:block;height:100%;border-radius:999px;}
+.cob-prob small{display:block;font-size:0.76rem;color:var(--ink-soft);line-height:1.4;}
+.svc-fotos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.svc-fotos-grid:empty{display:none;}
+.svc-foto-it{position:relative;aspect-ratio:1/1;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.svc-foto-it img{width:100%;height:100%;object-fit:cover;display:block;}
+.svc-foto-it.portada{outline:2px solid var(--paprika);}
+.svc-foto-it em{position:absolute;left:4px;bottom:4px;font-style:normal;font-size:0.62rem;font-weight:800;background:var(--paprika);color:#fff;border-radius:6px;padding:1px 6px;}
+.svc-foto-it button{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.65);color:#fff;font-size:0.8rem;cursor:pointer;}
+.svc-revision-nota{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:0.82rem;color:var(--ink-soft);margin:0 0 12px;}
+.video-tut{margin-bottom:14px;}
+.video-wrap{position:relative;padding-top:56.25%;margin-top:10px;border-radius:12px;overflow:hidden;background:#000;}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.svc-galeria{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin-bottom:12px;padding-bottom:4px;}
+.svc-galeria img{flex:0 0 86%;max-width:420px;height:230px;object-fit:cover;border-radius:12px;scroll-snap-align:start;border:1px solid var(--border);}
+.svc-galeria img:only-child{flex-basis:100%;max-width:none;}
+.svc-estado{display:inline-block;font-size:0.7rem;font-weight:800;border-radius:999px;padding:2px 9px;margin-left:6px;}
+.svc-estado.pend{background:#fff3d6;color:#8a5a00;}
+.svc-estado.rech{background:#fde2e2;color:#a12a2a;}
+.svc-estado.ok{background:#dff3e8;color:#1f7a4d;}
+.svc-nota-estado{font-size:0.78rem;color:var(--ink-soft);margin-top:4px;}
+.svc-apr{border-top:1px solid var(--border);padding:12px 0;}
+.svc-apr:first-of-type{border-top:none;}
+.svc-apr-fotos{display:flex;gap:6px;overflow-x:auto;margin:8px 0;}
+.svc-apr-fotos img{height:90px;width:auto;border-radius:8px;}
+.svc-apr-btns{display:flex;gap:8px;margin-top:8px;}
+.svc-apr-btns .btn{flex:1;}
 .foto-prev{margin-top:10px;display:none;}
 .foto-prev img{width:100%;max-height:200px;object-fit:cover;border-radius:10px;display:block;border:1px solid var(--border);}
 .detail-head{margin-bottom:12px;}
@@ -249,6 +279,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cuota-chip-neutral{background:rgba(46,95,138,0.1);color:#2E5F8A;}
 .cuota-chip-ok{background:rgba(60,150,110,0.12);color:#2E9463;}
 .cuota-chip-warn{background:rgba(217,124,63,0.14);color:var(--paprika);}
+.cuota-prog{height:12px;background:var(--border);border-radius:999px;overflow:hidden;margin:12px 4px 0;}
+.cuota-prog i{display:block;height:100%;background:linear-gradient(90deg,#2E9463,#4cc38a);border-radius:999px;transition:width .6s ease;}
+.cuota-prog-txt{text-align:center;font-size:0.88rem;font-weight:700;color:var(--ink-soft);margin-top:8px;}
+.cuota-carita{display:inline-block;font-size:1.3rem;vertical-align:middle;animation:popIn .6s ease;}
 .cuotas-donut-card{text-align:center;}
 .cuota-comentario{margin-top:12px;padding:10px 14px;border-radius:10px;font-size:0.88rem;font-weight:600;text-align:center;}
 .cuota-comentario-ok{background:rgba(60,150,110,0.1);color:#2E9463;}
@@ -560,7 +594,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-zoom-btn{width:34px;height:34px;border:none;border-radius:0;box-shadow:none;background:#fff;font-size:1.05rem;}
 .mapa-zoom-btn+.mapa-zoom-btn{border-top:1px solid var(--border);}
 .mapa-full .mapa-zoom-controls{top:calc(env(safe-area-inset-top,0px) + 58px);bottom:auto;}
-.mapa-full-logo{position:absolute;top:calc(env(safe-area-inset-top,0px) + 4px);right:50px;height:66px;width:auto;opacity:0.8;mix-blend-mode:multiply;pointer-events:none;z-index:35;}
+.mapa-full-logo{position:absolute;top:calc(env(safe-area-inset-top,0px) + 4px);right:54px;height:104px;width:auto;opacity:0.8;mix-blend-mode:multiply;pointer-events:none;z-index:35;}
 .mapa-full-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:8px;width:38px;height:38px;border-radius:50%;background:#fff;color:#1a1a1a;border:1px solid var(--border);font-size:1.05rem;font-weight:800;z-index:40;box-shadow:0 2px 8px rgba(0,0,0,0.25);cursor:pointer;}
 .lote-sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));z-index:45;box-shadow:0 -6px 24px rgba(0,0,0,0.28);cursor:default;}
 @media (min-width:700px){.lote-sheet{left:50%;right:auto;width:520px;transform:translateX(-50%);}}
@@ -1081,7 +1115,8 @@ function mapServicioRow(row){
     proyectoId: row.proyecto_id, etapa: row.etapa, direccion: row.direccion,
     titulo: row.titulo, descripcion: row.descripcion, categoriaId: row.categoria_id,
     precioMin: Number(row.precio_min), precioMax: Number(row.precio_max),
-    icono: row.icono || '', foto: row.foto || '',
+    icono: row.icono || '', foto: row.foto || '', fotos: Array.isArray(row.fotos) ? row.fotos : undefined,
+    manzana: row.manzana || '', estado: row.estado || 'aprobado', motivoRechazo: row.motivo_rechazo || '', revisarHasta: row.revisar_hasta || null,
     activo: row.activo, demo: false, createdAt: row.created_at,
     resenas: (row.resenas||[]).map(mapResenaRow)
   };
@@ -1094,7 +1129,7 @@ async function loadUsuario(userId){
 }
 async function loadServicios(){
   var res = await sb.from('servicios')
-    .select('*, usuarios(nombre,apellido,telefono), resenas(id,autor_id,puntuacion,comentario,created_at,usuarios(nombre,apellido))')
+    .select('id,autor_id,titulo,descripcion,categoria_id,precio_min,precio_max,proyecto_id,etapa,direccion,activo,created_at,icono,foto,manzana,estado,motivo_rechazo,revisar_hasta, usuarios(nombre,apellido,telefono), resenas(id,autor_id,puntuacion,comentario,created_at,usuarios(nombre,apellido))')
     .eq('activo', true)
     .order('created_at', {ascending:false});
   if (res.error){ console.error(res.error); return []; }
@@ -1314,7 +1349,7 @@ async function refreshServicios(){
 }
 
 function visibleServicios(){
-  var real = STATE.servicios.filter(function(s){ return s.activo !== false; });
+  var real = STATE.servicios.filter(function(s){ return s.activo !== false && (s.estado || 'aprobado') === 'aprobado'; });
   var demo = DEMO_SERVICIOS.filter(function(s){ return s.activo !== false; });
   if (ui.fProyecto !== 'all'){
     real = real.filter(function(s){ return String(s.proyectoId) === ui.fProyecto; });
@@ -1623,8 +1658,15 @@ function renderDetalle(){
   var alreadyReviewed = identity && s.resenas.some(function(r){ return r.autorId === identity.id; });
 
   var html = '<div class="back-row"><button type="button" class="back-btn" data-action="nav" data-value="home">← Volver</button></div>';
-  html += s.foto ? '<div class="detail-photo detail-photo-img"><img src="'+esc(s.foto)+'" alt="" /></div>'
-    : '<div class="detail-photo" style="color:var(--paprika);">'+iconSvg(svcIcono(s),48)+'</div>';
+  if (!s.demo && s.fotos === undefined && !s._cargandoFotos){
+    s._cargandoFotos = true;
+    cargarFotosServicio(s.id).then(function(){ s._cargandoFotos = false; if (ui.view === 'detalle' && ui.selectedId === s.id) render(); });
+  }
+  var galeria = (s.fotos && s.fotos.length) ? s.fotos : (s.foto ? [s.foto] : []);
+  html += galeria.length > 1
+    ? '<div class="svc-galeria">'+galeria.map(function(u){ return '<img src="'+esc(u)+'" alt="" />'; }).join('')+'</div>'
+    : (galeria.length === 1 ? '<div class="detail-photo detail-photo-img"><img src="'+esc(galeria[0])+'" alt="" /></div>'
+    : '<div class="detail-photo" style="color:var(--paprika);">'+iconSvg(svcIcono(s),48)+'</div>');
   html += '<div class="detail-head">';
   html += '<div class="meta-row"><span class="badge">'+iconSvg(svcIcono(s),13)+esc(cat.nombre)+'</span>'+(s.demo?'<span class="badge badge-demo">Aviso de demostración</span>':'')+'</div>';
   html += '<h1>'+esc(s.titulo)+'</h1>';
@@ -1633,7 +1675,7 @@ function renderDetalle(){
 
   html += '<div class="panel"><h4>Ofrecido por</h4><div class="provider-row">'+
     '<div class="avatar">'+esc((s.autorNombre||'?').charAt(0).toUpperCase())+'</div>'+
-    '<div><div class="provider-name">'+esc(s.autorNombre)+'</div><div class="provider-sub">'+esc(proyById(s.proyectoId).nombre)+(s.etapa?' · Etapa '+esc(s.etapa):'')+'</div></div>'+
+    '<div><div class="provider-name">'+esc(s.autorNombre)+'</div><div class="provider-sub">'+esc(proyById(s.proyectoId).nombre)+(s.etapa?' · Etapa '+esc(s.etapa):'')+(s.manzana?' · Mz. '+esc(s.manzana):'')+'</div></div>'+
   '</div></div>';
 
   html += '<div class="panel"><h4>Descripción</h4><p style="font-size:0.92rem;color:var(--ink-soft);">'+esc(s.descripcion)+'</p></div>';
@@ -1646,8 +1688,6 @@ function renderDetalle(){
     html += '<a class="wa-btn" href="'+waLink(s.autorTelefono, msg)+'" target="_blank" rel="noopener">'+svgWa()+' Contactar por WhatsApp</a>'+
       '<p style="font-size:0.75rem;color:var(--ink-faint);margin:-8px 0 14px;text-align:center;">Se abrirá WhatsApp con un mensaje ya escrito (nombre del servicio). No se envía nada hasta que tú lo envíes.</p>';
   }
-  html += '<a class="maps-btn" href="'+mapsUrl(s)+'" target="_blank" rel="noopener">'+svgPin()+' Cómo llegar hasta ahí</a>';
-  if (!s.direccion) html += '<p style="font-size:0.75rem;color:var(--ink-faint);margin-top:-10px;margin-bottom:16px;text-align:center;">Ubicación aproximada — este vecino no dejó una referencia exacta.</p>';
 
   if (!s.demo){
     html += '<p style="text-align:center;margin-bottom:16px;"><button type="button" class="btn-link-danger" data-action="reportar-servicio" data-id="'+s.id+'">Reportar este servicio</button></p>';
@@ -1727,9 +1767,78 @@ function authForm(){
   return html;
 }
 
+// ---------- Servicios: fotos múltiples, video tutorial ----------
+var SVC_MAX_FOTOS = 6;
+var VIDEO_TUTORIAL_URL = '';   // pega aquí el enlace del video (YouTube: https://www.youtube.com/embed/XXXX o un .mp4)
+function videoTutorialHtml(){
+  var abierto = !!ui.videoTutAbierto;
+  var cont = '';
+  if (abierto){
+    if (!VIDEO_TUTORIAL_URL) cont = '<p class="hint" style="margin:10px 0 0;">El video tutorial estará disponible muy pronto. Mientras tanto, completa el formulario de abajo paso a paso.</p>';
+    else if (/\.(mp4|webm|mov)(\?|$)/i.test(VIDEO_TUTORIAL_URL)) cont = '<video src="'+esc(VIDEO_TUTORIAL_URL)+'" controls playsinline style="width:100%;border-radius:12px;margin-top:10px;background:#000;"></video>';
+    else cont = '<div class="video-wrap"><iframe src="'+esc(VIDEO_TUTORIAL_URL)+'" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>';
+  }
+  return '<div class="video-tut"><button type="button" class="btn btn-secondary btn-block" data-action="video-tut-toggle">🎬 '+(abierto ? 'Ocultar video tutorial' : 'Ver video tutorial: cómo publicar tu servicio')+'</button>'+cont+'</div>';
+}
+function svcFotosHtml(){
+  var f = ui.svcFotos || [];
+  return f.map(function(u, i){
+    return '<div class="svc-foto-it'+(i===0?' portada':'')+'"><img src="'+esc(u)+'" alt="" />'+(i===0?'<em>Portada</em>':'')+
+      '<button type="button" data-action="svc-foto-quitar" data-value="'+i+'" aria-label="Quitar foto">✕</button></div>';
+  }).join('') + (f.length >= SVC_MAX_FOTOS ? '' : '');
+}
+function svcFotosPintar(){
+  var g = document.getElementById('svc-fotos-grid');
+  if (g) g.innerHTML = svcFotosHtml();
+}
+function svcReducirFoto(file){
+  return new Promise(function(ok){
+    var rd = new FileReader();
+    rd.onload = function(){
+      var im = new Image();
+      im.onload = function(){
+        var max = 800, k = Math.min(1, max/Math.max(im.width, im.height));
+        var cv = document.createElement('canvas');
+        cv.width = Math.round(im.width*k); cv.height = Math.round(im.height*k);
+        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+        ok(cv.toDataURL('image/jpeg', 0.72));
+      };
+      im.onerror = function(){ ok(null); };
+      im.src = rd.result;
+    };
+    rd.onerror = function(){ ok(null); };
+    rd.readAsDataURL(file);
+  });
+}
+async function cargarFotosServicio(id){
+  try {
+    var r = await sb.from('servicios').select('fotos,foto').eq('id', id).maybeSingle();
+    if (r.error || !r.data) return [];
+    var f = Array.isArray(r.data.fotos) ? r.data.fotos.filter(Boolean) : [];
+    if (!f.length && r.data.foto) f = [r.data.foto];
+    var sv = STATE.servicios.find(function(x){ return x.id === id; });
+    if (sv) sv.fotos = f;
+    return f;
+  } catch(e){ return []; }
+}
+
+function svcEstadoChip(s){
+  var e = s.estado || 'aprobado';
+  return e === 'pendiente' ? '<span class="svc-estado pend">⏳ En revisión</span>'
+    : e === 'rechazado' ? '<span class="svc-estado rech">No aprobado</span>'
+    : '<span class="svc-estado ok">✓ Publicado</span>';
+}
+function svcEstadoNota(s){
+  var e = s.estado || 'aprobado';
+  if (e === 'pendiente') return '<div class="svc-nota-estado">Un asesor de administración lo está revisando (máximo 1 día). Aún no lo ven los demás.</div>';
+  if (e === 'rechazado') return '<div class="svc-nota-estado">Motivo: '+esc(s.motivoRechazo || 'No cumple con las normas de la comunidad.')+' Puedes editarlo y enviarlo de nuevo.</div>';
+  return '';
+}
+
 function renderPublicar(){
   var editing = ui.editingId ? findServicioById(ui.editingId) : null;
   var html = '<h2 style="margin-bottom:14px;">'+(editing ? 'Editar servicio' : 'Publica tu servicio')+'</h2>';
+  if (identity) html += videoTutorialHtml();
 
   if (!identity){
     return html + authForm();
@@ -1751,12 +1860,15 @@ function renderPublicar(){
     '<div class="icono-grid">'+
     ICONOS_SERVICIO.map(function(n){ return '<button type="button" class="icono-opt'+(curIcono===n?' sel':'')+'" data-action="pick-icono" data-value="'+n+'" aria-label="'+n+'">'+iconSvg(n,24)+'</button>'; }).join('')+
     '</div><span class="hint">Elige el símbolo que mejor represente tu servicio, o sube una foto abajo.</span></div>';
-  html += '<div class="form-field"><label>Foto (opcional)</label>'+
-    '<input type="hidden" name="foto" id="svc-foto" value="'+esc(curFoto)+'" />'+
-    '<input type="file" id="svc-foto-file" accept="image/*" />'+
-    '<div class="foto-prev" id="svc-foto-prev"'+(curFoto?' style="display:block;"':'')+'><img id="svc-foto-img" alt="" src="'+esc(curFoto)+'" />'+
-    '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" data-action="quitar-foto">Quitar foto</button></div>'+
-    '<span class="hint">Si subes una foto, se verá en lugar del símbolo.</span></div>';
+  if (ui.svcFotosFor !== (editing ? editing.id : 'nuevo')){
+    ui.svcFotosFor = editing ? editing.id : 'nuevo';
+    ui.svcFotos = editing ? (editing.fotos && editing.fotos.length ? editing.fotos.slice() : (editing.foto ? [editing.foto] : [])) : [];
+    if (editing && editing.fotos === undefined) cargarFotosServicio(editing.id).then(function(f){ if (f && f.length && ui.svcFotosFor === editing.id){ ui.svcFotos = f.slice(); svcFotosPintar(); } });
+  }
+  html += '<div class="form-field"><label>Fotos de tu servicio o de tu local (hasta '+SVC_MAX_FOTOS+')</label>'+
+    '<input type="file" id="svc-foto-file" accept="image/*" multiple />'+
+    '<div class="svc-fotos-grid" id="svc-fotos-grid">'+svcFotosHtml()+'</div>'+
+    '<span class="hint">La primera foto es la portada y se verá en lugar del símbolo. Toca ✕ para quitar una.</span></div>';
   html += '<div class="form-field"><label>Descripción</label>'+
     '<textarea name="descripcion" rows="4" placeholder="Describe tu servicio, experiencia y disponibilidad...">'+esc(editing?editing.descripcion:'')+'</textarea>'+
     (e.descripcion?'<span class="err">'+esc(e.descripcion)+'</span>':'<span class="hint">Mínimo 20 caracteres.</span>')+
@@ -1765,9 +1877,14 @@ function renderPublicar(){
     '<div class="form-field"><label>Precio mínimo (S/)</label><input class="text-input" type="number" min="1" step="1" name="precioMin" value="'+(editing?editing.precioMin:'')+'" />'+(e.precioMin?'<span class="err">'+esc(e.precioMin)+'</span>':'')+'</div>'+
     '<div class="form-field"><label>Precio máximo (S/)</label><input class="text-input" type="number" min="1" step="1" name="precioMax" value="'+(editing?editing.precioMax:'')+'" />'+(e.precioMax?'<span class="err">'+esc(e.precioMax)+'</span>':'')+'</div>'+
   '</div>';
+  html += '<div class="form-row">'+
+    '<div class="form-field"><label>Tu etapa</label><input class="text-input" type="number" min="1" max="99" name="svcEtapa" value="'+esc(editing && editing.etapa ? editing.etapa : identity.etapa)+'" />'+(e.svcEtapa?'<span class="err">'+esc(e.svcEtapa)+'</span>':'')+'</div>'+
+    '<div class="form-field"><label>Tu manzana</label><input class="text-input" type="text" name="svcManzana" maxlength="12" placeholder="Ej. H" value="'+esc(editing && editing.manzana ? editing.manzana : (e._man || ''))+'" />'+(e.svcManzana?'<span class="err">'+esc(e.svcManzana)+'</span>':'')+'</div>'+
+  '</div><p class="hint" style="margin:-6px 0 14px;">Así tus vecinos saben dónde encontrarte.</p>';
   html += '<div class="form-field"><label>Proyecto</label><select name="proyectoId">'+
     PROYECTOS.map(function(p){ return '<option value="'+p.id+'" '+((editing?editing.proyectoId:identity.proyectoId)===p.id?'selected':'')+'>'+esc(p.nombre)+'</option>'; }).join('')+
-  '</select><span class="hint">Se publicará como '+esc(fullName(identity))+' · Etapa '+esc(identity.etapa)+' · WhatsApp '+esc(identity.telefono)+' — cambia estos datos desde Mi cuenta si hace falta.</span></div>';
+  '</select><span class="hint">Se publicará como '+esc(fullName(identity))+' · WhatsApp '+esc(identity.telefono)+' — cambia estos datos desde Mi cuenta si hace falta.</span></div>';
+  html += '<div class="svc-revision-nota">🕐 Antes de verse, un asesor de administración revisa tu publicación (máximo 1 día). Te avisamos aquí en "Mis servicios".</div>';
   html += '<button type="submit" class="btn btn-primary btn-block">'+(editing?'Guardar cambios':'Publicar servicio')+'</button>';
   if (editing) html += '<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px;" data-action="nav" data-value="mios">Cancelar</button>';
   html += '</form>';
@@ -1811,7 +1928,7 @@ function renderMios(){
     var rating = avgRating(s);
     return '<div class="mysvc-item">'+
       '<div class="mysvc-icon">'+(s.foto ? '<img src="'+esc(s.foto)+'" alt="" />' : iconSvg(svcIcono(s),20))+'</div>'+
-      '<div class="mysvc-info"><h4>'+esc(s.titulo)+'</h4><div class="mysvc-meta">'+(rating?rating.toFixed(1)+' ★ · ':'')+s.resenas.length+' reseñas · '+fmtMoney(s.precioMin)+(s.precioMin!==s.precioMax?'–'+fmtMoney(s.precioMax):'')+'</div></div>'+
+      '<div class="mysvc-info"><h4>'+esc(s.titulo)+svcEstadoChip(s)+'</h4>'+svcEstadoNota(s)+'<div class="mysvc-meta">'+(rating?rating.toFixed(1)+' ★ · ':'')+s.resenas.length+' reseñas · '+fmtMoney(s.precioMin)+(s.precioMin!==s.precioMax?'–'+fmtMoney(s.precioMax):'')+'</div></div>'+
       '<div class="mysvc-actions">'+
         '<button type="button" class="btn btn-ghost btn-sm" data-action="edit-svc" data-id="'+s.id+'">Editar</button>'+
         '<button type="button" class="btn btn-danger btn-sm" data-action="del-svc" data-id="'+s.id+'">Borrar</button>'+
@@ -2066,7 +2183,11 @@ function asesorCargarPanel(){
         return String(r.nombre || '').trim().toLowerCase() !== 'revisor google' || String(r.id) === String(asesoraIdActual);
       });
     }
-    var nuevo = JSON.stringify(res.data);
+    try {
+      var rsv = await sb.rpc('ec_servicios_por_aprobar', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+      ui.svcPend = (!rsv.error && rsv.data && rsv.data.ok && rsv.data.puede) ? rsv.data : null;
+    } catch(e){ ui.svcPend = null; }
+    var nuevo = JSON.stringify(res.data) + JSON.stringify(ui.svcPend || null);
     var cambio = nuevo !== ui._panelJson;
     ui._panelJson = nuevo;
     ui.asesorPanel = res.data;
@@ -2120,6 +2241,30 @@ function cobranzaCargar(){
     if (antes !== JSON.stringify(ui.cob) || ui.renderPendiente) renderSiLibre();
   });
 }
+// Probabilidad de que el cliente pague a tiempo, según su historial (cuotas ya vencidas; las más recientes pesan más)
+function cobProbPago(cuotas, hoy, proxima){
+  var DIA = 86400000, GRACIA = 3;
+  function dd(x){ return new Date(String(x).slice(0,10)+'T12:00:00').getTime(); }
+  var hist = (cuotas || []).filter(function(q){ return q.vence && String(q.vence) < String(hoy) && !/BFH/i.test(q.forma || ''); })
+    .sort(function(a, b){ return String(b.vence) < String(a.vence) ? -1 : 1; });   // la más reciente primero
+  if (!hist.length) return null;
+  var sw = 0, sok = 0, sl = 0, sd = 0;
+  hist.forEach(function(q, i){
+    var w = Math.pow(0.85, i);
+    var pagada = !(q.saldo > 0);
+    var dias = pagada && q.fecha_pago ? Math.max(0, Math.round((dd(q.fecha_pago) - dd(q.vence)) / DIA)) : Math.max(0, Math.round((dd(hoy) - dd(q.vence)) / DIA));
+    var aTiempo = pagada && dias <= GRACIA;
+    sw += w; if (aTiempo) sok += w;
+    if (!aTiempo){ sl += w; sd += w * dias; }
+  });
+  var prob = Math.round((sok + 1) / (sw + 2) * 100);
+  var atraso = sl > 0 ? Math.round(sd / sl) : 0;
+  var nivel = prob >= 75 ? ['Alta', '#2E9463'] : prob >= 45 ? ['Media', '#d9962b'] : ['Baja', '#b23b3b'];
+  var fp = null;
+  if (proxima){ var t = dd(proxima) + (atraso > 0 ? atraso : 0) * DIA; var dt = new Date(t); fp = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+  return {prob: prob, atraso: atraso, n: hist.length, nivel: nivel[0], color: nivel[1], fechaProbable: fp, pocaHistoria: hist.length < 3};
+}
+
 function cobranzaAbrirCliente(key){
   if (ui.cobAbierto === key){ ui.cobAbierto = null; render(); return; }
   ui.cobAbierto = key; render();
@@ -2234,6 +2379,14 @@ function renderCobranzaHtml(){
       else {
         h += '<div class="cob-det-res">Más antigua vencida: <b>'+cobF(c.mas_antigua)+'</b> · Próxima cuota: <b>'+cobF(c.proxima)+'</b></div>';
         var hoy = d.hoy;
+        var pp = cobProbPago(det, hoy, c.proxima);
+        if (pp){
+          h += '<div class="cob-prob" style="border-color:'+pp.color+';"><div class="cob-prob-top"><span>Probabilidad de pagar a tiempo</span><b style="color:'+pp.color+'">'+pp.prob+'% · '+pp.nivel+'</b></div>'+
+            '<div class="cob-prob-bar"><i style="width:'+pp.prob+'%;background:'+pp.color+'"></i></div>'+
+            '<small>'+(pp.atraso > 0 ? 'Cuando se atrasa, suele pagar unos <b>'+pp.atraso+' día'+(pp.atraso===1?'':'s')+'</b> después. ' : 'Suele pagar dentro de la fecha. ')+
+            (pp.fechaProbable ? 'Fecha probable de su próximo pago: <b>'+cobF(pp.fechaProbable)+'</b>. ' : '')+
+            'Estimado con sus últimas '+pp.n+' cuota'+(pp.n===1?'':'s')+' vencidas'+(pp.pocaHistoria ? ' (poca historia: tómalo como referencia)' : '')+'.</small></div>';
+        }
         h += det.map(function(q2){
           var venc = q2.saldo > 0 && q2.vence && String(q2.vence) < String(hoy) && !/BFH/i.test(q2.forma || '');
           var pag = !(q2.saldo > 0);
@@ -2476,6 +2629,23 @@ function renderAsesorPanelHtml(){
   });
   h += '</div>';
 
+  // Servicios por aprobar (solo asesores de administración)
+  if (ui.svcPend && ui.svcPend.puede){
+    var sl = ui.svcPend.lista || [];
+    h += '<div class="as-card"><h4>🛠️ Servicios por aprobar <small>'+sl.length+' pendiente'+(sl.length===1?'':'s')+'</small></h4>';
+    if (!sl.length) h += '<p style="font-size:0.85rem;color:var(--ink-faint);">No hay servicios esperando. ¡Todo al día!</p>';
+    sl.forEach(function(x){
+      h += '<div class="svc-apr"><strong>'+esc(x.titulo)+'</strong>'+(x.atrasado ? ' <span class="svc-estado rech">Atrasado</span>' : '')+
+        '<div style="font-size:0.78rem;color:var(--ink-faint);margin-top:2px;">'+esc(x.autor||'')+' · Etapa '+esc(x.etapa)+' · Mz. '+esc(x.manzana||'—')+' · '+esc(catById(x.categoria_id).nombre)+' · S/ '+esc(x.precio_min)+(x.precio_min!==x.precio_max?'–'+esc(x.precio_max):'')+'</div>'+
+        ((x.fotos && x.fotos.length) ? '<div class="svc-apr-fotos">'+x.fotos.map(function(u){ return '<img src="'+esc(u)+'" alt="" />'; }).join('')+'</div>' : '')+
+        '<p style="font-size:0.88rem;color:var(--ink-soft);margin:6px 0;">'+esc(x.descripcion)+'</p>'+
+        '<input class="text-input" type="text" id="svc-mot-'+esc(x.id)+'" placeholder="Si lo rechazas, escribe el motivo" />'+
+        '<div class="svc-apr-btns"><button type="button" class="btn btn-primary" data-action="svc-revisar" data-value="'+esc(x.id)+'|1"'+(ui.asesoraBusy?' disabled':'')+'>✅ Aprobar</button>'+
+        '<button type="button" class="btn btn-danger" data-action="svc-revisar" data-value="'+esc(x.id)+'|0"'+(ui.asesoraBusy?' disabled':'')+'>✕ Rechazar</button></div></div>';
+    });
+    h += '</div>';
+  }
+
   // Separaciones mías en curso
   if (p.mis_reservas && p.mis_reservas.length){
     h += '<div class="as-card"><h4>⏳ Mis separaciones en proceso</h4>';
@@ -2694,8 +2864,8 @@ function renderAsesorLoteAcciones(lote){
   var info = ui.sepInfo[lote.id];
   var h = '<div class="lote-detail-section"><div class="lote-detail-section-title js-desc-secreto" data-lote="'+lote.id+'" style="user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;">👨🏽‍💻 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
   if (lote.e === 'DISPONIBLE'){
-    h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>1 hora</strong>.</p>'+
-      '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (1 hora)</button>';
+    h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>3 horas</strong>.</p>'+
+      '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (3 horas)</button>';
     if (esJefe()) h += ofertaLoteHtml(lote);
   } else if (lote.e === 'EN_ATENCION' && lote.vence){
     var mia = esMiReserva(lote.id);
@@ -2707,18 +2877,18 @@ function renderAsesorLoteAcciones(lote){
       h += '<div class="asesora-form">'+filaAcordado+
         '<label>Nombre y apellidos del cliente</label>'+
         '<input class="text-input" type="text" id="sep-nombre" data-ui="sepNombre" autocomplete="off" placeholder="Como figura en su DNI" value="'+esc(ui.sepNombre)+'" />'+
-        '<label style="margin-top:8px;">DNI del cliente'+(miProySlug() === 'sullana' ? ' (opcional)' : '')+'</label>'+
+        (miProySlug() === 'sullana' ? '<p class="sep-info" style="margin:6px 0 0;">Solo necesitas el nombre y la captura del pago. El DNI y demás datos los completas después.</p>' : ('<label style="margin-top:8px;">DNI del cliente'+(miProySlug() === 'sullana' ? ' (opcional)' : '')+'</label>'+
         '<input class="text-input" type="text" id="sep-dni" data-ui="sepDni" inputmode="numeric" autocomplete="off" placeholder="12345678" value="'+esc(ui.sepDni)+'" />'+
         (miProySlug() === 'sullana' ? '<p class="sep-info" style="margin:4px 0 0;">Si el cliente aún no te da su DNI, déjalo vacío: la separación queda <strong>por aprobar</strong> del jefe de ventas y el pago pasa a ser opcional. Después podrás completar todo desde esta misma casa.</p>' : '')+
         '<label style="margin-top:8px;">N.º de operación (opcional si subes la captura)</label>'+
-        '<input class="text-input" type="text" id="sep-op" data-ui="sepOp" autocomplete="off" placeholder="Ej. 00123456" value="'+esc(ui.sepOp)+'" />'+
+        '<input class="text-input" type="text" id="sep-op" data-ui="sepOp" autocomplete="off" placeholder="Ej. 00123456" value="'+esc(ui.sepOp)+'" />'))+
         '<label style="margin-top:8px;">Captura del pago (Yape, Plin o voucher)</label>'+
         (ui.sepImg
           ? '<div style="margin:4px 0;"><img src="'+ui.sepImg+'" alt="Comprobante" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border);" /></div>'+
             '<button type="button" class="btn btn-secondary btn-block" data-action="sep-img-quitar">Quitar imagen</button>'
           : '<input class="text-input" type="file" id="sep-img" accept="image/*" />'+(ui.sepImgBusy ? '<p class="sep-info">Preparando imagen…</p>' : '')+(ui.sepImgErr ? '<p class="as-err">No se pudo leer esa imagen. Prueba con otra captura.</p>' : ''))+
-        '<label style="margin-top:8px;">Monto pagado (S/) · mínimo '+fmtMoney(sepMonto())+'</label>'+
-        '<input class="text-input" type="number" id="sep-monto" data-ui="sepMonto" inputmode="decimal" value="'+esc(ui.sepMonto !== '' ? ui.sepMonto : sepMonto())+'" />'+
+        (miProySlug() === 'sullana' ? '' : ('<label style="margin-top:8px;">Monto pagado (S/) · mínimo '+fmtMoney(sepMonto())+'</label>'+
+        '<input class="text-input" type="number" id="sep-monto" data-ui="sepMonto" inputmode="decimal" value="'+esc(ui.sepMonto !== '' ? ui.sepMonto : sepMonto())+'" />'))+
         '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="sep-confirmar" data-value="'+lote.id+'"'+busy+'>'+(ui.asesoraBusy?'Guardando…':(miProySlug() === 'sullana' ? '✅ Confirmar y separar' : '✅ Confirmar pago y separar'))+'</button>'+
         '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="reserva-cancelar" data-value="'+lote.id+'"'+busy+'>Cancelar separación</button>'+
       '</div>';
@@ -2983,9 +3153,9 @@ function donutCuotasSvg(pct){
 function cuotaRowHtml(r, kind){
   var chip = kind==='atrasada' ? '<span class="cuota-chip cuota-chip-danger">Atrasada</span>'
     : kind==='pendiente' ? (r.estado_pago==='PAGADO PARCIALMENTE' ? '<span class="cuota-chip cuota-chip-warn">Pago parcial</span>' : '<span class="cuota-chip cuota-chip-neutral">Por vencer</span>')
-    : (r.fecha_pago && r.fecha_pago > r.fecha_vencimiento ? '<span class="cuota-chip cuota-chip-warn">Pagada tarde</span>' : '<span class="cuota-chip cuota-chip-ok">Pagada a tiempo</span>');
+    : '<span class="cuota-chip cuota-chip-ok">😊 Pagada</span>';
   var fechaLinea = kind==='pagada'
-    ? 'Pagada el '+fmtFechaAbs(r.fecha_pago)+' · vencía '+fmtFechaAbs(r.fecha_vencimiento)
+    ? 'Pagada el '+fmtFechaAbs(r.fecha_pago)
     : (r.estado_pago==='PAGADO PARCIALMENTE' ? 'Vence '+fmtFechaAbs(r.fecha_vencimiento)+' · abonado '+fmtMoney(r.monto_pagado) : 'Vence '+fmtFechaAbs(r.fecha_vencimiento));
   return '<div class="cuota-row">'+
     '<div class="cuota-row-main">'+
@@ -3046,6 +3216,8 @@ function renderCuotas(){
   html += '<div class="panel cuotas-donut-card">'+
     donutCuotasSvg(r.pctPagado)+
     '<p style="text-align:center;font-size:0.85rem;color:var(--ink-faint);margin-top:6px;">'+fmtMoney(r.montoTotalPagado)+' pagado de '+fmtMoney(r.montoTotalPactado)+'</p>'+
+    '<div class="cuota-prog" role="progressbar" aria-valuenow="'+Math.round(r.pctPagado)+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+Math.max(2, Math.round(r.pctPagado))+'%"></i></div>'+
+    '<p class="cuota-prog-txt"><span class="cuota-carita">'+(r.pctPagado >= 99.5 ? '🎉' : r.atrasadas.length ? '🙂' : r.pagadas.length ? '😄' : '🙂')+'</span> '+r.pagadas.length+' de '+rows.length+' cuotas pagadas · '+Math.round(r.pctPagado)+'%</p>'+
     '<div class="cuota-comentario '+(comentario.tono==='danger'?'cuota-comentario-danger':'cuota-comentario-ok')+'">'+esc(comentario.texto)+'</div>'+
   '</div>';
 
@@ -3665,11 +3837,11 @@ function renderMapaEtapa5Html(etapaN){
     var otra = String(l.etapa) !== String(ETAPA_ACTUAL);
     return '<button type="button" class="presup-fila" data-action="'+(otra ? 'asesor-ir-lote' : 'interesado-lote')+'" data-value="'+esc(otra ? l.etapa+'|'+l.m+'|'+l.l : l.m+'|'+l.l)+'">'+
       '<span><strong>'+(presupTodas ? 'Etapa '+esc(l.etapa)+' · ' : '')+etiquetaLote(l.m, l.l)+'</strong>'+(l.v ? ' · '+esc(l.v) : '')+'<br><small>Precio '+fmtMoney(lotePrecio(l))+'</small></span>'+
-      '<span style="text-align:right;"><small>Inicial</small> <b>'+fmtMoney(loteInicial(l))+'</b>'+(dif > 0 ? '<br><small>(+'+fmtMoney(dif)+')</small>' : '')+'</span></button>';
+      '<span style="text-align:right;"><small>Precio cliente</small> <b>'+fmtMoney(loteInicial(l))+'</b>'+(dif > 0 ? '<br><small>(+'+fmtMoney(dif)+')</small>' : '')+'</span></button>';
   }
   var presupHtml = '';
   if (modoAsesor()){
-    presupHtml = '<div class="lote-filtros-row"><span class="lote-filtros-label presup-label">Presupuesto máximo del cliente (inicial que puede pagar)</span>'+
+    presupHtml = '<div class="lote-filtros-row"><span class="lote-filtros-label presup-label">Presupuesto máximo del cliente (precio cliente que puede pagar)</span>'+
       '<div class="presup-row"><span class="presup-sol">S/</span>'+
       '<input type="text" class="text-input presup-input" id="presupuesto-input" inputmode="numeric" autocomplete="off" placeholder="Ej. 25000" data-ui="presupuestoTxt" value="'+esc(ui.presupuestoTxt || '')+'" />'+
       '<button type="button" class="btn btn-primary presup-btn" data-action="presupuesto-buscar">Buscar</button></div>'+
@@ -3680,9 +3852,9 @@ function renderMapaEtapa5Html(etapaN){
     } else if (presup > 0){
       presupHtml += '<div class="presup-result">'+
         (presupModo === 'dentro'
-          ? '<p><strong>'+presupLista.length+' casa'+(presupLista.length===1?'':'s')+'</strong> disponible'+(presupLista.length===1?'':'s')+' con inicial de hasta <strong>'+fmtMoney(presup)+'</strong>. Se muestran primero las más cercanas a su presupuesto:</p>'
+          ? '<p><strong>'+presupLista.length+' casa'+(presupLista.length===1?'':'s')+'</strong> disponible'+(presupLista.length===1?'':'s')+' con precio cliente de hasta <strong>'+fmtMoney(presup)+'</strong>. Se muestran primero las más cercanas a su presupuesto:</p>'
           : (presupLista.length
-              ? '<p>No hay casas disponibles con inicial de hasta <strong>'+fmtMoney(presup)+'</strong>. Las <strong>más cercanas</strong> son:</p>'
+              ? '<p>No hay casas disponibles con precio cliente de hasta <strong>'+fmtMoney(presup)+'</strong>. Las <strong>más cercanas</strong> son:</p>'
               : '<p>No hay casas disponibles con precio cargado.</p>'))+
         presupLista.slice(0, 8).map(presupFilaHtml).join('')+
         (presupLista.length > 8 ? '<p class="presup-mas">y '+(presupLista.length-8)+' más (resaltadas en el plano)</p>' : '')+
@@ -3823,11 +3995,11 @@ function renderMapaEtapa5Html(etapaN){
         '<div class="lote-detail-section-title">✅ Estado y forma de pago</div>'+
         '<div class="lote-detail-grid">'+
           '<div class="lote-detail-tile"><span>Estado</span><strong class="cuota-chip cuota-chip-'+estadoInfo.cls+'" style="margin-top:3px;">'+estadoInfo.txt+'</strong></div>'+
-          '<div class="lote-detail-tile"><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Precio cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
           '<div class="lote-detail-tile"><span>Bono Familiar Habitacional</span><strong>'+fmtMoney(bfh)+'</strong></div>'+
-          '<div class="lote-detail-tile"><span>Precio total del lote</span><strong>'+precioHtml(lote)+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Precio total de la casa</span><strong>'+precioHtml(lote)+'</strong></div>'+
         '</div>'+
-        '<p style="font-size:0.74rem;color:var(--ink-faint);margin-top:8px;">El Bono Familiar Habitacional lo descuenta el Estado directamente del precio — el cliente solo paga la inicial.</p>'+
+        '<p style="font-size:0.74rem;color:var(--ink-faint);margin-top:8px;">El Bono Familiar Habitacional lo descuenta el Estado directamente del precio — el cliente paga el precio cliente.</p>'+
       '</div>';
       if (lote.d){
         html += '<p style="font-size:0.78rem;color:var(--ink-faint);padding:0 16px 14px;">Precio lista: '+fmtMoney(lote.pl)+' · Descuento: '+fmtMoney(lote.d)+'</p>';
@@ -3857,7 +4029,7 @@ function renderMapaEtapa5Html(etapaN){
             '<div class="cuotas-calc-label">Tu cuota mensual referencial</div>'+
             '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(cuotaMensual)+'</div>'+
             '<div class="cuotas-calc-breakdown">'+
-              '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Precio cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
               '<div><span>Separación (ya pagada)</span><strong>− '+fmtMoney(sepMonto())+'</strong></div>'+
               '<div><span>Monto financiado</span><strong>'+fmtMoney(saldoFinanciar)+'</strong></div>'+
             '</div>'+
@@ -3879,7 +4051,7 @@ function renderMapaEtapa5Html(etapaN){
             '<div class="cuotas-calc-label">'+(restoFin > 0 ? 'Tu cuota mensual referencial' : 'El adelanto cubre toda la inicial')+'</div>'+
             '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(restoFin > 0 ? cuotaPers : 0)+'</div>'+
             '<div class="cuotas-calc-breakdown">'+
-              '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Precio cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
               '<div><span>Separación (ya pagada)</span><strong>− '+fmtMoney(sepMonto())+'</strong></div>'+
               '<div><span>Adelanto ahora</span><strong>− '+fmtMoney(adelantoCalc)+'</strong></div>'+
               '<div><span>Monto financiado</span><strong>'+fmtMoney(restoFin)+'</strong></div>'+
@@ -3890,7 +4062,7 @@ function renderMapaEtapa5Html(etapaN){
             '<div class="cuotas-calc-label">Saldo en un solo pago</div>'+
             '<div class="cuotas-calc-amount cuotas-calc-amount-lg">'+fmtMoney(saldoFinanciar)+'</div>'+
             '<div class="cuotas-calc-breakdown">'+
-              '<div><span>Inicial del cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
+              '<div><span>Precio cliente</span><strong>'+fmtMoney(inicialCliente)+'</strong></div>'+
               '<div><span>Separación ya pagada</span><strong>'+fmtMoney(sepMonto())+'</strong></div>'+
             '</div>'+
           '</div>';
@@ -4295,6 +4467,11 @@ function validateServicioForm(fd){
   if (!precioMin || precioMin <= 0) errors.precioMin = 'Ingresa un precio válido.';
   if (!precioMax || precioMax <= 0) errors.precioMax = 'Ingresa un precio válido.';
   if (precioMin && precioMax && precioMin > precioMax) errors.precioMax = 'Debe ser mayor o igual al precio mínimo.';
+  var et = parseInt(fd.get('svcEtapa'), 10);
+  if (!(et >= 1 && et <= 99)) errors.svcEtapa = 'Escribe tu etapa.';
+  var mz = String(fd.get('svcManzana')||'').trim();
+  if (!mz) errors.svcManzana = 'Escribe tu manzana.';
+  errors._man = mz;
   return errors;
 }
 
@@ -4388,6 +4565,21 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'toggle-filters'){
     ui.showFilters = !ui.showFilters;
     render();
+  } else if (action === 'svc-revisar'){
+    var rv2 = value.split('|'), rvId = rv2[0], rvOk = rv2[1] === '1';
+    var motEl = document.getElementById('svc-mot-'+rvId), mot = motEl ? motEl.value.trim() : '';
+    if (!rvOk && !mot){ ui.asesoraError = 'Escribe el motivo para rechazar.'; render(); return; }
+    var rr = await asesoraLlamar('ec_servicio_revisar', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin, p_servicio_id: rvId, p_aprobar: rvOk, p_motivo: mot || null });
+    if (rr.ok){ ui.sepMsg = rvOk ? 'Servicio aprobado: ya lo ven los vecinos.' : 'Servicio rechazado. El vecino verá el motivo.'; await asesorCargarPanel(); }
+    render();
+  } else if (action === 'svc-foto-quitar'){
+    var qi = parseInt(value, 10);
+    if (ui.svcFotos && qi >= 0) ui.svcFotos.splice(qi, 1);
+    svcFotosPintar();
+  } else if (action === 'video-tut-toggle'){
+    ui.videoTutAbierto = !ui.videoTutAbierto;
+    var vtEl = document.querySelector('.video-tut');
+    if (vtEl) vtEl.outerHTML = videoTutorialHtml(); else render();
   } else if (action === 'edit-svc'){
     ui.editingId = t.getAttribute('data-id');
     ui.view = 'publicar';
@@ -4814,7 +5006,7 @@ document.addEventListener('click', async function(ev){
     ui.sepMsg = ''; ui.sepOp = ''; ui.sepNombre = ''; ui.sepDni = ''; ui.sepMonto = ''; ui.sepImg = '';
     var rv = await asesoraLlamar('ec_reservar_lote', { p_lote_id: rvId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
     if (rv.ok){
-      ui.sepMsg = 'Casa bloqueada por 1 hora. Cobra la separación y registra el comprobante antes de que se acabe el tiempo.';
+      ui.sepMsg = 'Casa bloqueada por 3 horas. Cobra la separación y registra el comprobante antes de que se acabe el tiempo.';
       await etapa5Refrescar(); await asesorCargarPanel();
     }
     render();
@@ -4824,6 +5016,10 @@ document.addEventListener('click', async function(ev){
       var kv = p.split(':'), el = document.getElementById(kv[0]);
       if (el) ui[kv[1]] = el.value;
     });
+    if (miProySlug() === 'sullana' && (!String(ui.sepNombre||'').trim() || !ui.sepImg)){
+      ui.asesoraError = !String(ui.sepNombre||'').trim() ? 'Escribe el nombre del cliente.' : 'Sube la captura del pago (Yape, Plin o voucher).';
+      render(); return;
+    }
     var montoNum = parseFloat(String(ui.sepMonto).replace(',','.'));
     var rSep = await asesoraLlamar('ec_reserva_confirmar', { p_lote_id: sepId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin,
       p_nombre: ui.sepNombre, p_dni: ui.sepDni, p_operacion: ui.sepOp, p_monto: isNaN(montoNum) ? null : montoNum, p_imagen: ui.sepImg || null });
@@ -5007,12 +5203,12 @@ async function asesoraLlamar(fn, args){
       no_disponible: 'Ese lote ya no está disponible: alguien se te adelantó.',
       no_separado: 'Ese lote ya no está separado.',
       no_existe: 'No se encontró el lote.',
-      vencida: 'Se acabó el tiempo de esta separación (1 hora). La casa volvió a estar disponible; si sigue libre, sepárala de nuevo.',
+      vencida: 'Se acabó el tiempo de esta separación (3 horas). La casa volvió a estar disponible; si sigue libre, sepárala de nuevo.',
       operacion: 'Escribe el número de operación (entre 4 y 30 letras o números) o sube la captura del pago.',
       imagen: 'La imagen no se pudo guardar. Prueba con otra captura.',
       tope: 'Ese descuento supera el máximo permitido para esa forma de pago.',
       permiso_jefe: 'Este descuento lo definió jefatura: no se puede cambiar.',
-      solo_tu_reserva: 'Primero separa la casa (1 hora) para poder aplicar un precio acordado.',
+      solo_tu_reserva: 'Primero separa la casa (3 horas) para poder aplicar un precio acordado.',
       operacion_repetida: 'Ese número de operación ya fue usado en otra separación.',
       sin_separacion: 'No se encontró esa venta entre las tuyas.',
       pago2_hecho: 'Esa venta ya tiene la segunda boleta registrada.',
@@ -6112,11 +6308,11 @@ function generarCotizacionPDF(mz, loteNum){
   y += 6; doc.text('Estado: '+(lote.e==='DISPONIBLE'?'Disponible':lote.e), 14, y);
 
   y += 12; doc.setFontSize(13); doc.setTextColor(20,20,20);
-  doc.text('Precio total del lote: '+fmtMoney(lotePrecio(lote)), 14, y);
+  doc.text('Precio total de la casa: '+fmtMoney(lotePrecio(lote)), 14, y);
   y += 7; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
   doc.text('Bono Familiar Habitacional: '+fmtMoney(bfh), 14, y);
   y += 6; doc.setFontSize(13); doc.setTextColor(20,20,20);
-  doc.text('Inicial del cliente: '+fmtMoney(inicialCliente), 14, y);
+  doc.text('Precio cliente: '+fmtMoney(inicialCliente), 14, y);
   y += 10; doc.setFontSize(12); doc.setTextColor(57,126,173);
   doc.text(modo === 'contado' ? 'Plan: Al contado' : (modo === 'personalizada' ? 'Plan: Adelanto + cuotas ('+meses+' meses)' : 'Plan: En cuotas ('+meses+' meses)'), 14, y);
   y += 8; doc.setFontSize(10.5); doc.setTextColor(60,60,60);
@@ -6189,28 +6385,22 @@ document.addEventListener('input', function(ev){
 
 document.addEventListener('change', function(ev){
   if (ev.target.id === 'svc-foto-file'){
-    var file = ev.target.files && ev.target.files[0];
-    if (!file) return;
-    var rd = new FileReader();
-    rd.onload = function(){
-      var im = new Image();
-      im.onload = function(){
-        var max = 800, k = Math.min(1, max/Math.max(im.width, im.height));
-        var cv = document.createElement('canvas');
-        cv.width = Math.round(im.width*k); cv.height = Math.round(im.height*k);
-        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
-        var url = cv.toDataURL('image/jpeg', 0.72);
-        document.getElementById('svc-foto').value = url;
-        document.getElementById('svc-foto-img').src = url;
-        document.getElementById('svc-foto-prev').style.display = 'block';
-      };
-      im.onerror = function(){ toast('No se pudo leer esa foto. Prueba con otra.'); };
-      im.src = rd.result;
-    };
-    rd.readAsDataURL(file);
+    var files = Array.prototype.slice.call(ev.target.files || []);
+    ev.target.value = '';
+    if (!files.length) return;
+    (async function(){
+      ui.svcFotos = ui.svcFotos || [];
+      var hubo = false;
+      for (var fi = 0; fi < files.length; fi++){
+        if (ui.svcFotos.length >= SVC_MAX_FOTOS){ toast('Máximo '+SVC_MAX_FOTOS+' fotos.'); break; }
+        var u = await svcReducirFoto(files[fi]);
+        if (u){ ui.svcFotos.push(u); hubo = true; } else toast('No se pudo leer una foto. Prueba con otra.');
+      }
+      if (hubo) svcFotosPintar();
+    })();
     return;
   }
-  if (ev.target.id === 'lote-calc-meses'){
+    if (ev.target.id === 'lote-calc-meses'){
     ui.loteCalcMeses = Math.min(cuotasMax(), Math.max(1, parseInt(ev.target.value, 10) || 24));
     render();
   }
@@ -6432,7 +6622,7 @@ document.addEventListener('submit', async function(ev){
   if (kind === 'servicio'){
     var errors = validateServicioForm(fd);
     ui.formErrors = errors;
-    if (Object.keys(errors).length){ render(); return; }
+    if (Object.keys(errors).filter(function(k){ return k !== '_man'; }).length){ render(); return; }
     var editId = form.getAttribute('data-id');
     var titulo = (fd.get('titulo')||'').trim();
     var descripcion = (fd.get('descripcion')||'').trim();
@@ -6442,18 +6632,22 @@ document.addEventListener('submit', async function(ev){
     var svcProyectoId = parseInt(fd.get('proyectoId'),10);
     var svcIcono = (fd.get('icono')||'').trim();
     if (svcIcono && !iconoValido(svcIcono)) svcIcono = '';
-    var svcFoto = (fd.get('foto')||'');
+    var svcFotos = (ui.svcFotos || []).slice(0, SVC_MAX_FOTOS);
+    var svcFoto = svcFotos[0] || '';
+    var svcEtapa = parseInt(fd.get('svcEtapa'), 10);
+    var svcManzana = String(fd.get('svcManzana')||'').trim();
     if (editId){
       var updS = await sb.rpc('ec_editar_servicio', {
         p_token: sessionToken, p_servicio_id: editId, p_titulo: titulo, p_descripcion: descripcion,
         p_categoria_id: categoriaId, p_precio_min: precioMin, p_precio_max: precioMax, p_proyecto_id: svcProyectoId,
-        p_icono: svcIcono, p_foto: svcFoto
+        p_icono: svcIcono, p_foto: svcFoto, p_fotos: svcFotos, p_etapa: svcEtapa, p_manzana: svcManzana
       });
       if (updS.error){
         if (handleSessionError(updS.error)){ render(); return; }
         toast('No se pudo guardar. Intenta de nuevo.'); render(); return;
       }
-      toast('Servicio actualizado.');
+      toast('Servicio guardado. Si cambiaste texto o fotos, vuelve a revisión.');
+      ui.svcFotosFor = null; ui.svcFotos = [];
       ui.view = 'mios';
       await refreshServicios();
       render();
@@ -6461,15 +6655,15 @@ document.addEventListener('submit', async function(ev){
       var insS = await sb.rpc('ec_crear_servicio', {
         p_token: sessionToken, p_titulo: titulo, p_descripcion: descripcion,
         p_categoria_id: categoriaId, p_precio_min: precioMin, p_precio_max: precioMax, p_proyecto_id: svcProyectoId,
-        p_icono: svcIcono, p_foto: svcFoto
+        p_icono: svcIcono, p_foto: svcFoto, p_fotos: svcFotos, p_etapa: svcEtapa, p_manzana: svcManzana
       });
       if (insS.error){
         if (handleSessionError(insS.error)){ render(); return; }
         toast('No se pudo publicar. Intenta de nuevo.'); render(); return;
       }
-      toast('¡Tu servicio ya está publicado!');
-      ui.view = 'detalle';
-      ui.selectedId = insS.data;
+      toast('¡Listo! Tu servicio fue enviado a revisión (máx. 1 día).');
+      ui.svcFotosFor = null; ui.svcFotos = [];
+      ui.view = 'mios';
       await refreshServicios();
       render();
     }
