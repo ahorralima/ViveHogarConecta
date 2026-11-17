@@ -74,17 +74,17 @@ input,select,textarea{font-family:inherit;font-size:0.95rem;}
 }
 .header-row{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;max-width:1040px;margin:0 auto;width:100%;flex-wrap:wrap;}
 .brand{display:flex;align-items:center;gap:9px;line-height:1.1;min-width:0;}
-.brand-mark{flex:none;height:27px;width:auto;}
+.brand-mark{flex:none;height:42px;width:auto;}
 .brand-text{display:flex;flex-direction:column;min-width:0;}
-.brand-name{font-family:var(--font-display);font-weight:800;font-size:1.1rem;letter-spacing:-0.01em;white-space:nowrap;}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:1.3rem;letter-spacing:-0.01em;white-space:nowrap;}
 .brand-name .n1{color:var(--paprika);}
 .brand-name .n2{color:var(--teal);}
 .brand-name .n3{color:var(--purple);}
-.brand-tag{font-size:0.68rem;font-weight:600;letter-spacing:0.02em;color:var(--ink-faint);white-space:nowrap;}
+.brand-tag{font-size:0.74rem;font-weight:600;letter-spacing:0.02em;color:var(--ink-faint);white-space:nowrap;}
 @media (min-width:420px){
-  .brand-mark{height:34px;}
-  .brand-name{font-size:1.3rem;}
-  .brand-tag{font-size:0.74rem;}
+  .brand-mark{height:50px;}
+  .brand-name{font-size:1.5rem;}
+  .brand-tag{font-size:0.8rem;}
 }
 .proyecto-switch{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;max-width:100%;overflow-x:auto;scrollbar-width:none;}
 .proyecto-switch::-webkit-scrollbar{display:none;}
@@ -1586,6 +1586,7 @@ function renderHome(){
     html += '<div class="quick-access-grid">'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="cuotas"><span class="qa-icon">💰</span><strong>Mis cuotas</strong><span>Consulta tus pagos</span></button>'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="publicar"><span class="qa-icon">🛠️</span><strong>Publicar servicio</strong><span>Ofrece algo a tus vecinos</span></button>'+
+      '<button type="button" class="quick-access-tile" style="grid-column:1 / -1;" data-action="ver-boletin"><span class="qa-icon">📰</span><strong>Ver boletín</strong><span>Novedades y avisos del proyecto</span></button>'+
     '</div>';
   }
 
@@ -1774,6 +1775,7 @@ function authForm(){
 
 // ---------- Servicios: fotos múltiples, video tutorial ----------
 var SVC_MAX_FOTOS = 6;
+var BOLETIN_URL = '';   // pega aquí el enlace del boletín informativo (PDF o página web)
 var VIDEO_TUTORIAL_URL = '';   // pega aquí el enlace del video (YouTube: https://www.youtube.com/embed/XXXX o un .mp4)
 function videoTutorialHtml(){
   var abierto = !!ui.videoTutAbierto;
@@ -4863,6 +4865,9 @@ document.addEventListener('click', async function(ev){
     setGate('interesado');
     window.scrollTo(0,0);
     render();
+  } else if (action === 'ver-boletin'){
+    if (!BOLETIN_URL) toast('El boletín estará disponible muy pronto.');
+    else window.open(BOLETIN_URL, '_blank', 'noopener');
   } else if (action === 'gate-reset'){
     if (confirm('¿Volver a la pantalla de inicio? Podrás elegir de nuevo "Soy cliente" o "Estoy interesado".')){
       setGate(null);
