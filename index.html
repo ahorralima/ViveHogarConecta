@@ -1202,6 +1202,30 @@ function saveClienteDni(dni){
 
 function normBloque(b){ return String(b==null?'':b).replace(/^\s*mz\.?\s*-?\s*/i,'').trim(); }
 function normLote(l){ return String(l==null?'':l).trim().replace(/^0+(?=\d)/,''); }
+var clienteGerencia = null;
+try { clienteGerencia = localStorage.getItem('ec_cliente_gerencia_v1') || null; } catch(e) { clienteGerencia = null; }
+function saveClienteGerencia(slug){
+  clienteGerencia = slug || null;
+  try { if (slug) localStorage.setItem('ec_cliente_gerencia_v1', slug); else localStorage.removeItem('ec_cliente_gerencia_v1'); } catch(e){}
+}
+// Gerencia: entran como cliente con su usuario y clave de asesor; no tienen casa
+var GERENCIA_PROY = [
+  {n:['edwin','orbego'], p:'sullana', id:2},
+  {n:['pablo','franco'], p:'castilla', id:1},
+  {n:['francisco','blanco'], p:'castilla', id:1},
+  {n:['emilio','blanco'], p:'ejidos', id:3},
+  {n:['jorge','alvarado'], p:'lambayeque', id:4},
+  {n:['jesus','blanco'], p:'castilla', id:1},
+  {n:['eduardo','villa'], p:'castilla', id:1}
+];
+function gerenciaDeNombre(nombre){
+  var t = String(nombre||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  for (var i=0;i<GERENCIA_PROY.length;i++){
+    var g = GERENCIA_PROY[i];
+    if (g.n.every(function(x){ return t.indexOf(x) !== -1; })) return g;
+  }
+  return null;
+}
 var clienteBloqueVerificado = null;
 try { clienteBloqueVerificado = normBloque(localStorage.getItem('ec_cliente_bloque_v1')) || null; } catch(e) { clienteBloqueVerificado = null; }
 function saveClienteBloque(bloque){
@@ -1569,15 +1593,16 @@ function renderHome(){
   if (clienteNombreVerificado && clienteDniVerificado){
     var hProyNombre = PROY_NOMBRES[proySlugPref()];
     var hSubParts = [];
-    if (localPref && localPref.etapa) hSubParts.push('Etapa '+esc(localPref.etapa));
+    if (clienteGerencia) hSubParts.push('Gerencia');
+    else if (localPref && localPref.etapa) hSubParts.push('Etapa '+esc(localPref.etapa));
     if (clienteBloqueVerificado) hSubParts.push('Mz. '+esc(clienteBloqueVerificado));
     if (clienteLoteVerificado) hSubParts.push('Lote '+esc(clienteLoteVerificado));
     html += '<div class="panel panel-flat mivivienda-card">'+
       '<div class="mivivienda-top">'+
-        '<span class="mivivienda-label">MI VIVIENDA</span>'+
-        '<span class="cuota-chip cuota-chip-ok">Cliente verificado</span>'+
+        '<span class="mivivienda-label">'+(clienteGerencia ? 'GERENCIA' : 'MI VIVIENDA')+'</span>'+
+        '<span class="cuota-chip cuota-chip-ok">'+(clienteGerencia ? 'Gerencia' : 'Cliente verificado')+'</span>'+
       '</div>'+
-      '<div class="mivivienda-proyecto">'+esc(hProyNombre)+'</div>'+
+      '<div class="mivivienda-proyecto">'+(clienteGerencia ? 'Gerencia '+esc(hProyNombre.replace('Vive Hogar ','')) : esc(hProyNombre))+'</div>'+
       (hSubParts.length ? '<div class="mivivienda-sub">'+hSubParts.join(' · ')+'</div>' : '')+
       '<div style="font-size:0.76rem;color:var(--ink-faint);margin-top:6px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
       '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px;" data-action="nav" data-value="micasa">Ver mi vivienda →</button>'+
@@ -1975,7 +2000,7 @@ function renderMiCasa(){
     '</div>'+
     '<div class="mivivienda-rows">'+
       (etapaNum ? '<div class="mivivienda-row"><span>Etapa</span><strong>'+esc(etapaNum)+'</strong></div>' : '')+
-      '<div class="mivivienda-row"><span>Manzana y lote</span><strong>'+(clienteBloqueVerificado || clienteLoteVerificado ? esc((clienteBloqueVerificado||'')+(clienteLoteVerificado?' · Lote '+clienteLoteVerificado:'')) : 'Pendiente de registro')+'</strong></div>'+
+      '<div class="mivivienda-row"><span>Manzana y lote</span><strong>'+(clienteGerencia ? 'Gerencia (sin vivienda)' : clienteBloqueVerificado || clienteLoteVerificado ? esc((clienteBloqueVerificado||'')+(clienteLoteVerificado?' · Lote '+clienteLoteVerificado:'')) : 'Pendiente de registro')+'</strong></div>'+
     '</div>'+
   '</div>';
 
@@ -3075,7 +3100,10 @@ function renderClienteVerificacion(){
 
   html += '<div class="panel panel-flat"><h4>¿No encuentras tus datos?</h4>'+
     '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Escríbenos por WhatsApp y te ayudamos a revisar tu contrato.</p>'+
-    '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no puedo verificar mis datos de cliente en la app')+'" target="_blank" rel="noopener">💬 ¿Necesitas ayuda? Contáctanos</a>'+
+    '<p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">¿De qué proyecto eres?</p>'+
+    ['sullana','castilla','ejidos','lambayeque'].map(function(k){
+      return '<a class="btn btn-secondary btn-block" style="margin-bottom:8px;" href="https://wa.me/'+(VHS_WA_PROY[k]||VHS_WHATSAPP)+'?text='+encodeURIComponent('Hola, soy cliente de '+PROY_NOMBRES[k]+' y no puedo verificar mis datos en la app')+'" target="_blank" rel="noopener">💬 '+PROY_NOMBRES[k]+'</a>';
+    }).join('')+
   '</div>';
 
   html += '</div>';
@@ -3532,6 +3560,8 @@ var VHS_SITIOS_WEB = {
   castilla: 'https://castilla.vivehogar.com.pe'
 };
 var VHS_WHATSAPP = '51934042610';
+// WhatsApp de ayuda por proyecto (si falta alguno, se usa el general)
+var VHS_WA_PROY = { sullana: '51934042610', castilla: '', ejidos: '', lambayeque: '' };
 
 // Datos de la sección de confianza (Vive Hogar Sullana). Cada campo
 // queda en null hasta que Jesús confirme internamente la razón
@@ -4906,6 +4936,7 @@ document.addEventListener('click', async function(ev){
       setGate(null);
       clienteNombreVerificado = null;
       clienteDniVerificado = null;
+      saveClienteGerencia('');
       try { localStorage.removeItem('ec_cliente_nombre_v1'); localStorage.removeItem('ec_cliente_dni_v1'); } catch(e){}
       ui.cuotasData = null;
       ui.cuotasError = '';
@@ -6500,14 +6531,14 @@ document.addEventListener('submit', async function(ev){
       // Cuenta de demostración: no consulta datos reales de clientes
       ui.fProyecto = 'all'; ui.fEtapa = ''; ui.showEtapaPrompt = false;
       saveLocalPref(2, '5'); saveClienteNombre('Prueba 123'); saveClienteDni(vDni);
-      saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', '');
+      saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', ''); saveClienteGerencia('');
       ui.cuotasData = null; ui.cuotasError = '';
       ui.view = 'home'; window.scrollTo(0,0); setGate('cliente-verificado'); render(); toast('Cuenta de demostración: ves todos los proyectos.');
       return;
     }
-    // Edwin Orbegozo (administración): entra como cliente con su usuario y clave de asesor
-    var vNN = vNombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    if (/edwin/.test(vNN) && /orbego[sz]o/.test(vNN)){
+    // Gerencia: entra como cliente con su usuario y clave de asesor
+    var vGer = gerenciaDeNombre(vNombre);
+    if (vGer){
       ui.clienteBusy = true; ui.clienteErrors = {}; render();
       var edRes;
       try { edRes = await sb.rpc('ec_asesor_login', { p_nombre: vNombre, p_clave: vDni }); } catch(eNet){ edRes = { error: eNet }; }
@@ -6518,11 +6549,11 @@ document.addEventListener('submit', async function(ev){
       if (!edRes.data.ok){
         ui.clienteErrors = {general: edRes.data.error === 'bloqueada' ? 'Demasiados intentos. Espera 10 minutos.' : 'Nombre o contraseña incorrectos.'}; render(); return;
       }
-      ui.fProyecto = 'all'; ui.fEtapa = ''; ui.showEtapaPrompt = false;
-      saveLocalPref(2, '5'); saveClienteNombre(vNombre); saveClienteDni('00000000');
-      saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', '');
+      ui.fProyecto = String(vGer.id); ui.fEtapa = ''; ui.showEtapaPrompt = false;
+      saveLocalPref(vGer.id, ''); saveClienteNombre(toTitleCase(vNombre)); saveClienteDni('00000000');
+      saveClienteBloque(''); saveClienteLote(''); saveClienteGestora('', ''); saveClienteGerencia(vGer.p);
       ui.cuotasData = null; ui.cuotasError = '';
-      ui.view = 'home'; window.scrollTo(0,0); setGate('cliente-verificado'); render(); toast('Ingresaste como cliente: ves todos los proyectos.');
+      ui.view = 'home'; window.scrollTo(0,0); setGate('cliente-verificado'); render(); toast('Ingresaste como Gerencia '+PROY_NOMBRES[vGer.p].replace('Vive Hogar ','')+'.');
       return;
     }
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
@@ -6556,6 +6587,7 @@ document.addEventListener('submit', async function(ev){
     saveClienteBloque(vData.bloque || '');
     saveClienteLote(vData.lote || '');
     saveClienteGestora(vData.gestora_nombre || '', vData.gestora_telefono || '');
+    saveClienteGerencia('');
     // Siempre limpiar el cache de cuotas al verificar, aunque sea el
     // mismo cliente de antes, para nunca arrastrar datos de otra persona.
     ui.cuotasData = null;
