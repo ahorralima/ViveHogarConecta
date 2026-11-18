@@ -1586,7 +1586,7 @@ function renderHome(){
     html += '<div class="quick-access-grid">'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="cuotas"><span class="qa-icon">💰</span><strong>Mis cuotas</strong><span>Consulta tus pagos</span></button>'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="publicar"><span class="qa-icon">🛠️</span><strong>Publicar servicio</strong><span>Ofrece algo a tus vecinos</span></button>'+
-      '<button type="button" class="quick-access-tile" style="grid-column:1 / -1;" data-action="ver-boletin"><span class="qa-icon">📰</span><strong>Ver boletín</strong><span>Novedades y avisos del proyecto</span></button>'+
+      (BOLETIN_IMG[proySlugPref()] ? '<button type="button" class="quick-access-tile" style="grid-column:1 / -1;" data-action="ver-boletin"><span class="qa-icon">📰</span><strong>Ver boletín</strong><span>Novedades y avisos del proyecto</span></button>' : '')+
     '</div>';
   }
 
@@ -1775,6 +1775,7 @@ function authForm(){
 
 // ---------- Servicios: fotos múltiples, video tutorial ----------
 var SVC_MAX_FOTOS = 6;
+var BOLETIN_IMG = { sullana: 'boletin/sullana-papa.jpg' };   // boletín por proyecto (solo clientes de ese proyecto)
 var BOLETIN_URL = '';   // pega aquí el enlace del boletín informativo (PDF o página web)
 var VIDEO_TUTORIAL_URL = '';   // pega aquí el enlace del video (YouTube: https://www.youtube.com/embed/XXXX o un .mp4)
 function videoTutorialHtml(){
@@ -4885,7 +4886,14 @@ document.addEventListener('click', async function(ev){
     window.scrollTo(0,0);
     render();
   } else if (action === 'ver-boletin'){
-    if (!BOLETIN_URL) toast('El boletín estará disponible muy pronto.');
+    var bImg = BOLETIN_IMG[proySlugPref()];
+    if (bImg){
+      var bo = document.createElement('div');
+      bo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;';
+      bo.innerHTML = '<img src="'+bImg+'" alt="Boletín" style="max-width:100%;max-height:100%;border-radius:8px;" /><button type="button" style="position:fixed;top:max(12px,env(safe-area-inset-top,0px));right:12px;font-size:1.6rem;line-height:1;background:#fff;border:0;border-radius:50%;width:42px;height:42px;">×</button>';
+      bo.addEventListener('click', function(){ bo.remove(); });
+      document.body.appendChild(bo);
+    } else if (!BOLETIN_URL) toast('El boletín estará disponible muy pronto.');
     else window.open(BOLETIN_URL, '_blank', 'noopener');
   } else if (action === 'gate-reset'){
     if (confirm('¿Volver a la pantalla de inicio? Podrás elegir de nuevo "Soy cliente" o "Estoy interesado".')){
@@ -6495,6 +6503,26 @@ document.addEventListener('submit', async function(ev){
       saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', '');
       ui.cuotasData = null; ui.cuotasError = '';
       ui.view = 'home'; window.scrollTo(0,0); setGate('cliente-verificado'); render(); toast('Cuenta de demostración: ves todos los proyectos.');
+      return;
+    }
+    // Edwin Orbegozo (administración): entra como cliente con su usuario y clave de asesor
+    var vNN = vNombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (/edwin/.test(vNN) && /orbego[sz]o/.test(vNN)){
+      ui.clienteBusy = true; ui.clienteErrors = {}; render();
+      var edRes;
+      try { edRes = await sb.rpc('ec_asesor_login', { p_nombre: vNombre, p_clave: vDni }); } catch(eNet){ edRes = { error: eNet }; }
+      ui.clienteBusy = false;
+      if (edRes.error || !edRes.data){
+        ui.clienteErrors = {general:'No pudimos conectarnos. Revisa tu internet e intenta de nuevo.'}; render(); return;
+      }
+      if (!edRes.data.ok){
+        ui.clienteErrors = {general: edRes.data.error === 'bloqueada' ? 'Demasiados intentos. Espera 10 minutos.' : 'Nombre o contraseña incorrectos.'}; render(); return;
+      }
+      ui.fProyecto = 'all'; ui.fEtapa = ''; ui.showEtapaPrompt = false;
+      saveLocalPref(2, '5'); saveClienteNombre(vNombre); saveClienteDni('00000000');
+      saveClienteBloque('A'); saveClienteLote('1'); saveClienteGestora('', '');
+      ui.cuotasData = null; ui.cuotasError = '';
+      ui.view = 'home'; window.scrollTo(0,0); setGate('cliente-verificado'); render(); toast('Ingresaste como cliente: ves todos los proyectos.');
       return;
     }
     ui.clienteBusy = true; ui.clienteErrors = {}; render();
