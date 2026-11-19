@@ -703,7 +703,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .ref-banner:active{transform:scale(0.99);}
 .ref-banner .ref-tag{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.75;}
 .ref-banner .ref-big{font-size:1.25rem;font-weight:800;line-height:1.2;margin-top:4px;}
-.ref-banner .ref-big b{font-size:1.9rem;}
+.ref-banner .ref-big b{font-size:1.5rem;}
 .ref-banner .ref-sub{font-size:.82rem;margin-top:4px;opacity:.9;}
 .ref-banner .ref-cta{display:inline-block;margin-top:10px;background:#3b2a05;color:#FFE9B0;font-weight:700;font-size:.82rem;border-radius:999px;padding:7px 14px;}
 .ref-banner .ref-gift{position:absolute;right:10px;top:6px;font-size:3.4rem;opacity:.9;}
@@ -1625,7 +1625,7 @@ function renderHome(){
     if (!clienteGerencia && (proySlugPref() === 'sullana' || proySlugPref() === 'castilla')){
       html += '<button type="button" class="ref-banner" data-action="ver-referidos"><span class="ref-gift">🎁</span>'+
         '<div class="ref-tag">Promoción Referidos</div>'+
-        '<div class="ref-big">Recomienda a un amigo y gana <b>S/ 50</b></div>'+
+        '<div class="ref-big">Recomienda a un amigo y <b>gana premios</b></div>'+
         '<div class="ref-sub">Cuando tu referido compre su casa.</div>'+
         '<span class="ref-cta">Quiero referir →</span></button>';
     }
@@ -4953,11 +4953,11 @@ document.addEventListener('click', async function(ev){
     var rs = document.createElement('div');
     rs.id = 'ref-sheet'; rs.className = 'ref-sheet';
     rs.innerHTML = '<button type="button" class="ref-close" data-action="cerrar-referidos" aria-label="Cerrar">×</button>'+
-      '<div style="text-align:center;margin:4px 0 10px;"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:150px;max-width:55%;height:auto;mix-blend-mode:multiply;" /></div><h2>🎁 Referidos: gana S/ 50</h2>'+
-      '<p style="color:var(--ink-soft);font-size:.9rem;margin:0 0 8px;">Si recomiendas a alguien y compra su casa en '+esc(PROY_NOMBRES[rpSlug] || 'Vive Hogar')+', te pagamos <strong>S/ 50</strong>.</p>'+
+      '<div style="text-align:center;margin:4px 0 10px;"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:150px;max-width:55%;height:auto;mix-blend-mode:multiply;" /></div><h2>🎁 Referidos: gana premios</h2>'+
+      '<p style="color:var(--ink-soft);font-size:.9rem;margin:0 0 8px;">Si recomiendas a alguien y compra su casa en '+esc(PROY_NOMBRES[rpSlug] || 'Vive Hogar')+', te regalamos <strong>premios</strong>.</p>'+
       '<div class="ref-step"><i>1</i><p><strong>Recomienda</strong> a un familiar, amigo o conocido que quiera su casa propia.</p></div>'+
       '<div class="ref-step"><i>2</i><p><strong>Cuéntanos</strong> su nombre y teléfono aquí abajo. Un asesor lo contactará.</p></div>'+
-      '<div class="ref-step"><i>3</i><p><strong>Gana S/ 50</strong> cuando comprobemos que tu referido compró su casa.</p></div>'+
+      '<div class="ref-step"><i>3</i><p><strong>Gana premios</strong> cuando comprobemos que tu referido compró su casa.</p></div>'+
       '<div class="panel panel-flat" style="margin-top:14px;"><h4 style="margin:0 0 4px;">Datos de tu referido</h4>'+
       '<input id="ref-nombre" type="text" placeholder="Nombre de tu referido" autocomplete="off" />'+
       '<input id="ref-tel" type="tel" inputmode="tel" placeholder="Teléfono de tu referido" autocomplete="off" />'+
@@ -4971,7 +4971,7 @@ document.addEventListener('click', async function(ev){
     var rt = (document.getElementById('ref-tel') || {}).value || '';
     if (!rn.trim() || !rt.trim()){ toast('Escribe el nombre y el teléfono de tu referido.'); return; }
     var rk = proySlugPref();
-    var rmsg = 'Hola, quiero referir a un amigo para la promoción Referidos (S/ 50). '+
+    var rmsg = 'Hola, quiero referir a un amigo para la promoción Referidos. '+
       'Soy '+toTitleCase(clienteNombreVerificado || 'cliente')+', cliente de '+(PROY_NOMBRES[rk] || 'Vive Hogar')+'. '+
       'Mi referido es '+rn.trim()+', teléfono '+rt.trim()+'.';
     window.open('https://wa.me/'+(VHS_WA_PROY[rk] || VHS_WHATSAPP)+'?text='+encodeURIComponent(rmsg), '_blank', 'noopener');
