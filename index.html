@@ -523,6 +523,14 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lote-dot-neutral{background:rgba(120,120,120,0.55);}
 .lote-dot-warn{background:rgba(248,177,50,0.7);}
 .lote-dot-sel{background:var(--paprika);}
+.lote-dot-mine{background:#F8B132;border-color:#c98a10;}
+@keyframes miLotePulso{0%,100%{box-shadow:0 0 0 2px #fff,0 0 8px 2px rgba(248,177,50,.9);}50%{box-shadow:0 0 0 3px #fff,0 0 18px 7px rgba(248,177,50,.95);}}
+.lote-hotspot-mine{animation:miLotePulso 1.6s ease-in-out infinite;}
+.lote-hotspot-mine-label{font-size:0.72rem !important;padding:3px 8px !important;top:-26px !important;}
+.mi-lote-ficha{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFF4D6;border:2px solid #F8B132;border-radius:12px;padding:10px 12px;margin:8px 0 10px;}
+.mi-lote-ficha small{display:block;font-size:0.72rem;color:#7a5a10;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.mi-lote-ficha strong{font-size:1.1rem;color:#3b2a05;}
+.mi-lote-leyenda{position:sticky;top:0;z-index:4;background:var(--card, #fff);padding:6px 4px;}
 .lote-filtros{background:var(--surface-2);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;}
 .lote-filtros-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .lote-filtros-label{font-size:0.76rem;font-weight:700;color:var(--ink-faint);flex:none;width:68px;}
@@ -1613,7 +1621,7 @@ function renderHome(){
     if (clienteGerencia) hSubParts.push('Gerencia');
     else if (localPref && localPref.etapa) hSubParts.push('Etapa '+esc(localPref.etapa));
     if (clienteBloqueVerificado) hSubParts.push('Mz. '+esc(clienteBloqueVerificado));
-    if (clienteLoteVerificado) hSubParts.push('Lote '+esc(clienteLoteVerificado));
+    if (clienteLoteVerificado) hSubParts.push('Casa '+esc(clienteLoteVerificado));
     html += '<div class="panel panel-flat mivivienda-card">'+
       '<div class="mivivienda-top">'+
         '<span class="mivivienda-label">'+(clienteGerencia ? 'GERENCIA' : 'MI VIVIENDA')+'</span>'+
@@ -2025,7 +2033,7 @@ function renderMiCasa(){
     '</div>'+
     '<div class="mivivienda-rows">'+
       (etapaNum ? '<div class="mivivienda-row"><span>Etapa</span><strong>'+esc(etapaNum)+'</strong></div>' : '')+
-      '<div class="mivivienda-row"><span>Manzana y lote</span><strong>'+(clienteGerencia ? 'Gerencia (sin vivienda)' : clienteBloqueVerificado || clienteLoteVerificado ? esc((clienteBloqueVerificado||'')+(clienteLoteVerificado?' · Lote '+clienteLoteVerificado:'')) : 'Pendiente de registro')+'</strong></div>'+
+      '<div class="mivivienda-row"><span>Manzana y casa</span><strong>'+(clienteGerencia ? 'Gerencia (sin vivienda)' : clienteBloqueVerificado || clienteLoteVerificado ? esc((clienteBloqueVerificado||'')+(clienteLoteVerificado?' · Casa '+clienteLoteVerificado:'')) : 'Pendiente de registro')+'</strong></div>'+
     '</div>'+
   '</div>';
 
@@ -3877,6 +3885,15 @@ function renderMapaEtapa5Html(etapaN){
   var vistaCliente = !modoAsesor() && !!ui.miCasaKey;
   if (vistaCliente){
     html += '<div class="etapa5-header-sub">Tu casa está marcada en amarillo en el plano.'+(planoProy() === 'castilla' ? ' Verde: disponible · Gris: no disponible.' : '')+' Puedes acercar y mover el plano con los botones.</div>';
+    var mlP = String(ui.miCasaKey).split('|');
+    html += '<div class="mi-lote-ficha"><div><small>📍 Mi casa</small><strong>Mz. '+esc(mlP[0])+' · Casa '+esc(mlP[1])+'</strong><div style="font-size:0.78rem;color:#7a5a10;">Etapa '+esc(ETAPA_ACTUAL)+'</div></div>'+
+      '<button type="button" class="btn btn-primary" style="white-space:nowrap;" data-action="etapa5-ir-mi-lote">Ir a mi casa</button></div>';
+    html += '<div class="lote-legend mi-lote-leyenda">'+
+      '<span><i class="lote-dot lote-dot-mine"></i> <strong>Tu casa</strong></span>'+
+      (planoProy() === 'sullana'
+        ? '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-vend"></i> Vendida</span>'
+        : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-neutral"></i> No disponible</span>')+
+      '<span><i class="lote-dot lote-dot-area"></i> Parque</span></div>';
   } else {
   html += '<div class="etapa5-header-sub">'+(etapa5Disponibles === 0 ? 'Por ahora no hay lotes disponibles en esta etapa (los demás están vendidos o separados)' : 'Elige tu casa · '+etapa5Disponibles+(etapa5Disponibles === 1 ? ' lote disponible' : ' lotes disponibles'))+'</div>';
   html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>'+(planoProy() === 'sullana' ? 'blanca' : 'verde')+'</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
@@ -5287,6 +5304,18 @@ document.addEventListener('click', async function(ev){
       var tgt = irFicha ? document.querySelector('.lote-detail-card') : document.getElementById('etapa5-zoom');
       if (tgt) tgt.scrollIntoView({block:'start'});
     }, 60);
+  } else if (action === 'etapa5-ir-mi-lote'){
+    var mk = String(ui.miCasaKey || '').split('|');
+    var ml = ETAPA5_LOTES_PLANO.filter(function(l){ return l.m === mk[0] && String(l.l) === mk[1]; })[0];
+    var mzi = document.getElementById('etapa5-zoom-inner'), mzo = document.getElementById('etapa5-zoom');
+    if (ml && mzi && mzo){
+      var mcw = mzo.clientWidth, mch = mzo.clientHeight;
+      var msc = 3.2;
+      var mcx = (ml.le + ml.w/2)/100*mzi.offsetWidth*msc, mcy = (ml.t + ml.h/2)/100*mzi.offsetHeight*msc;
+      ui.etapa5Zoom = clampZoom({scale:msc, x:mcw/2 - mcx, y:mch/2 - mcy}, mcw, mch);
+      applyEtapa5Zoom();
+      mzo.scrollIntoView({block:'center', behavior:'smooth'});
+    } else { toast('No encontramos tu casa en este plano.'); }
   } else if (action === 'etapa5-zoom-mz'){
     var mzN = t.getAttribute('data-value');
     var mzItems = ETAPA5_LOTES_PLANO.concat(ETAPA5_RECREACION_PLANO).filter(function(l){ return l.m === mzN; });
