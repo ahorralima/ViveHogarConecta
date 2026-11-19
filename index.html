@@ -917,6 +917,13 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .as-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
 .as-lotechip{border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:5px 9px;font-size:0.76rem;font-weight:700;cursor:pointer;}
 .as-lotechip.of{border-color:#e0a000;background:#fff6dc;}
+.as-lotechip.sel{border-color:#2E5F8A;background:#2E5F8A;color:#fff;box-shadow:0 0 0 2px rgba(46,95,138,.25);}
+.as-mz{margin-top:10px;}
+.as-mz-h{display:flex;justify-content:space-between;align-items:baseline;font-size:0.8rem;font-weight:800;color:var(--ink);border-bottom:1px solid var(--border);padding-bottom:3px;}
+.as-mz-h small{font-weight:600;color:var(--ink-faint);}
+.as-mz .as-chips{margin-top:6px;}
+.as-mas{width:100%;margin-top:12px;}
+.as-etapa-lista{max-height:none;}
 .as-oferta-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:0.86rem;}
 .as-oferta-row:first-of-type{border-top:0;}
 .as-oferta-row s{color:var(--ink-faint);}
@@ -2138,6 +2145,7 @@ ui.asesorPanelError = '';
 ui.asesorLoginError = '';
 ui.asNombre = '';
 ui.asEtapaAbierta = {};
+ui.asEtapaTodos = {};
 ui.renderPendiente = false;
 ui.sepOp = '';
 ui.sepMonto = '';
@@ -2203,6 +2211,10 @@ function mmss(iso){
   return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 }
 function etiquetaLote(m, l){ return esc(m)+'-Lt'+esc(l); }
+// Orden natural de manzanas: A2 antes que A10, I3 antes que I11
+function cmpManzana(a, b){
+  return String(a).localeCompare(String(b), 'es', {numeric:true, sensitivity:'base'});
+}
 
 // Evita borrar lo que se está escribiendo cuando llega una actualización en vivo
 function renderSiLibre(){
@@ -2735,9 +2747,24 @@ function renderAsesorPanelHtml(){
       '<span><strong>Etapa '+esc(e.etapa)+'</strong></span><span class="as-etapa-n">'+e.n+' disponible'+(e.n===1?'':'s')+' '+(abierta?'▴':'▾')+'</span></button>';
     if (abierta){
       var ofIds = {}; (p.ofertas||[]).forEach(function(o){ ofIds[o.id] = 1; });
-      h += '<div class="as-chips">'+e.lotes.slice(0, 80).map(function(l){
-        return '<button type="button" class="as-lotechip'+(ofIds[l.id]?' of':'')+'" data-action="asesor-ir-lote" data-value="'+esc(e.etapa)+'|'+esc(l.m)+'|'+esc(l.l)+'">'+(ofIds[l.id]?'🏷️ ':'')+etiquetaLote(l.m, l.l)+'</button>';
-      }).join('')+(e.lotes.length > 80 ? '<span style="font-size:0.76rem;color:var(--ink-faint);align-self:center;">y '+(e.lotes.length-80)+' más…</span>' : '')+'</div>';
+      var topeL = ui.asEtapaTodos[e.etapa] ? 1e9 : 80;
+      var ordL = e.lotes.slice().sort(function(x, y){ return cmpManzana(x.m, y.m) || (parseInt(x.l, 10) - parseInt(y.l, 10)) || String(x.l).localeCompare(String(y.l), 'es', {numeric:true}); });
+      var visL = ordL.slice(0, topeL), grupos = [], gMap = {};
+      visL.forEach(function(l){
+        var g = gMap[l.m]; if (!g){ g = gMap[l.m] = {m:l.m, items:[]}; grupos.push(g); }
+        g.items.push(l);
+      });
+      var totMz = {}; ordL.forEach(function(l){ totMz[l.m] = (totMz[l.m] || 0) + 1; });
+      grupos.forEach(function(g){
+        h += '<div class="as-mz"><div class="as-mz-h"><span>Manzana '+esc(g.m)+'</span><small>'+totMz[g.m]+' disponible'+(totMz[g.m]===1?'':'s')+'</small></div><div class="as-chips">'+
+          g.items.map(function(l){
+            var selC = String(ui.interesadoEtapaSel) === String(e.etapa) && ui.interesadoLoteSel === l.m+'|'+l.l;
+            return '<button type="button" class="as-lotechip'+(ofIds[l.id]?' of':'')+(selC?' sel':'')+'" data-action="asesor-ir-lote" data-value="'+esc(e.etapa)+'|'+esc(l.m)+'|'+esc(l.l)+'">'+(ofIds[l.id]?'🏷️ ':'')+'Lt '+esc(l.l)+'</button>';
+          }).join('')+'</div></div>';
+      });
+      if (ordL.length > topeL){
+        h += '<button type="button" class="btn btn-secondary as-mas" data-action="asesor-etapa-todos" data-value="'+esc(e.etapa)+'">Mostrar los '+(ordL.length-topeL)+' lotes restantes</button>';
+      }
     }
     h += '</div>';
   });
@@ -4814,6 +4841,11 @@ document.addEventListener('click', async function(ev){
     var etK = t.getAttribute('data-value');
     ui.asEtapaAbierta[etK] = !ui.asEtapaAbierta[etK];
     render();
+  } else if (action === 'asesor-etapa-todos'){
+    var etT = t.getAttribute('data-value'), yPos = window.scrollY;
+    ui.asEtapaTodos[etT] = true; ui.asEtapaAbierta[etT] = true;
+    render();
+    window.scrollTo(0, yPos);
   } else if (action === 'asesor-ir-lote'){
     asesorIrALote(t.getAttribute('data-value'));
   } else if (action === 'sep-img-quitar'){
