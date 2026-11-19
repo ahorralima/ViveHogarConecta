@@ -1622,11 +1622,12 @@ function renderHome(){
       '<div style="font-size:0.76rem;color:var(--ink-faint);margin-top:6px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
       '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px;" data-action="nav" data-value="micasa">Ver mi vivienda →</button>'+
     '</div>';
-    if (!clienteGerencia && (proySlugPref() === 'sullana' || proySlugPref() === 'castilla')){
+    if (!clienteGerencia && REF_PREMIOS[proySlugPref()]){
+      var rfp = REF_PREMIOS[proySlugPref()];
       html += '<button type="button" class="ref-banner" data-action="ver-referidos"><span class="ref-gift">🎁</span>'+
         '<div class="ref-tag">Promoción Referidos</div>'+
-        '<div class="ref-big">Recomienda a un amigo y <b>gana premios</b></div>'+
-        '<div class="ref-sub">Cuando tu referido compre su casa.</div>'+
+        '<div class="ref-big">'+rfp.banner+'</div>'+
+        '<div class="ref-sub">'+rfp.sub+'</div>'+
         '<span class="ref-cta">Quiero referir →</span></button>';
     }
     html += '<div class="quick-access-label">Accesos rápidos</div>';
@@ -3587,6 +3588,17 @@ var VHS_SITIOS_WEB = {
 };
 var VHS_WHATSAPP = '51934042610';
 // WhatsApp de ayuda por proyecto (si falta alguno, se usa el general)
+var REF_PREMIOS = {
+  sullana:{banner:'Recomienda a un amigo y <b>gana una gift card</b>', sub:'Cuando tu referido compre su casa.', titulo:'gana una gift card',
+    intro:'te regalamos una <strong>gift card para consumir</strong>. Y este mes, además, un <strong>vale por un pavo entero</strong> 🦃.',
+    paso3:'<strong>Gana tu gift card</strong> (y el vale del pavo este mes) cuando comprobemos que tu referido compró su casa.'},
+  castilla:{banner:'Recomienda a un amigo y <b>gana premios</b>', sub:'Gift cards y vales de consumo por S/ 50.', titulo:'gana premios',
+    intro:'te regalamos <strong>premios</strong>: gift cards y vales de consumo por S/ 50.',
+    paso3:'<strong>Gana tu premio</strong> cuando comprobemos que tu referido compró su casa.'},
+  lambayeque:{banner:'Refiere y <b>juega a la ruleta</b>', sub:'Tú y tu referido ganan un electrodoméstico 🎡', titulo:'juega a la ruleta',
+    intro:'<strong>tú y tu referido juegan a la ruleta</strong> y se llevan un <strong>electrodoméstico</strong>.',
+    paso3:'<strong>Juega a la ruleta</strong> (tú y tu referido) y gana un electrodoméstico cuando comprobemos que tu referido compró su casa.'}
+};
 var VHS_WA_PROY = { sullana: '51934042610', castilla: '', ejidos: '', lambayeque: '' };
 
 // Datos de la sección de confianza (Vive Hogar Sullana). Cada campo
@@ -4949,20 +4961,20 @@ document.addEventListener('click', async function(ev){
     var apl = document.getElementById('ayuda-proy-lista');
     if (apl){ apl.style.display = 'block'; t.style.display = 'none'; }
   } else if (action === 'ver-referidos'){
-    var rpSlug = proySlugPref();
+    var rpSlug = proySlugPref(); var rfp2 = REF_PREMIOS[rpSlug] || REF_PREMIOS.castilla;
     var rs = document.createElement('div');
     rs.id = 'ref-sheet'; rs.className = 'ref-sheet';
     rs.innerHTML = '<button type="button" class="ref-close" data-action="cerrar-referidos" aria-label="Cerrar">×</button>'+
-      '<div style="text-align:center;margin:4px 0 10px;"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:150px;max-width:55%;height:auto;mix-blend-mode:multiply;" /></div><h2>🎁 Referidos: gana premios</h2>'+
-      '<p style="color:var(--ink-soft);font-size:.9rem;margin:0 0 8px;">Si recomiendas a alguien y compra su casa en '+esc(PROY_NOMBRES[rpSlug] || 'Vive Hogar')+', te regalamos <strong>premios</strong>.</p>'+
+      '<div style="text-align:center;margin:4px 0 10px;"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:150px;max-width:55%;height:auto;mix-blend-mode:multiply;" /></div><h2>🎁 Referidos: '+rfp2.titulo+'</h2>'+
+      '<p style="color:var(--ink-soft);font-size:.9rem;margin:0 0 8px;">Si recomiendas a alguien y compra su casa en '+esc(PROY_NOMBRES[rpSlug] || 'Vive Hogar')+', '+rfp2.intro+'</p>'+
       '<div class="ref-step"><i>1</i><p><strong>Recomienda</strong> a un familiar, amigo o conocido que quiera su casa propia.</p></div>'+
       '<div class="ref-step"><i>2</i><p><strong>Cuéntanos</strong> su nombre y teléfono aquí abajo. Un asesor lo contactará.</p></div>'+
-      '<div class="ref-step"><i>3</i><p><strong>Gana premios</strong> cuando comprobemos que tu referido compró su casa.</p></div>'+
+      '<div class="ref-step"><i>3</i><p>'+rfp2.paso3+'</p></div>'+
       '<div class="panel panel-flat" style="margin-top:14px;"><h4 style="margin:0 0 4px;">Datos de tu referido</h4>'+
       '<input id="ref-nombre" type="text" placeholder="Nombre de tu referido" autocomplete="off" />'+
       '<input id="ref-tel" type="tel" inputmode="tel" placeholder="Teléfono de tu referido" autocomplete="off" />'+
       '<button type="button" class="btn btn-primary btn-block" style="margin-top:14px;" data-action="referir-enviar">💬 Enviar por WhatsApp</button>'+
-      '<p style="font-size:.74rem;color:var(--ink-faint);margin:10px 0 0;text-align:center;">Solo para clientes de Sullana y Castilla. Pide el permiso de tu referido antes de compartir sus datos.</p></div>';
+      '<p style="font-size:.74rem;color:var(--ink-faint);margin:10px 0 0;text-align:center;">Solo para clientes de Sullana, Castilla y Lambayeque. Pide el permiso de tu referido antes de compartir sus datos.</p></div>';
     document.body.appendChild(rs);
   } else if (action === 'cerrar-referidos'){
     var rs2 = document.getElementById('ref-sheet'); if (rs2) rs2.remove();
