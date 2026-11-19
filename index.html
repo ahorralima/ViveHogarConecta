@@ -699,6 +699,21 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mivivienda-proyecto{font-weight:800;font-size:1.15rem;color:var(--ink);margin-top:6px;}
 .mivivienda-sub{font-size:0.85rem;color:var(--ink-soft);margin-top:2px;}
 .quick-access-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.ref-banner{display:block;width:100%;text-align:left;border:0;border-radius:14px;padding:16px;margin:12px 0 4px;color:#3b2a05;background:linear-gradient(135deg,#FFD36B 0%,#F8B132 60%,#EE9B16 100%);box-shadow:0 4px 14px rgba(238,155,22,.28);position:relative;overflow:hidden;}
+.ref-banner:active{transform:scale(0.99);}
+.ref-banner .ref-tag{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.75;}
+.ref-banner .ref-big{font-size:1.25rem;font-weight:800;line-height:1.2;margin-top:4px;}
+.ref-banner .ref-big b{font-size:1.9rem;}
+.ref-banner .ref-sub{font-size:.82rem;margin-top:4px;opacity:.9;}
+.ref-banner .ref-cta{display:inline-block;margin-top:10px;background:#3b2a05;color:#FFE9B0;font-weight:700;font-size:.82rem;border-radius:999px;padding:7px 14px;}
+.ref-banner .ref-gift{position:absolute;right:10px;top:6px;font-size:3.4rem;opacity:.9;}
+.ref-sheet{position:fixed;inset:0;z-index:99999;background:var(--bg);overflow:auto;padding:max(16px,env(safe-area-inset-top,0px)) 16px 28px;}
+.ref-sheet h2{margin:8px 0 4px;}
+.ref-step{display:flex;gap:12px;align-items:flex-start;margin:12px 0;}
+.ref-step i{flex:0 0 30px;height:30px;border-radius:50%;background:#F8B132;color:#3b2a05;font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.ref-step p{margin:0;font-size:.9rem;color:var(--ink);}
+.ref-sheet input{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:1rem;margin-top:8px;background:var(--surface);color:var(--ink);}
+.ref-close{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:12px;font-size:1.5rem;line-height:1;background:var(--surface-2);border:0;border-radius:50%;width:40px;height:40px;color:var(--ink);}
 .quick-access-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:left;}
 .quick-access-tile:active{transform:scale(0.98);}
 .quick-access-tile strong{font-size:0.9rem;color:var(--ink);}
@@ -1607,6 +1622,13 @@ function renderHome(){
       '<div style="font-size:0.76rem;color:var(--ink-faint);margin-top:6px;">Conectado como '+esc(toTitleCase(clienteNombreVerificado))+' · <button type="button" class="btn-link-inline" data-action="cambiar-cliente">Cambiar</button></div>'+
       '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px;" data-action="nav" data-value="micasa">Ver mi vivienda →</button>'+
     '</div>';
+    if (!clienteGerencia && (proySlugPref() === 'sullana' || proySlugPref() === 'castilla')){
+      html += '<button type="button" class="ref-banner" data-action="ver-referidos"><span class="ref-gift">🎁</span>'+
+        '<div class="ref-tag">Promoción Referidos</div>'+
+        '<div class="ref-big">Recomienda a un amigo y gana <b>S/ 50</b></div>'+
+        '<div class="ref-sub">Cuando tu referido compre su casa.</div>'+
+        '<span class="ref-cta">Quiero referir →</span></button>';
+    }
     html += '<div class="quick-access-label">Accesos rápidos</div>';
     html += '<div class="quick-access-grid">'+
       '<button type="button" class="quick-access-tile" data-action="nav" data-value="cuotas"><span class="qa-icon">💰</span><strong>Mis cuotas</strong><span>Consulta tus pagos</span></button>'+
@@ -4926,6 +4948,33 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'ayuda-proyecto'){
     var apl = document.getElementById('ayuda-proy-lista');
     if (apl){ apl.style.display = 'block'; t.style.display = 'none'; }
+  } else if (action === 'ver-referidos'){
+    var rpSlug = proySlugPref();
+    var rs = document.createElement('div');
+    rs.id = 'ref-sheet'; rs.className = 'ref-sheet';
+    rs.innerHTML = '<button type="button" class="ref-close" data-action="cerrar-referidos" aria-label="Cerrar">×</button>'+
+      '<div style="font-size:3rem;">🎁</div><h2>Referidos: gana S/ 50</h2>'+
+      '<p style="color:var(--ink-soft);font-size:.9rem;margin:0 0 8px;">Si recomiendas a alguien y compra su casa en '+esc(PROY_NOMBRES[rpSlug] || 'Vive Hogar')+', te pagamos <strong>S/ 50</strong>.</p>'+
+      '<div class="ref-step"><i>1</i><p><strong>Recomienda</strong> a un familiar, amigo o conocido que quiera su casa propia.</p></div>'+
+      '<div class="ref-step"><i>2</i><p><strong>Cuéntanos</strong> su nombre y teléfono aquí abajo. Un asesor lo contactará.</p></div>'+
+      '<div class="ref-step"><i>3</i><p><strong>Gana S/ 50</strong> cuando comprobemos que tu referido compró su casa.</p></div>'+
+      '<div class="panel panel-flat" style="margin-top:14px;"><h4 style="margin:0 0 4px;">Datos de tu referido</h4>'+
+      '<input id="ref-nombre" type="text" placeholder="Nombre de tu referido" autocomplete="off" />'+
+      '<input id="ref-tel" type="tel" inputmode="tel" placeholder="Teléfono de tu referido" autocomplete="off" />'+
+      '<button type="button" class="btn btn-primary btn-block" style="margin-top:14px;" data-action="referir-enviar">💬 Enviar por WhatsApp</button>'+
+      '<p style="font-size:.74rem;color:var(--ink-faint);margin:10px 0 0;text-align:center;">Solo para clientes de Sullana y Castilla. Pide el permiso de tu referido antes de compartir sus datos.</p></div>';
+    document.body.appendChild(rs);
+  } else if (action === 'cerrar-referidos'){
+    var rs2 = document.getElementById('ref-sheet'); if (rs2) rs2.remove();
+  } else if (action === 'referir-enviar'){
+    var rn = (document.getElementById('ref-nombre') || {}).value || '';
+    var rt = (document.getElementById('ref-tel') || {}).value || '';
+    if (!rn.trim() || !rt.trim()){ toast('Escribe el nombre y el teléfono de tu referido.'); return; }
+    var rk = proySlugPref();
+    var rmsg = 'Hola, quiero referir a un amigo para la promoción Referidos (S/ 50). '+
+      'Soy '+toTitleCase(clienteNombreVerificado || 'cliente')+', cliente de '+(PROY_NOMBRES[rk] || 'Vive Hogar')+'. '+
+      'Mi referido es '+rn.trim()+', teléfono '+rt.trim()+'.';
+    window.open('https://wa.me/'+(VHS_WA_PROY[rk] || VHS_WHATSAPP)+'?text='+encodeURIComponent(rmsg), '_blank', 'noopener');
   } else if (action === 'ver-boletin'){
     var bImg = BOLETIN_IMG[proySlugPref()];
     if (bImg){
