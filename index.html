@@ -4953,7 +4953,7 @@ document.addEventListener('click', async function(ev){
     var rs = document.createElement('div');
     rs.id = 'ref-sheet'; rs.className = 'ref-sheet';
     rs.innerHTML = '<button type="button" class="ref-close" data-action="cerrar-referidos" aria-label="Cerrar">×</button>'+
-      '<div style="font-size:3rem;">🎁</div><h2>Referidos: gana S/ 50</h2>'+
+      '<div style="text-align:center;margin:4px 0 10px;"><img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" style="width:150px;max-width:55%;height:auto;mix-blend-mode:multiply;" /></div><h2>🎁 Referidos: gana S/ 50</h2>'+
       '<p style="color:var(--ink-soft);font-size:.9rem;margin:0 0 8px;">Si recomiendas a alguien y compra su casa en '+esc(PROY_NOMBRES[rpSlug] || 'Vive Hogar')+', te pagamos <strong>S/ 50</strong>.</p>'+
       '<div class="ref-step"><i>1</i><p><strong>Recomienda</strong> a un familiar, amigo o conocido que quiera su casa propia.</p></div>'+
       '<div class="ref-step"><i>2</i><p><strong>Cuéntanos</strong> su nombre y teléfono aquí abajo. Un asesor lo contactará.</p></div>'+
