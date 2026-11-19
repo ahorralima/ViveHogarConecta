@@ -3100,10 +3100,13 @@ function renderClienteVerificacion(){
 
   html += '<div class="panel panel-flat"><h4>¿No encuentras tus datos?</h4>'+
     '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:10px;">Escríbenos por WhatsApp y te ayudamos a revisar tu contrato.</p>'+
+    '<button type="button" class="btn btn-secondary btn-block" data-action="ayuda-proyecto">💬 ¿Necesitas ayuda? Contáctanos</button>'+
+    '<div id="ayuda-proy-lista" style="display:none;margin-top:12px;">'+
     '<p style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">¿De qué proyecto eres?</p>'+
     ['sullana','castilla','ejidos','lambayeque'].map(function(k){
       return '<a class="btn btn-secondary btn-block" style="margin-bottom:8px;" href="https://wa.me/'+(VHS_WA_PROY[k]||VHS_WHATSAPP)+'?text='+encodeURIComponent('Hola, soy cliente de '+PROY_NOMBRES[k]+' y no puedo verificar mis datos en la app')+'" target="_blank" rel="noopener">💬 '+PROY_NOMBRES[k]+'</a>';
     }).join('')+
+    '</div>'+
   '</div>';
 
   html += '</div>';
@@ -4915,6 +4918,9 @@ document.addEventListener('click', async function(ev){
     setGate('interesado');
     window.scrollTo(0,0);
     render();
+  } else if (action === 'ayuda-proyecto'){
+    var apl = document.getElementById('ayuda-proy-lista');
+    if (apl){ apl.style.display = 'block'; t.style.display = 'none'; }
   } else if (action === 'ver-boletin'){
     var bImg = BOLETIN_IMG[proySlugPref()];
     if (bImg){
