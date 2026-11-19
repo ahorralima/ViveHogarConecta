@@ -2191,6 +2191,7 @@ function asesorCargarPanel(){
     }
     if (!res.data || !res.data.ok){
       if (res.data && res.data.error === 'codigo') salirAsesorTotal('Tu sesión venció. Ingresa de nuevo.');
+      else if (!ui.asesorPanel){ ui.asesorPanelError = 'red'; render(); }
       return;
     }
     ui.asesorPanelError = '';
@@ -2464,7 +2465,7 @@ async function asesorLogin(){
     ui.interesadoProyecto = c0.proyecto;
     ui.interesadoStep = 'mapa';
     ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null;
-    ui.asNombre = ''; ui.asesorPanel = null; ui._panelJson = '';
+    ui.asNombre = ''; ui.asesorPanel = null; ui.asesorPanelError = ''; ui._panelJson = '';
     render();
     await asesorCargarPanel();
     toast('¡Bienvenid@, '+primerNombre(c0.nombre)+'!');
@@ -2494,7 +2495,7 @@ function asesorCambiarCuenta(id){
   var c = asesorCuentas().filter(function(x){ return String(x.id) === String(id); })[0];
   if (!c) return;
   saveAsesoraSesion(asesoraPin, String(c.id), c.nombre);
-  ui.asesorPanel = null; ui._panelJson = '';
+  ui.asesorPanel = null; ui.asesorPanelError = ''; ui._panelJson = '';
   ui.interesadoProyecto = c.proyecto;
   ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null; ui.sepMsg = '';
   render();
@@ -4466,6 +4467,10 @@ function renderApp(){
   }
   var demoMarket = !!(appGate === 'asesor' && modoAsesor() && asesorSoloLectura && ui.demoMarket);
   if (appGate === 'asesor' && !demoMarket){
+    if (modoAsesor() && !ui.asesorPanel && !ui.asesorPanelError && !esCobranza()){
+      document.getElementById('app').innerHTML = '<div class="loading-screen"><div class="spinner"></div><p>Cargando tu panel…</p></div>';
+      return;
+    }
     document.getElementById('app').innerHTML = modoAsesor() ? renderInteresadoMapa() : renderAsesorLogin();
     initEtapa5ZoomDrag(); initGenZoom();
     return;
