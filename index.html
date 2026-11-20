@@ -7079,6 +7079,26 @@ async function init(){
   setTimeout(function(){ ui.showSplash = false; render(); }, 1600);
 }
 
+// ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
+// APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
+var APP_BUILD = '20261120-125656';
+function revisarVersionNueva(){
+  try {
+    if (document.hidden) return;
+    fetch(location.pathname + '?cb=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.text() : ''; }).then(function(t){
+      var m = t && t.match(/APP_BUILD\s*=\s*'([^']+)'/);
+      if (!m || m[1] === APP_BUILD) return;
+      var el = document.activeElement;
+      if (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;   // no recargar mientras alguien escribe
+      try { if (sessionStorage.getItem('ecRecarga') === m[1]) return; sessionStorage.setItem('ecRecarga', m[1]); } catch(e){}   // evita recargar en bucle
+      location.replace(location.pathname + '?v=' + encodeURIComponent(m[1]));
+    }).catch(function(){});
+  } catch(e){}
+}
+setTimeout(revisarVersionNueva, 4000);
+setInterval(revisarVersionNueva, 5 * 60 * 1000);
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) setTimeout(revisarVersionNueva, 800); });
+
 init();
 
 })();
