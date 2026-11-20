@@ -516,6 +516,15 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-zoom-controls{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:8px;z-index:30;}
 .mapa-zoom-btn{width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1.25rem;font-weight:700;color:var(--ink);box-shadow:0 4px 10px -2px rgba(0,0,0,0.3);line-height:1;}
 .mapa-zoom-btn:active{transform:scale(0.93);}
+.e5-conteo{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:0.8rem;font-weight:700;margin:6px 0 8px;}
+.e5-conteo span{padding:3px 9px;border-radius:999px;background:var(--surface-2,#eef1f4);color:var(--ink-soft);}
+.e5-conteo .e5-c-ok{background:#e3f4e8;color:#17663a;}
+.e5-conteo .e5-c-sep{background:#fff2cc;color:#7a5a10;}
+.e5-buscar{display:flex;align-items:center;gap:8px;margin:0 0 8px;}
+.e5-b-t{font-size:0.82rem;font-weight:700;color:var(--ink-soft);white-space:nowrap;}
+.e5-b-in{width:62px;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:10px;font-size:1rem;text-align:center;background:var(--bg,#fff);color:inherit;}
+.e5-b-go{padding:8px 18px;}
+.e5-b-msg{font-size:0.8rem;color:var(--danger);margin:-2px 0 8px;}
 .lote-legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:0.75rem;color:var(--ink-soft);margin-bottom:10px;}
 .lote-legend span{display:flex;align-items:center;gap:5px;}
 .lote-dot{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,0.3);}
@@ -3924,6 +3933,15 @@ function renderMapaEtapa5Html(etapaN){
   } else {
   html += '<div class="etapa5-header-sub">'+(etapa5Disponibles === 0 ? 'Por ahora no hay lotes disponibles en esta etapa (los demás están vendidos o separados)' : 'Elige tu casa · '+etapa5Disponibles+(etapa5Disponibles === 1 ? ' lote disponible' : ' lotes disponibles'))+'</div>';
   html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>'+(planoProy() === 'sullana' ? 'blanca' : 'verde')+'</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
+  var nSep = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'SEPARADO' || l.e === 'BLOQUEADO'; }).length;
+  var nVen = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'VENDIDO'; }).length;
+  html += '<div class="e5-conteo"><span class="e5-c-ok">✔ '+etapa5Disponibles+' disponibles</span>'+
+    (planoProy() === 'sullana' ? '<span class="e5-c-sep">◔ '+nSep+' separadas</span><span class="e5-c-ven">✖ '+nVen+' vendidas</span>' : '<span class="e5-c-ven">'+(ETAPA5_LOTES_PLANO.length-etapa5Disponibles)+' no disponibles</span>')+'</div>';
+  html += '<div class="e5-buscar"><span class="e5-b-t">🔎 Buscar casa</span>'+
+    '<input id="e5-b-mz" class="e5-b-in" type="text" inputmode="text" autocapitalize="characters" maxlength="4" placeholder="Mz" aria-label="Manzana" />'+
+    '<input id="e5-b-lt" class="e5-b-in" type="text" inputmode="numeric" maxlength="4" placeholder="Lt" aria-label="Número de lote" />'+
+    '<button type="button" class="btn btn-primary e5-b-go" data-action="etapa5-buscar">Ir</button></div>'+
+    (ui.etapa5BuscarMsg ? '<div class="e5-b-msg">'+esc(ui.etapa5BuscarMsg)+'</div>' : '');
   html += '<div class="lote-legend">'+
     (planoProy() === 'sullana'
       ? '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span>'+
@@ -5348,6 +5366,26 @@ document.addEventListener('click', async function(ev){
       applyEtapa5Zoom();
       mzo.scrollIntoView({block:'center', behavior:'smooth'});
     } else { toast('No encontramos tu casa en este plano.'); }
+  } else if (action === 'etapa5-buscar'){
+    var bmz = String((document.getElementById('e5-b-mz')||{}).value||'').trim().toUpperCase();
+    var blt = String((document.getElementById('e5-b-lt')||{}).value||'').trim().replace(/^0+(?=\d)/,'');
+    var bl = ETAPA5_LOTES_PLANO.filter(function(l){ return String(l.m).toUpperCase() === bmz && String(l.l) === blt; })[0];
+    if (!bmz || !blt){ ui.etapa5BuscarMsg = 'Escribe la manzana y el número de lote.'; render(); }
+    else if (!bl){ ui.etapa5BuscarMsg = 'No encontramos Mz. '+bmz+' · Lt. '+blt+' en esta etapa.'; render(); }
+    else {
+      ui.etapa5BuscarMsg = ''; ui.interesadoLoteSel = bl.m+'|'+bl.l; ui.etapa5AreaSel = null;
+      ui.sepFormLote = null; ui.asesoraError = ''; ui.sepMsg = '';
+      if (modoAsesor() && (bl.e === 'SEPARADO' || bl.e === 'VENDIDO') && !ui.sepInfo[bl.id]) cargarSepInfo(bl.id).then(function(){ render(); });
+      render();
+      var bzi = document.getElementById('etapa5-zoom-inner'), bzo = document.getElementById('etapa5-zoom');
+      if (bzi && bzo){
+        var bcw = bzo.clientWidth, bch = bzo.clientHeight, bsc = 3.2;
+        var bcx = (bl.le + bl.w/2)/100*bzi.offsetWidth*bsc, bcy = (bl.t + bl.h/2)/100*bzi.offsetHeight*bsc;
+        ui.etapa5Zoom = clampZoom({scale:bsc, x:bcw/2 - bcx, y:bch/2 - bcy}, bcw, bch);
+        applyEtapa5Zoom();
+        bzo.scrollIntoView({block:'center', behavior:'smooth'});
+      }
+    }
   } else if (action === 'etapa5-zoom-mz'){
     var mzN = t.getAttribute('data-value');
     var mzItems = ETAPA5_LOTES_PLANO.concat(ETAPA5_RECREACION_PLANO).filter(function(l){ return l.m === mzN; });
@@ -5960,6 +5998,11 @@ async function cargarSepInfo(loteId){
   if (!res.error && res.data && res.data.ok) ui.sepInfo[loteId] = res.data;
 }
 
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && e.target && (e.target.id === 'e5-b-mz' || e.target.id === 'e5-b-lt')){
+    var b = document.querySelector('[data-action="etapa5-buscar"]'); if (b) b.click();
+  }
+});
 // Visor de fotos: al tocar una foto de la galería se abre grande y se pasa de foto en foto (deslizando o con las flechas)
 (function(){
   var ov=null, list=[], idx=0, sx=null;
