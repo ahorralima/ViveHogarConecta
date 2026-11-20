@@ -2260,6 +2260,7 @@ function asesorCargarPanel(){
       var r2 = await sb.rpc('ec_ranking_2nf', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
       if (!r2.error && r2.data && r2.data.ok && res.data.ranking){
         var ex = {}; (r2.data.items || []).forEach(function(x){ ex[String(x.asesora_id)] = x; });
+        res.data.sinAsesora = r2.data.sin_asesora || null;   // casas del 2NF sin asesora en la app (ej. usuario Administrador)
         res.data.ranking.forEach(function(r){ var x = ex[String(r.id)]; if (x){ r.ventas += (x.ventas || 0); r.separadas = (r.separadas || 0) + (x.separadas || 0); } });
         res.data.ranking.sort(function(p1, p2){
           return ((p2.ventas + (p2.separadas || 0)) - (p1.ventas + (p1.separadas || 0))) || (p2.ventas - p1.ventas) || String(p1.nombre).localeCompare(String(p2.nombre));
@@ -2694,12 +2695,15 @@ function renderAsesorPanelHtml(){
   } else {
     var tv = p.ranking.reduce(function(a,r){ return a + r.ventas + (r.separadas || 0); }, 0);
     var tvv = p.ranking.reduce(function(a,r){ return a + r.ventas; }, 0);
+    var sinA = p.sinAsesora || {}, sinV = sinA.ventas || 0, sinS = sinA.separadas || 0;
+    tv += sinV + sinS; tvv += sinV;   // las casas del 2NF sin asesora en la app tambien suman en la sala
     var tm = p.ranking.reduce(function(a,r){ return a + r.meta; }, 0);
     var tp = tm > 0 ? Math.min(100, Math.round(tv/tm*100)) : 0;
     h += '<div class="as-mes">Ventas de la sala · '+esc(mesTxt)+'</div>'+
       '<div class="as-big">'+tv+' <small>/ '+(tm > 0 ? tm : '—')+' casas</small></div>'+
       '<div class="as-bar"><i style="width:'+tp+'%"></i></div>'+
-      (tv > tvv ? '<div class="as-note">'+tvv+' ventas + '+(tv-tvv)+' separadas</div>' : '');
+      (tv > tvv ? '<div class="as-note">'+tvv+' ventas + '+(tv-tvv)+' separadas</div>' : '')+
+      ((sinV + sinS) > 0 ? '<div class="as-note" style="opacity:.85;">Incluye '+(sinV+sinS)+' casa'+((sinV+sinS)===1?'':'s')+' del 2NF sin asesora en la app</div>' : '');
   }
   h += '</div>';
 
@@ -5470,7 +5474,7 @@ async function asesoraLlamar(fn, args){
       muchas_reservas: 'Ya tienes 3 casas separadas en proceso. Confirma o cancela alguna primero.',
       otro_proyecto: 'Esa casa es de otro proyecto.',
       no_reserva: 'No hay una separación en proceso que cancelar.',
-      no_jefe: 'Solo el jefe de ventas puede hacer esto.',
+      no_jefe: 'Solo el jefe de ventas puede hacer esto.', no_aprueba: 'No tienes permiso para aprobar o rechazar ventas manuales en este proyecto.',
       solo_lectura: 'Cuenta de vista: solo lectura (no puede modificar nada).',
       solo_asesora: 'Solo las asesoras pueden registrar ventas.',
       etapa: 'Escribe la etapa (solo el número, ej. 13).',
@@ -5490,7 +5494,7 @@ async function asesoraLlamar(fn, args){
       permiso_dni: 'Solo la asesora que hizo la separación o su jefe de ventas puede editarla.',
       por_aprobar: 'Esa separación sigue por aprobar del jefe de ventas.',
       no_editable: 'Esa separación ya no se puede editar.',
-      no_jefe: 'Solo el jefe de ventas puede hacer esto.',
+      no_jefe: 'Solo el jefe de ventas puede hacer esto.', no_aprueba: 'No tienes permiso para aprobar o rechazar ventas manuales en este proyecto.',
       dni_ya: 'Esa separación ya tiene su DNI.'
     };
     ui.asesoraError = msgs[d.error] || 'No se pudo completar.';
