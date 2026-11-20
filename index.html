@@ -4527,7 +4527,7 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
-  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderVentasMesHtml() + renderVentas2nfHtml() + renderVentasManualesJefeHtml();
+  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + renderVentasManualesJefeHtml();
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentas2nfHtml() + renderVentaManualAsesorHtml();
   if (esAsesor) html += renderApagadoHtml();
   if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
@@ -5748,6 +5748,48 @@ async function cargarVentas2nf(){
     }
   } catch(e){}
   return false;
+}
+// Aviso de sincronizacion con el 2NF (solo jefes / admin): dice si los datos estan al dia o desactualizados
+async function cargarEstadoSincro(){
+  if (!asesoraPin || !asesoraIdActual) return;
+  if (ui._sincroT && Date.now() - ui._sincroT < 90000) return;   // como mucho 1 consulta cada 90 s
+  ui._sincroT = Date.now();
+  try {
+    var res = await sb.rpc('ec_estado_sincro', { p_token: sessionToken || null, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+    if (!res.error && res.data && res.data.ok){
+      var antes = JSON.stringify(ui.estadoSincro);
+      ui.estadoSincro = res.data;
+      if (antes !== JSON.stringify(ui.estadoSincro)) renderSiLibre();
+    }
+  } catch(e){}
+}
+function renderAlertaSincroHtml(){
+  if (!ui.estadoSincro && !ui._sincroCarg){ ui._sincroCarg = true; cargarEstadoSincro().then(function(){ ui._sincroCarg = false; }); }
+  var es = ui.estadoSincro;
+  if (!es || !es.proyectos) return '';   // todavia no cargo o la v35 aun no esta en Supabase: no se muestra nada
+  var ahora = es.ahora ? new Date(es.ahora).getTime() : Date.now();
+  var hora = function(iso){ try { return new Date(iso).toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit', timeZone:'America/Lima' }); } catch(e){ return ''; } };
+  var hace = function(ms){ var m = Math.round(ms/60000); if (m < 60) return m+' min'; var h = Math.floor(m/60); return h < 48 ? h+' h' : Math.floor(h/24)+' días'; };
+  var corrida = 0, venta = 0, proys = Object.keys(es.proyectos);
+  proys.forEach(function(k){
+    var c = es.proyectos[k].ultima_corrida ? new Date(es.proyectos[k].ultima_corrida).getTime() : 0;
+    var v = es.proyectos[k].ultima_venta ? new Date(es.proyectos[k].ultima_venta).getTime() : 0;
+    if (c > corrida) corrida = c; if (v > venta) venta = v;
+  });
+  if (!corrida) return '';
+  var dow = new Date(new Date(ahora).toLocaleString('en-US', { timeZone:'America/Lima' })).getDay();   // 0 = domingo
+  var estilo, txt;
+  if (ahora - corrida > 45*60000){
+    estilo = 'background:#fdecea;border:1px solid #e0463a;color:#8a1c12;';
+    txt = '⚠️ <strong>La sincronización con el 2NF no se actualiza.</strong> Última vez: '+esc(hora(corrida))+' (hace '+hace(ahora-corrida)+'). Las ventas nuevas pueden no verse.';
+  } else if (venta && dow !== 0 && ahora - venta > 30*3600000){
+    estilo = 'background:#fff6e0;border:1px solid #e8a317;color:#7a5200;';
+    txt = '⚠️ <strong>El 2NF no trae ventas nuevas desde hace '+hace(ahora-venta)+'.</strong> Si hubo ventas, avisa a Iván: la copia puede estar atrasada.';
+  } else {
+    estilo = 'background:#eaf6ee;border:1px solid #b6dfc4;color:#1f5a35;';
+    txt = '✅ Datos del 2NF al día · última sincronización '+esc(hora(corrida));
+  }
+  return '<div class="panel panel-flat" id="alerta-sincro" style="'+estilo+'padding:10px 12px;margin:0 0 10px;font-size:.85rem;">'+txt+'</div>';
 }
 function renderVentas2nfHtml(){
   var vm = (ui.ventas2nf && ui.ventas2nfId === String(asesoraIdActual)) ? ui.ventas2nf : null;
