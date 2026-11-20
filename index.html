@@ -5043,20 +5043,21 @@ document.addEventListener('click', async function(ev){
       '<div class="panel panel-flat" style="margin-top:14px;"><h4 style="margin:0 0 4px;">Datos de tu referido</h4>'+
       '<input id="ref-nombre" type="text" placeholder="Nombre de tu referido" autocomplete="off" />'+
       '<input id="ref-tel" type="tel" inputmode="tel" placeholder="Teléfono de tu referido" autocomplete="off" />'+
-      '<button type="button" class="btn btn-primary btn-block" style="margin-top:14px;" data-action="referir-enviar">💬 Enviar por WhatsApp</button>'+
+      '<a id="ref-enviar" class="btn btn-primary btn-block" style="margin-top:14px;" href="https://wa.me/'+(VHS_WA_PROY[rpSlug] || VHS_WHATSAPP)+'" target="_blank" rel="noopener" data-action="referir-enviar">💬 Enviar por WhatsApp</a>'+
       '<p style="font-size:.74rem;color:var(--ink-faint);margin:10px 0 0;text-align:center;">Solo para clientes de Sullana, Castilla y Lambayeque. Pide el permiso de tu referido antes de compartir sus datos.</p></div>';
     document.body.appendChild(rs);
   } else if (action === 'cerrar-referidos'){
     var rs2 = document.getElementById('ref-sheet'); if (rs2) rs2.remove();
   } else if (action === 'referir-enviar'){
+    // Es un enlace normal (como los demas botones de WhatsApp): window.open lo bloquean algunos telefonos
     var rn = (document.getElementById('ref-nombre') || {}).value || '';
     var rt = (document.getElementById('ref-tel') || {}).value || '';
-    if (!rn.trim() || !rt.trim()){ toast('Escribe el nombre y el teléfono de tu referido.'); return; }
+    if (!rn.trim() || !rt.trim()){ ev.preventDefault(); toast('Escribe el nombre y el teléfono de tu referido.'); return; }
     var rk = proySlugPref();
     var rmsg = 'Hola, quiero referir a un amigo para la promoción Referidos. '+
       'Soy '+toTitleCase(clienteNombreVerificado || 'cliente')+', cliente de '+(PROY_NOMBRES[rk] || 'Vive Hogar')+'. '+
       'Mi referido es '+rn.trim()+', teléfono '+rt.trim()+'.';
-    window.open('https://wa.me/'+(VHS_WA_PROY[rk] || VHS_WHATSAPP)+'?text='+encodeURIComponent(rmsg), '_blank', 'noopener');
+    t.setAttribute('href', 'https://wa.me/'+(VHS_WA_PROY[rk] || VHS_WHATSAPP)+'?text='+encodeURIComponent(rmsg));
   } else if (action === 'ver-boletin'){
     var bImg = BOLETIN_IMG[proySlugPref()];
     if (bImg){
