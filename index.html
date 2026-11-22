@@ -3249,7 +3249,15 @@ setInterval(function(){ if (document.querySelector('.gate-car') && Date.now() - 
 })();
 
 var gnIdx = 0;
-setInterval(function(){ var a = document.querySelectorAll('.gn-alt'); if (!a.length || window.innerWidth < 900) return; gnIdx = (gnIdx + 1) % (a.length + 1); [].forEach.call(a, function(im, k){ im.classList.toggle('on', k === gnIdx - 1); }); }, 5000);
+function gnSiguiente(){
+  var a = document.querySelectorAll('.gn-alt');
+  if (a.length && window.innerWidth >= 900){
+    gnIdx = (gnIdx + 1) % (a.length + 1);
+    [].forEach.call(a, function(im, k){ im.classList.toggle('on', k === gnIdx - 1); });
+  }
+  setTimeout(gnSiguiente, gnIdx === 0 ? 9000 : 5000);
+}
+setTimeout(gnSiguiente, 9000);
 function renderGate(){
   var ico = 'width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3f9a3a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
   return '<div class="gn"><div class="gn-in">'+
@@ -7224,7 +7232,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-124033';
+var APP_BUILD = '20261122-124251';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
