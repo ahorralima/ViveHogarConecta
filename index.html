@@ -2268,6 +2268,11 @@ function asesorCargarPanel(){
         });
       }
     } catch(e){}
+    // Resumen debajo del ranking: casas en el 2NF vs hechas solo en la app (si la funcion aun no existe, no se muestra)
+    try {
+      var rr = await sb.rpc('ec_resumen_2nf_app', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
+      res.data.resumen2nf = (!rr.error && rr.data && rr.data.ok) ? rr.data : null;
+    } catch(e){ res.data.resumen2nf = null; }
     // La cuenta de prueba de Google Play no debe verse en el ranking de las asesoras (solo la ve ella misma)
     if (res.data.ranking){
       res.data.ranking = res.data.ranking.filter(function(r){
@@ -2721,6 +2726,11 @@ function renderAsesorPanelHtml(){
       '<div style="font-size:0.72rem;color:var(--ink-faint);margin-top:2px;">'+r.ventas+' venta'+(r.ventas===1?'':'s')+' · '+rsp+' separada'+(rsp===1?'':'s')+'</div></div>'+
       '<div class="as-rank-score">'+rtot+'<small> / '+(r.meta > 0 ? r.meta : '—')+'</small></div></div>';
   });
+  if (p.resumen2nf){
+    var so = p.resumen2nf.solo_app || [];
+    h += '<div class="as-note" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line, #e3e8ee);">📊 En el 2NF: <strong>'+(p.resumen2nf.en_2nf || 0)+'</strong> casa'+((p.resumen2nf.en_2nf || 0)===1?'':'s')+
+      '<br>📱 Solo en la app (falta registrar en el 2NF): <strong>'+so.length+'</strong>'+(so.length ? ' · '+so.map(esc).join(', ') : '')+'</div>';
+  }
   h += '</div>';
 
   // Servicios por aprobar (solo asesores de administración)
@@ -7082,7 +7092,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261121-001735';
+var APP_BUILD = '20261121-192102';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
