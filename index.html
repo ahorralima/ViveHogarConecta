@@ -428,9 +428,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 /* Portada nueva (carrusel de fotos + mensajes de confianza) */
 .gn{min-height:100vh;display:flex;justify-content:center;background:#fff;}
 .gn-in{width:100%;max-width:520px;min-height:100vh;display:flex;flex-direction:column;background:#fff;position:relative;overflow:hidden;}
-.gn-herow{position:relative;flex:none;}
-.gn-hero{width:100%;height:auto;display:block;}
-.gn-herologo{position:absolute;top:calc(7% + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:42%;max-width:230px;height:auto;mix-blend-mode:multiply;}
+.gn-herow{position:relative;flex:1 1 auto;aspect-ratio:851/935;overflow:hidden;}
+.gn-hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block;}
+.gn-herologo{display:none;position:absolute;top:calc(7% + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:42%;max-width:230px;height:auto;mix-blend-mode:multiply;}
 .gn-card{position:relative;z-index:5;margin:-34px 14px 14px;background:#fff;border-radius:26px;padding:22px 18px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 10px 30px -8px rgba(20,48,27,.28);display:flex;flex-direction:column;gap:12px;}
 .gn-card h1{margin:0;text-align:center;font-size:1.75rem;line-height:1.15;color:#14301b;font-weight:800;letter-spacing:-.01em;}
 .gn-card h1 em{display:block;color:#3f9a3a;font-style:italic;position:relative;padding-bottom:10px;}
@@ -451,11 +451,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .gn-alt{display:none;}
 @media (min-width:900px){
   .gn-in{max-width:none;flex-direction:row;box-shadow:none;}
-  .gn-herow{flex:1 1 58%;min-height:100vh;overflow:hidden;}
+  .gn-herow{flex:1 1 58%;min-height:100vh;aspect-ratio:auto;overflow:hidden;}
   .gn-hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 70%;}
   .gn-alt{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s;}
   .gn-alt.on{opacity:1;}
-  .gn-herologo{z-index:3;mix-blend-mode:normal;background:#fff;border-radius:18px;padding:10px 18px;box-shadow:0 2px 12px rgba(0,0,0,.25);width:auto;max-width:none;height:110px;top:24px;}
+  .gn-herologo{display:block;z-index:3;mix-blend-mode:normal;background:#fff;border-radius:18px;padding:10px 18px;box-shadow:0 2px 12px rgba(0,0,0,.25);width:auto;max-width:none;height:110px;top:24px;}
   .gn-card{flex:0 0 42%;max-width:640px;margin:0;border-radius:0;box-shadow:none;justify-content:center;padding:40px 56px;gap:18px;}
   .gn-card h1{font-size:2.3rem;}
   .gn-trust div{font-size:.9rem;padding:16px 12px;}
@@ -3261,7 +3261,7 @@ setTimeout(gnSiguiente, 9000);
 function renderGate(){
   var ico = 'width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3f9a3a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
   return '<div class="gn"><div class="gn-in">'+
-    '<div class="gn-herow"><img class="gn-hero" src="portada/portada_hero.jpg" alt="Vive Hogar Castilla" />'+GATE_FOTOS.map(function(src){ return '<img class="gn-alt" src="'+src+'" alt="Vive Hogar Castilla" />'; }).join('')+'<img class="gn-herologo" src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
+    '<div class="gn-herow"><picture><source media="(min-width:900px)" srcset="portada/portada_hero.jpg" /><img class="gn-hero" src="portada/portada_hero_tel.jpg" alt="Vive Hogar Castilla" /></picture>'+GATE_FOTOS.map(function(src){ return '<img class="gn-alt" src="'+src+'" alt="Vive Hogar Castilla" />'; }).join('')+'<img class="gn-herologo" src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
     '<div class="gn-card">'+
       '<h1>Tu casa propia,<em>cada vez más cerca</em></h1>'+
       '<div class="gn-trust">'+
@@ -7232,7 +7232,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-124251';
+var APP_BUILD = '20261122-124559';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
