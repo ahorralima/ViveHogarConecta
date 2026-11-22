@@ -3235,33 +3235,16 @@ function renderGate(){
 
 function renderClienteVerificacion(){
   var e = ui.clienteErrors || {};
-  var html = '<div class="interesado-screen">';
-  html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<h2 style="margin-top:12px;">Bienvenido a tu espacio Vive Hogar</h2>';
-  html += '<p style="color:var(--ink-soft);margin-top:6px;max-width:56ch;">Accede a la información de tu vivienda, consulta tus cuotas y mantente al día con tu proyecto.</p>';
-
-  html += '<div class="panel panel-flat">'+
-    '<div class="benefit-row">'+
-      '<span class="benefit-icon">🏠</span>'+
-      '<div><strong>Mi vivienda</strong><span class="benefit-sub">Consulta los datos de tu casa y etapa.</span></div>'+
-    '</div>'+
-    '<div class="benefit-row">'+
-      '<span class="benefit-icon">💰</span>'+
-      '<div><strong>Mis cuotas</strong><span class="benefit-sub">Revisa tus pagos y próximos vencimientos.</span></div>'+
-    '</div>'+
-    '<div class="benefit-row">'+
-      '<span class="benefit-icon">🤝</span>'+
-      '<div><strong>Comunidad Vive Hogar</strong><span class="benefit-sub">Conecta con tus vecinos y servicios.</span></div>'+
-    '</div>'+
-  '</div>';
-
-  html += '<div class="panel panel-flat"><h4>Tus datos</h4>'+
-    '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:14px;">Usa el mismo nombre y DNI con el que firmaste tu contrato — así los encontramos en nuestros registros.</p>'+
+  var html = '<div class="as-login"><button type="button" class="back-btn" data-action="gate-back" style="align-self:flex-start;">← Volver</button>';
+  html += '<div class="as-login-card">'+
+    '<img class="as-login-logo" src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
+    '<h2>Tus datos</h2>'+
+    '<p class="as-login-sub" style="text-align:left;">Usa el mismo nombre y DNI con el que firmaste tu contrato — así los encontramos en nuestros registros.</p>'+
     '<form data-form="cliente-verificar">'+
-      '<div class="form-field"><label>Nombre y apellidos según contrato</label><input class="text-input" type="text" name="nombre" required minlength="4" placeholder="Como aparece en tu DNI" />'+(e.nombre?'<span class="err">'+esc(e.nombre)+'</span>':'')+'</div>'+
-      '<div class="form-field"><label>DNI (8 dígitos)</label><input class="text-input" type="text" name="dni" required inputmode="numeric" placeholder="12345678" />'+(e.dni?'<span class="err">'+esc(e.dni)+'</span>':'')+'</div>'+
-      (e.general ? '<div class="form-err-general">'+esc(e.general)+'</div>' : '')+
-      '<button type="submit" class="btn btn-primary btn-block" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Buscando…':'Buscar mi vivienda')+'</button>'+
+      '<label>Nombre y apellido</label><input class="text-input" type="text" name="nombre" required minlength="4" autocapitalize="words" />'+(e.nombre?'<p class="as-err">'+esc(e.nombre)+'</p>':'')+
+      '<label>DNI (8 dígitos)</label><input class="text-input" type="text" name="dni" required inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" />'+(e.dni?'<p class="as-err">'+esc(e.dni)+'</p>':'')+
+      (e.general ? '<p class="as-err">'+esc(e.general)+'</p>' : '')+
+      '<button type="submit" class="btn btn-primary btn-block" style="margin-top:14px;" '+(ui.clienteBusy?'disabled':'')+'>'+(ui.clienteBusy?'Buscando…':'Ver mis datos y pagos')+'</button>'+
       '<p style="font-size:0.72rem;color:var(--ink-faint);text-align:center;margin-top:10px;">Tu nombre y DNI solo se usan para comprobar que eres cliente de Vive Hogar; no se publican ni se comparten con otros vecinos. Más detalles en nuestra <a href="privacy.html" target="_blank" rel="noopener" style="text-decoration:underline;">política de privacidad</a>.</p>'+
     '</form>'+
   '</div>';
@@ -6852,7 +6835,7 @@ document.addEventListener('submit', async function(ev){
     var vDni = (fd.get('dni')||'').trim();
     var vErrs = {};
     if (vNombre.length < 4) vErrs.nombre = 'Ingresa tu nombre completo.';
-    if (!/^\d{5,8}$/.test(vDni)) vErrs.dni = 'Ingresa un DNI válido.';
+    if (!/^\d{5,8}$/.test(vDni)) vErrs.dni = 'El DNI debe tener 8 números. Revisa que no falte ninguno.';
     if (Object.keys(vErrs).length){ ui.clienteErrors = vErrs; render(); return; }
     if (vNombre.toLowerCase().replace(/\s+/g,'') === 'prueba123' && vDni === '12345678'){
       // Cuenta de demostración: no consulta datos reales de clientes
@@ -7181,7 +7164,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-101420';
+var APP_BUILD = '20261122-102531';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
