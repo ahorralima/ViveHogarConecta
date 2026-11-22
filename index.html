@@ -385,6 +385,10 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .hr{height:1px;background:var(--border);margin:16px 0;border:none;}
 
+.spl{position:relative;min-height:100vh;width:100%;overflow:hidden;background:#7fb8ea;animation:fadeIn 0.4s ease;}
+.spl-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 85%;}
+.spl-logo{position:absolute;top:calc(15% + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(62vw,300px);height:auto;mix-blend-mode:multiply;}
+.spl-spin{border-color:rgba(255,255,255,.65);border-top-color:#2e7d32;position:absolute;left:50%;top:calc(15% + 190px);margin-left:-18px;}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:14px;color:var(--ink-soft);}
 .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--paprika);animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -417,6 +421,29 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .gate-screen-v2{position:relative;min-height:100vh;width:100%;overflow:hidden;background:#1B3A56;}
 /* Portada nueva (carrusel de fotos + mensajes de confianza) */
+.gn{min-height:100vh;display:flex;justify-content:center;background:#fff;}
+.gn-in{width:100%;max-width:520px;min-height:100vh;display:flex;flex-direction:column;background:#fff;position:relative;overflow:hidden;}
+.gn-herow{position:relative;flex:none;}
+.gn-hero{width:100%;height:auto;display:block;}
+.gn-herologo{position:absolute;top:calc(7% + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:58%;max-width:320px;height:auto;mix-blend-mode:multiply;}
+.gn-card{position:relative;z-index:5;margin:-34px 14px 14px;background:#fff;border-radius:26px;padding:22px 18px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 10px 30px -8px rgba(20,48,27,.28);display:flex;flex-direction:column;gap:12px;}
+.gn-card h1{margin:0;text-align:center;font-size:1.75rem;line-height:1.15;color:#14301b;font-weight:800;letter-spacing:-.01em;}
+.gn-card h1 em{display:block;color:#3f9a3a;font-style:italic;position:relative;padding-bottom:10px;}
+.gn-card h1 em::after{content:"";position:absolute;left:18%;right:8%;bottom:0;height:4px;border-radius:4px;background:#5fb04a;transform:rotate(-1.2deg);}
+.gn-trust{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 4px;}
+.gn-trust div{display:flex;align-items:center;gap:8px;background:#f1f7ee;border-radius:14px;padding:12px 10px;font-size:.78rem;line-height:1.25;color:#2c4a33;}
+.gn-trust svg{flex:none;}
+.gn-trust b{display:block;font-size:1.3rem;color:#1d5a2a;line-height:1.1;}
+.gn-trust span b{font-size:.9rem;letter-spacing:.01em;display:inline;}
+.gn-trust div:first-child span b{display:block;font-size:1.3rem;}
+.gn-b1,.gn-b2{display:flex;align-items:center;justify-content:space-between;width:100%;border-radius:14px;padding:16px 18px;font-size:1.05rem;font-weight:700;font-family:inherit;cursor:pointer;}
+.gn-b1{background:#2e7d32;color:#fff;border:0;}
+.gn-b2{background:#fff;color:#2e7d32;border:2px solid #2e7d32;}
+.gn-b1 span,.gn-b2 span{flex:1;text-align:center;}
+.gn-b1 svg,.gn-b2 svg{flex:none;}
+.gn-ref{display:flex;align-items:center;justify-content:center;gap:12px;font-size:.95rem;font-weight:500;color:#2e7d32;margin-top:6px;}
+.gn-ref u{display:block;width:70px;height:1.5px;background:#7fb985;text-decoration:none;}
+@media (min-width:900px){.gn-in{max-width:520px;box-shadow:0 0 40px rgba(0,0,0,.12);}}
 .gate-new{min-height:100vh;display:flex;justify-content:center;background:#e9efe6;}
 .gate-new-in{width:100%;max-width:520px;background:#fff;display:flex;flex-direction:column;min-height:100vh;}
 .gate-car{position:relative;flex:1 1 auto;min-height:300px;background:#cfd8cf;overflow:hidden;touch-action:pan-y;}
@@ -1038,7 +1065,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading-screen"><div class="spinner"></div><p>Cargando ViveHogarConecta…</p></div></div>
+<div id="app"><div class="spl"><img class="spl-photo" src="portada/portada_splash.jpg" alt="" /><img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /><div class="spinner spl-spin"></div></div></div>
 <script>
 (function(){
 'use strict';
@@ -3179,14 +3206,11 @@ document.addEventListener('change', asesorUiBind);
 
 
 function renderSplash(){
-  return '<div class="splash-screen-v2">'+
-    '<img class="splash-v2-photo" src="'+GATE_AERIAL_DATAURI+'" alt="" />'+
-    '<div class="splash-v2-scrim"></div>'+
-    '<div class="gate-v2-logo splash-v2-logo"><img class="gate-v2-logo-img" src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" /></div>'+
-  '</div>';
+  return '<div class="spl"><img class="spl-photo" src="portada/portada_splash.jpg" alt="" />'+
+    '<img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /></div>';
 }
 
-var GATE_FOTOS = ['portada/aerea.jpg','portada/render1.jpg','portada/render5.jpg','portada/render2.jpg','portada/render6.jpg'];
+var GATE_FOTOS = ['portada/castilla1.jpg','portada/castilla2.jpg','portada/castilla3.jpg','portada/castilla4.jpg'];
 var gateFotoIdx = 0, gateFotoManual = 0;
 function gateFotoIr(n, manual){
   var imgs = document.querySelectorAll('.gate-car > img'); if (!imgs.length) return;
@@ -3207,6 +3231,22 @@ setInterval(function(){ if (document.querySelector('.gate-car') && Date.now() - 
 })();
 
 function renderGate(){
+  var ico = 'width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3f9a3a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  return '<div class="gn"><div class="gn-in">'+
+    '<div class="gn-herow"><img class="gn-hero" src="portada/portada_hero.jpg" alt="Vive Hogar Castilla" /><img class="gn-herologo" src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
+    '<div class="gn-card">'+
+      '<h1>Tu casa propia,<em>cada vez más cerca</em></h1>'+
+      '<div class="gn-trust">'+
+        '<div><svg '+ico+'><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span><b>+4,000</b>viviendas entregadas</span></div>'+
+        '<div><svg '+ico+'><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg><span>Respaldo del Fondo <b>MIVIVIENDA</b></span></div>'+
+      '</div>'+
+      '<button type="button" class="gn-b1" data-action="gate-cliente"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Ingresar como cliente</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>'+
+      '<button type="button" class="gn-b2" data-action="gate-asesor"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M11 13v2h2v-2"/></svg><span>Ingresar como asesor</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>'+
+    '</div>'+
+    '<div class="gn-ref" style="padding:16px 0 calc(18px + env(safe-area-inset-bottom,0px));"><u></u>Vive Hogar<u></u></div>'+
+  '</div></div>';
+}
+function renderGateViejo(){
   return '<div class="gate-new"><div class="gate-new-in">'+
     '<div class="gate-head"><img src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
     '<div class="gate-car">'+
@@ -4630,7 +4670,7 @@ function renderInteresado(){
 
 function renderApp(){
   if (loading){
-    document.getElementById('app').innerHTML = '<div class="loading-screen"><div class="spinner"></div><p>Cargando ViveHogarConecta…</p></div>';
+    document.getElementById('app').innerHTML = '<div class="spl"><img class="spl-photo" src="portada/portada_splash.jpg" alt="" /><img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /><div class="spinner spl-spin"></div></div>';
     return;
   }
   if (ui.showSplash){
@@ -7164,7 +7204,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-102531';
+var APP_BUILD = '20261122-123413';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
