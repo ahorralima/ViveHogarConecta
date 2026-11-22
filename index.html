@@ -3228,7 +3228,7 @@ function renderSplash(){
     '<img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /></div>';
 }
 
-var GATE_FOTOS = ['portada/castilla1.jpg','portada/castilla2.jpg','portada/castilla3.jpg','portada/castilla4.jpg'];
+var GATE_FOTOS = ['portada/render1.jpg','portada/render5.jpg','portada/render2.jpg','portada/render6.jpg'];
 var gateFotoIdx = 0, gateFotoManual = 0;
 function gateFotoIr(n, manual){
   var imgs = document.querySelectorAll('.gate-car > img'); if (!imgs.length) return;
@@ -7224,7 +7224,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-123729';
+var APP_BUILD = '20261122-123838';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
