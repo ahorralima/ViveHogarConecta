@@ -443,7 +443,20 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .gn-b1 svg,.gn-b2 svg{flex:none;}
 .gn-ref{display:flex;align-items:center;justify-content:center;gap:12px;font-size:.95rem;font-weight:500;color:#2e7d32;margin-top:6px;}
 .gn-ref u{display:block;width:70px;height:1.5px;background:#7fb985;text-decoration:none;}
-@media (min-width:900px){.gn-in{max-width:520px;box-shadow:0 0 40px rgba(0,0,0,.12);}}
+.gn-alt{display:none;}
+@media (min-width:900px){
+  .gn-in{max-width:none;flex-direction:row;box-shadow:none;}
+  .gn-herow{flex:1 1 58%;min-height:100vh;overflow:hidden;}
+  .gn-hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 70%;}
+  .gn-alt{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s;}
+  .gn-alt.on{opacity:1;}
+  .gn-herologo{z-index:3;mix-blend-mode:normal;background:#fff;border-radius:18px;padding:10px 18px;box-shadow:0 2px 12px rgba(0,0,0,.25);width:auto;max-width:none;height:110px;top:24px;}
+  .gn-card{flex:0 0 42%;max-width:640px;margin:0;border-radius:0;box-shadow:none;justify-content:center;padding:40px 56px;gap:18px;}
+  .gn-card h1{font-size:2.3rem;}
+  .gn-trust div{font-size:.9rem;padding:16px 12px;}
+  .gn-b1,.gn-b2{padding:18px 20px;font-size:1.15rem;}
+  .gn-ref{display:none;}
+}
 .gate-new{min-height:100vh;display:flex;justify-content:center;background:#e9efe6;}
 .gate-new-in{width:100%;max-width:520px;background:#fff;display:flex;flex-direction:column;min-height:100vh;}
 .gate-car{position:relative;flex:1 1 auto;min-height:300px;background:#cfd8cf;overflow:hidden;touch-action:pan-y;}
@@ -3230,10 +3243,12 @@ setInterval(function(){ if (document.querySelector('.gate-car') && Date.now() - 
   }, {passive:true});
 })();
 
+var gnIdx = 0;
+setInterval(function(){ var a = document.querySelectorAll('.gn-alt'); if (!a.length || window.innerWidth < 900) return; gnIdx = (gnIdx + 1) % (a.length + 1); [].forEach.call(a, function(im, k){ im.classList.toggle('on', k === gnIdx - 1); }); }, 5000);
 function renderGate(){
   var ico = 'width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3f9a3a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
   return '<div class="gn"><div class="gn-in">'+
-    '<div class="gn-herow"><img class="gn-hero" src="portada/portada_hero.jpg" alt="Vive Hogar Castilla" /><img class="gn-herologo" src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
+    '<div class="gn-herow"><img class="gn-hero" src="portada/portada_hero.jpg" alt="Vive Hogar Castilla" />'+GATE_FOTOS.map(function(src){ return '<img class="gn-alt" src="'+src+'" alt="Vive Hogar Castilla" />'; }).join('')+'<img class="gn-herologo" src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
     '<div class="gn-card">'+
       '<h1>Tu casa propia,<em>cada vez más cerca</em></h1>'+
       '<div class="gn-trust">'+
@@ -7204,7 +7219,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-123413';
+var APP_BUILD = '20261122-123603';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
