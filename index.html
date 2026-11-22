@@ -3084,8 +3084,8 @@ function renderAsesorLoteAcciones(lote){
   var info = ui.sepInfo[lote.id];
   var h = '<div class="lote-detail-section"><div class="lote-detail-section-title js-desc-secreto" data-lote="'+lote.id+'" style="user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;">👨🏽‍💻 Asesor · '+esc(toTitleCase(asesoraNombreActual||''))+'</div>';
   if (lote.e === 'DISPONIBLE'){
-    h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>3 horas</strong>.</p>'+
-      '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (3 horas)</button>';
+    h += '<p class="sep-info">Separación de este proyecto: <strong>'+fmtMoney(sepMonto())+'</strong>. Al separar, la casa se bloquea para todos durante <strong>5 horas</strong>.</p>'+
+      '<button type="button" class="btn btn-primary btn-block" data-action="sep-abrir" data-value="'+lote.id+'"'+busy+'>🔒 Separar esta casa (5 horas)</button>';
     if (esJefe()) h += ofertaLoteHtml(lote);
   } else if (lote.e === 'EN_ATENCION' && lote.vence){
     var mia = esMiReserva(lote.id);
@@ -4676,8 +4676,8 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
-  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + renderVentasManualesJefeHtml();
-  else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + renderVentaManualAsesorHtml();
+  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentasManualesJefeHtml() : '');
+  else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentaManualAsesorHtml() : '');
   if (esAsesor) html += renderApagadoHtml();
   if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">🏠 Así puede quedar tu casa</h4>'+
@@ -5377,7 +5377,7 @@ document.addEventListener('click', async function(ev){
     ui.sepMsg = ''; ui.sepOp = ''; ui.sepNombre = ''; ui.sepDni = ''; ui.sepMonto = ''; ui.sepImg = '';
     var rv = await asesoraLlamar('ec_reservar_lote', { p_lote_id: rvId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
     if (rv.ok){
-      ui.sepMsg = 'Casa bloqueada por 3 horas. Cobra la separación y registra el comprobante antes de que se acabe el tiempo.';
+      ui.sepMsg = 'Casa bloqueada por 5 horas. Cobra la separación y registra el comprobante antes de que se acabe el tiempo.';
       await etapa5Refrescar(); await asesorCargarPanel();
     }
     render();
@@ -5612,12 +5612,12 @@ async function asesoraLlamar(fn, args){
       no_disponible: 'Ese lote ya no está disponible: alguien se te adelantó.',
       no_separado: 'Ese lote ya no está separado.',
       no_existe: 'No se encontró el lote.',
-      vencida: 'Se acabó el tiempo de esta separación (3 horas). La casa volvió a estar disponible; si sigue libre, sepárala de nuevo.',
+      vencida: 'Se acabó el tiempo de esta separación (5 horas). La casa volvió a estar disponible; si sigue libre, sepárala de nuevo.',
       operacion: 'Escribe el número de operación (entre 4 y 30 letras o números) o sube la captura del pago.',
       imagen: 'La imagen no se pudo guardar. Prueba con otra captura.',
       tope: 'Ese descuento supera el máximo permitido para esa forma de pago.',
       permiso_jefe: 'Este descuento lo definió jefatura: no se puede cambiar.',
-      solo_tu_reserva: 'Primero separa la casa (3 horas) para poder aplicar un precio acordado.',
+      solo_tu_reserva: 'Primero separa la casa (5 horas) para poder aplicar un precio acordado.',
       operacion_repetida: 'Ese número de operación ya fue usado en otra separación.',
       sin_separacion: 'No se encontró esa venta entre las tuyas.',
       pago2_hecho: 'Esa venta ya tiene la segunda boleta registrada.',
@@ -7232,7 +7232,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-124559';
+var APP_BUILD = '20261122-143124';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
