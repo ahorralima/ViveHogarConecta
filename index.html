@@ -448,6 +448,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   .gate-new-in{max-width:none;flex-direction:row;}
   .gate-car{flex:1 1 58%;min-height:100vh;}
   .gate-car-fade{display:none;}
+  .gate-car-arr{display:none;}
   .gate-head{display:none;}
   .gate-car-logo{display:block;padding:10px 18px;border-radius:18px;top:24px;}
   .gate-car-logo img{height:110px;}
@@ -7180,7 +7181,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261122-010245';
+var APP_BUILD = '20261122-101420';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
