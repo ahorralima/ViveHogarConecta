@@ -5954,28 +5954,9 @@ function renderReporteVentasHtml(){
       ui._repCarg = false; ui.reporteRecibido = (!r.error && r.data && r.data.ok) ? r.data.recibido : null; renderSiLibre();
     }, function(){ ui._repCarg = false; ui.reporteRecibido = null; });
   }
-  var d = reporteDatos(), mes = '';
-  try { localStorage.setItem('vhs_rep_por_recibir', String(ui.reportePorRecibir || '')); } catch(e){}
-  try { mes = new Date().toLocaleDateString('es-PE', { month: 'long', timeZone: 'America/Lima' }).toUpperCase(); } catch(e){}
-  var S = function(n){ return n === null ? '—' : 'S/ ' + Math.round(n).toLocaleString('en-US'); };
-  var th = 'style="padding:6px 8px;border:1px solid #9bb7c9;background:#bfe3f2;font-size:.78rem;text-align:center;"', td = 'style="padding:6px 8px;border:1px solid #cfd8de;text-align:center;"';
-  var h = '<div class="panel panel-flat" id="reporte-ventas"><h4>📋 Reporte de ventas · Sullana</h4>'+
-    '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.88rem;">'+
-    '<tr><th colspan="4" '+th+'>ASESORES MES DE '+esc(mes)+'</th></tr>'+
-    '<tr><th style="padding:6px 8px;border:1px solid #cfd8de;text-align:left;">ASESOR</th><th style="padding:6px 8px;border:1px solid #cfd8de;">VENTA</th><th style="padding:6px 8px;border:1px solid #cfd8de;">SEPARACIONES</th><th style="padding:6px 8px;border:1px solid #cfd8de;font-size:.75rem;">TOTAL VTAS + SEPARACIONES</th></tr>';
-  d.filas.forEach(function(f){
-    h += '<tr><td style="padding:6px 8px;border:1px solid #cfd8de;">'+esc(f.nombre)+'</td><td '+td+'>'+f.ventas+'</td><td '+td+'>'+f.separadas+'</td><td '+td+'><strong>'+(f.ventas+f.separadas)+'</strong></td></tr>';
-  });
-  h += '<tr><td '+th+'></td><td '+th+'><strong>'+d.tv+'</strong></td><td '+th+'><strong>'+d.ts+'</strong></td><td style="padding:6px 8px;border:1px solid #cfd8de;background:#e00000;color:#fff;text-align:center;font-size:1.2rem;"><strong>'+(d.tv+d.ts)+'</strong></td></tr></table></div>'+
-    '<table style="width:100%;border-collapse:collapse;font-size:.88rem;margin-top:12px;">'+
-    '<tr><td '+th+'><strong>META RECAUDO:</strong></td><td '+td+'>'+S(REPORTE_META)+'</td></tr>'+
-    '<tr><td '+th+'><strong>PROYECTADO A LA FECHA</strong></td><td style="padding:6px 8px;border:1px solid #cfd8de;text-align:center;background:#d5f0d9;">'+S(d.proyectado)+'</td></tr>'+
-    '<tr><td '+th+'><strong>FALTANTE META DE RECAUDO</strong></td><td '+td+'>'+(d.faltante === null ? '—' : '-'+S(d.faltante))+'</td></tr>'+
-    '<tr><td '+th+'><strong>ABONOS RECIBIDOS</strong></td><td style="padding:6px 8px;border:1px solid #cfd8de;text-align:center;background:#d5f0d9;">'+(d.recibido === null ? 'Cargando…' : S(d.recibido))+'</td></tr>'+
-    '<tr><td '+th+'><strong>ABONOS POR RECIBIR</strong></td><td '+td+'><input class="text-input" type="number" inputmode="decimal" min="0" data-ui="reportePorRecibir" data-rerender="1" value="'+esc(ui.reportePorRecibir || '')+'" placeholder="Escribe el monto" style="max-width:150px;text-align:center;" /></td></tr></table>'+
-    '<p style="font-size:.78rem;color:var(--ink-faint);margin:8px 0 10px;">Abonos recibidos = separaciones + inicial de las casas del mes (sin cobranza). Abonos por recibir lo llena Juan Carlos.</p>'+
-    '<button type="button" class="btn btn-secondary btn-block" data-action="reporte-excel">📊 Exportar reporte a Excel</button></div>';
-  return h;
+  return '<div class="panel panel-flat" id="reporte-ventas"><h4>📋 Reporte de ventas · Sullana</h4>'+
+    '<p style="font-size:.85rem;color:var(--ink-soft);margin:0 0 10px;">Baja el reporte del mes en Excel, con ventas, separaciones y recaudo por asesor.</p>'+
+    '<button type="button" class="btn btn-secondary btn-block" data-action="reporte-excel">📊 Exportar a Excel</button></div>';
 }
 function xlsxReporteBlob(filas, mesTxt, d){
   function x(t){ return String(t).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -7419,7 +7400,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-120138';
+var APP_BUILD = '20261123-120340';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
