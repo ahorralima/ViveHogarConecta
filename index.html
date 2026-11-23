@@ -999,6 +999,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cob-cli-der{display:flex;flex-direction:column;align-items:flex-end;text-align:right;max-width:46vw;}
 .cob-cli-der b{font-size:0.78rem;}
 .cob-det{border-top:1px solid #e4ebf1;padding:8px 12px 10px;background:#f7fafc;max-height:380px;overflow:auto;}
+.cob-wa{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px;}
+.cob-wa .btn{flex:1 1 150px;text-align:center;font-size:.85rem;padding:10px 12px;}
 .cob-det-res{font-size:0.78rem;color:#44525e;margin-bottom:8px;}
 .cob-cuota{border-bottom:1px solid #e4ebf1;padding:6px 0;}
 .cob-cuota.venc{background:#fdecea;margin:0 -12px;padding:6px 12px;}
@@ -2503,6 +2505,17 @@ function cobranzaAbrirCliente(key){
     ui.cobDet[key] = (res.data && res.data.ok) ? res.data.cuotas : 'error';
     render();
   });
+  // Telefonos para el boton de WhatsApp (si aun no se cargaron en Supabase, simplemente no se muestran)
+  if (!ui.cobTel) ui.cobTel = {};
+  if (ui.cobTel[key] === undefined){
+    var tl = ui.cobAdmin
+      ? sb.rpc('ec_cobranza_telefonos_admin', { p_token: sessionToken, p_dni: p[0], p_manzana: p[1], p_proyecto: ui.cobProy })
+      : sb.rpc('ec_cobranza_telefonos', { p_id: asesoraIdActual, p_pin: asesoraPin, p_dni: p[0], p_manzana: p[1], p_proyecto: ui.cobProy });
+    tl.then(function(r){
+      ui.cobTel[key] = (!r.error && r.data && r.data.ok) ? { t1: r.data.tel1 || '', t2: r.data.tel2 || '' } : null;
+      render();
+    }, function(){ ui.cobTel[key] = null; });
+  }
 }
 function cobDona(vals, cols, labs, tot){
   var R = 42, C = 2 * Math.PI * R, off = 0, arcs = '';
@@ -2603,6 +2616,14 @@ function renderCobranzaHtml(){
       if (!det) h += '<p class="cob-vacio">Cargando pagos…</p>';
       else if (det === 'error') h += '<p class="cob-vacio">No se pudo cargar el detalle.</p>';
       else {
+        var tel = ui.cobTel && ui.cobTel[k];
+        if (tel && (tel.t1 || tel.t2)){
+          var pn = (PROY_NOMBRES && PROY_NOMBRES[ui.cobProy]) || 'Vive Hogar';
+          var wm = 'Hola, te saludamos de '+pn+'. ' + (c.vencidas > 0 ? 'Te recordamos que tienes '+c.vencidas+(c.vencidas === 1 ? ' cuota vencida' : ' cuotas vencidas')+'. ¿Cuándo podrías ponerte al día?' : 'Gracias por mantener tus cuotas al día.');
+          h += '<div class="cob-wa">'+[tel.t1, tel.t2].filter(Boolean).map(function(t, i){
+            return '<a class="btn btn-primary" target="_blank" rel="noopener" href="https://wa.me/51'+esc(t)+'?text='+encodeURIComponent(wm)+'">💬 WhatsApp'+(tel.t2 && tel.t1 ? ' (número '+(i+1)+')' : '')+' · '+esc(t)+'</a>';
+          }).join('')+'</div>';
+        }
         h += '<div class="cob-det-res">Más antigua vencida: <b>'+cobF(c.mas_antigua)+'</b> · Próxima cuota: <b>'+cobF(c.proxima)+'</b></div>';
         var hoy = d.hoy;
         var pp = cobProbPago(det, hoy, c.proxima);
@@ -7532,7 +7553,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-130840';
+var APP_BUILD = '20261123-132253';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
