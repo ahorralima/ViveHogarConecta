@@ -6017,17 +6017,31 @@ function xlsxReporteBlob(filas, mesTxt, d){
 }
 function exportarReporteVentasExcel(){
   if (!puedeReporteVentas()) return;
-  var d = reporteDatos(), mes = '', hoy = '';
-  try { mes = new Date().toLocaleDateString('es-PE', { month: 'long', timeZone: 'America/Lima' }).toUpperCase(); hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }); } catch(e){}
-  var nombre = 'Reporte_Ventas_Sullana_' + (hoy || 'hoy') + '.xlsx';
-  var blob = xlsxReporteBlob(d.filas, mes, d);
   try {
-    var file = new File([blob], nombre, { type: blob.type });
-    if (navigator.canShare && navigator.canShare({ files: [file] })){ navigator.share({ files: [file], title: nombre }).catch(function(){}); return; }
-  } catch(e){}
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
-  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    var d = reporteDatos(), mes = '', hoy = '';
+    try { mes = new Date().toLocaleDateString('es-PE', { month: 'long', timeZone: 'America/Lima' }).toUpperCase(); hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }); } catch(e){}
+    var nombre = 'Reporte_Ventas_Sullana_' + (hoy || 'hoy') + '.xlsx';
+    var blob = xlsxReporteBlob(d.filas, mes, d);
+    var descargar = function(){
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
+      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+      toast('Descargando ' + nombre + '…');
+    };
+    var celular = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+    if (celular){
+      try {
+        var file = new File([blob], nombre, { type: blob.type });
+        if (navigator.canShare && navigator.canShare({ files: [file] })){
+          navigator.share({ files: [file], title: nombre }).catch(function(e){ if (!e || e.name !== 'AbortError') descargar(); });
+          return;
+        }
+      } catch(e){}
+    }
+    descargar();
+  } catch(e){
+    toast('No se pudo crear el Excel: ' + (e && e.message ? e.message : 'error'));
+  }
 }
 function exportarVentasMesExcel(){
   var vm = ui.ventasMes; if (!vm || !vm.items || !vm.items.length) return;
@@ -7400,7 +7414,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-120624';
+var APP_BUILD = '20261123-120705';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
