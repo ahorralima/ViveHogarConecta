@@ -5226,9 +5226,43 @@ document.addEventListener('click', async function(ev){
     var bImg = BOLETIN_IMG[proySlugPref()];
     if (bImg){
       var bo = document.createElement('div');
-      bo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;';
-      bo.innerHTML = '<img src="'+bImg+'" alt="Boletín" style="max-width:100%;max-height:100%;border-radius:8px;" /><button type="button" style="position:fixed;top:max(12px,env(safe-area-inset-top,0px));right:12px;font-size:1.6rem;line-height:1;background:#fff;border:0;border-radius:50%;width:42px;height:42px;">×</button>';
-      bo.addEventListener('click', function(){ bo.remove(); });
+      bo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.94);overflow:hidden;touch-action:none;';
+      bo.innerHTML = '<img src="'+bImg+'" alt="Boletín" draggable="false" style="position:absolute;left:50%;top:50%;max-width:96vw;max-height:88vh;transform-origin:center center;user-select:none;-webkit-user-drag:none;border-radius:6px;will-change:transform;" />'
+        + '<button type="button" data-bc aria-label="Cerrar" style="position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:12px;font-size:1.6rem;line-height:1;background:#fff;border:0;border-radius:50%;width:44px;height:44px;">×</button>'
+        + '<div style="position:absolute;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom,0px));text-align:center;color:#fff;font-size:.85rem;opacity:.85;pointer-events:none;">Pellizca o toca dos veces para acercar · arrastra para moverte</div>'
+        + '<div style="position:absolute;left:12px;bottom:max(48px,calc(env(safe-area-inset-bottom,0px) + 34px));display:flex;gap:8px;"><button type="button" data-bz="1" style="width:44px;height:44px;border:0;border-radius:50%;font-size:1.5rem;background:rgba(255,255,255,.9);">+</button><button type="button" data-bz="-1" style="width:44px;height:44px;border:0;border-radius:50%;font-size:1.5rem;background:rgba(255,255,255,.9);">−</button></div>';
+      var im = bo.querySelector('img'), sc = 1, tx = 0, ty = 0, pts = {}, d0 = 0, sc0 = 1, lastTap = 0;
+      function apply(){
+        var maxX = Math.max(0, (im.offsetWidth*sc - window.innerWidth)/2), maxY = Math.max(0, (im.offsetHeight*sc - window.innerHeight)/2);
+        tx = Math.min(maxX, Math.max(-maxX, tx)); ty = Math.min(maxY, Math.max(-maxY, ty));
+        im.style.transform = 'translate(-50%,-50%) translate('+tx+'px,'+ty+'px) scale('+sc+')';
+      }
+      function zoom(n){ sc = Math.min(5, Math.max(1, n)); if (sc === 1){ tx = 0; ty = 0; } apply(); }
+      apply();
+      bo.addEventListener('pointerdown', function(e){
+        if (e.target.closest('button')) return;
+        bo.setPointerCapture(e.pointerId); pts[e.pointerId] = {x:e.clientX, y:e.clientY};
+        var k = Object.keys(pts);
+        if (k.length === 2){ d0 = Math.hypot(pts[k[0]].x-pts[k[1]].x, pts[k[0]].y-pts[k[1]].y); sc0 = sc; }
+        else if (k.length === 1){ var now = Date.now(); if (now - lastTap < 300){ zoom(sc > 1 ? 1 : 2.5); } lastTap = now; }
+      });
+      bo.addEventListener('pointermove', function(e){
+        var p = pts[e.pointerId]; if (!p) return;
+        var k = Object.keys(pts);
+        if (k.length === 2){
+          pts[e.pointerId] = {x:e.clientX, y:e.clientY};
+          var d = Math.hypot(pts[k[0]].x-pts[k[1]].x, pts[k[0]].y-pts[k[1]].y);
+          if (d0) zoom(sc0 * d / d0);
+        } else if (sc > 1){ tx += e.clientX - p.x; ty += e.clientY - p.y; pts[e.pointerId] = {x:e.clientX, y:e.clientY}; apply(); }
+      });
+      function up(e){ delete pts[e.pointerId]; d0 = 0; }
+      bo.addEventListener('pointerup', up); bo.addEventListener('pointercancel', up);
+      bo.addEventListener('wheel', function(e){ e.preventDefault(); zoom(sc * (e.deltaY < 0 ? 1.15 : 0.87)); }, {passive:false});
+      bo.addEventListener('click', function(e){
+        var z = e.target.closest('[data-bz]');
+        if (z) zoom(sc + (z.getAttribute('data-bz') === '1' ? 0.75 : -0.75));
+        else if (e.target.closest('[data-bc]')) bo.remove();
+      });
       document.body.appendChild(bo);
     } else if (!BOLETIN_URL) toast('El boletín estará disponible muy pronto.');
     else window.open(BOLETIN_URL, '_blank', 'noopener');
@@ -7241,7 +7275,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-102140';
+var APP_BUILD = '20261123-113130';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
