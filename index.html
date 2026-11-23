@@ -6156,7 +6156,7 @@ function renderVentasMesHtml(){
   if (!vm.items.length) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Todavía no hay ventas este mes.</p></div>';
   var total = 0, nPend = 0; vm.items.forEach(function(v){ if (v.aprobacion === 'pendiente') nPend++; else total += Number(v.monto) || 0; });
   h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' · separaciones cobradas: <strong>'+fmtMoney(total)+'</strong>.'+(nPend ? ' <strong style="color:var(--danger,#b3261e);">⏳ '+nPend+' por aprobar.</strong>' : '')+' Toca una venta para ver el detalle.</p>'+
-    (esJefe() ? '<button type="button" class="btn btn-secondary btn-block" style="margin:0 0 10px;" data-action="ventas-excel">📊 Exportar a Excel</button>' : '');
+    (esJefe() && !puedeReporteVentas() ? '<button type="button" class="btn btn-secondary btn-block" style="margin:0 0 10px;" data-action="ventas-excel">📊 Exportar a Excel</button>' : '');
   vm.items.forEach(function(v){
     var abierta = String(ui.ventaAbierta) === String(v.id);
     var chip = (v.aprobacion === 'pendiente' ? '⏳ Por aprobar' : (v.estado === 'comprada' ? 'Vendida' : 'Separada')) + (v.exige_pago2 ? (v.pago2_en ? ' · 2.ª boleta ✅' : ' · ⏳ falta 2.ª boleta') : '') + ((esJefe() && !v.dni) ? ' · ⚠️ DNI pendiente' : '');
@@ -7400,7 +7400,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-120340';
+var APP_BUILD = '20261123-120624';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
