@@ -4705,7 +4705,7 @@ function renderInteresadoMapa(){
     '</div>';
   }
 
-  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentasManualesJefeHtml() : '');
+  if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderReporteVentasHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentasManualesJefeHtml() : '');
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentaManualAsesorHtml() : '');
   if (esAsesor) html += renderApagadoHtml();
   if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
@@ -5069,6 +5069,8 @@ document.addEventListener('click', async function(ev){
     var v2Id = t.getAttribute('data-value');
     ui.v2nfAbierta = String(ui.v2nfAbierta) === String(v2Id) ? null : v2Id;
     render();
+  } else if (action === 'reporte-excel'){
+    exportarReporteVentasExcel();
   } else if (action === 'ventas-excel'){
     exportarVentasMesExcel();
   } else if (action === 'venta-toggle'){
@@ -5923,6 +5925,128 @@ function xlsxBlob(cols, filas, anchos){
     { name: 'xl/styles.xml', data: H+'<styleSheet xmlns="'+NS+'spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>' },
     { name: 'xl/worksheets/sheet1.xml', data: H+'<worksheet xmlns="'+NS+'spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'+colsXml+'<sheetData>'+rows+'</sheetData></worksheet>' }
   ]);
+}
+// ===== Reporte de ventas (formato Excel de Juan Carlos): solo Juan Carlos Cavagnaro y Marcelo Blanco, solo Sullana =====
+function puedeReporteVentas(){
+  var yo = ui.asesorPanel && ui.asesorPanel.yo;
+  if (!yo || yo.rol !== 'jefe' || yo.proyecto !== 'sullana') return false;
+  var n = String(yo.nombre || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  return n.indexOf('cavagnaro') >= 0 || (n.indexOf('blanco') >= 0 && (n.indexOf('marcelo') >= 0 || n.indexOf('jesus') >= 0));
+}
+var REPORTE_META = 250000;   // meta de recaudo del mes (Sullana)
+function reporteDatos(){
+  var p = ui.asesorPanel, rk = (p && p.ranking) || [];
+  var filas = rk.map(function(r){ return { nombre: toTitleCase(r.nombre || ''), ventas: r.ventas || 0, separadas: r.separadas || 0 }; });
+  var tv = 0, ts = 0; filas.forEach(function(f){ tv += f.ventas; ts += f.separadas; });
+  var rec = (ui.reporteRecibido !== undefined && ui.reporteRecibido !== null) ? Number(ui.reporteRecibido) || 0 : null;
+  var pr = ui.reportePorRecibir;
+  if (pr === undefined){ try { pr = localStorage.getItem('vhs_rep_por_recibir') || ''; } catch(e){ pr = ''; } ui.reportePorRecibir = pr; }
+  var prN = String(pr).trim() === '' ? null : Number(String(pr).replace(/,/g, ''));
+  if (prN !== null && !isFinite(prN)) prN = null;
+  var proy = (prN === null && rec === null) ? null : (rec || 0) + (prN || 0);
+  return { filas: filas, tv: tv, ts: ts, recibido: rec, porRecibir: prN, proyectado: proy, faltante: proy === null ? null : Math.max(0, REPORTE_META - proy) };
+}
+function renderReporteVentasHtml(){
+  if (!puedeReporteVentas()) return '';
+  if (ui.reporteRecibido === undefined && !ui._repCarg){
+    ui._repCarg = true;
+    sb.rpc('ec_reporte_recibido', { p_asesora_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
+      ui._repCarg = false; ui.reporteRecibido = (!r.error && r.data && r.data.ok) ? r.data.recibido : null; renderSiLibre();
+    }, function(){ ui._repCarg = false; ui.reporteRecibido = null; });
+  }
+  var d = reporteDatos(), mes = '';
+  try { localStorage.setItem('vhs_rep_por_recibir', String(ui.reportePorRecibir || '')); } catch(e){}
+  try { mes = new Date().toLocaleDateString('es-PE', { month: 'long', timeZone: 'America/Lima' }).toUpperCase(); } catch(e){}
+  var S = function(n){ return n === null ? '—' : 'S/ ' + Math.round(n).toLocaleString('en-US'); };
+  var th = 'style="padding:6px 8px;border:1px solid #9bb7c9;background:#bfe3f2;font-size:.78rem;text-align:center;"', td = 'style="padding:6px 8px;border:1px solid #cfd8de;text-align:center;"';
+  var h = '<div class="panel panel-flat" id="reporte-ventas"><h4>📋 Reporte de ventas · Sullana</h4>'+
+    '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.88rem;">'+
+    '<tr><th colspan="4" '+th+'>ASESORES MES DE '+esc(mes)+'</th></tr>'+
+    '<tr><th style="padding:6px 8px;border:1px solid #cfd8de;text-align:left;">ASESOR</th><th style="padding:6px 8px;border:1px solid #cfd8de;">VENTA</th><th style="padding:6px 8px;border:1px solid #cfd8de;">SEPARACIONES</th><th style="padding:6px 8px;border:1px solid #cfd8de;font-size:.75rem;">TOTAL VTAS + SEPARACIONES</th></tr>';
+  d.filas.forEach(function(f){
+    h += '<tr><td style="padding:6px 8px;border:1px solid #cfd8de;">'+esc(f.nombre)+'</td><td '+td+'>'+f.ventas+'</td><td '+td+'>'+f.separadas+'</td><td '+td+'><strong>'+(f.ventas+f.separadas)+'</strong></td></tr>';
+  });
+  h += '<tr><td '+th+'></td><td '+th+'><strong>'+d.tv+'</strong></td><td '+th+'><strong>'+d.ts+'</strong></td><td style="padding:6px 8px;border:1px solid #cfd8de;background:#e00000;color:#fff;text-align:center;font-size:1.2rem;"><strong>'+(d.tv+d.ts)+'</strong></td></tr></table></div>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:.88rem;margin-top:12px;">'+
+    '<tr><td '+th+'><strong>META RECAUDO:</strong></td><td '+td+'>'+S(REPORTE_META)+'</td></tr>'+
+    '<tr><td '+th+'><strong>PROYECTADO A LA FECHA</strong></td><td style="padding:6px 8px;border:1px solid #cfd8de;text-align:center;background:#d5f0d9;">'+S(d.proyectado)+'</td></tr>'+
+    '<tr><td '+th+'><strong>FALTANTE META DE RECAUDO</strong></td><td '+td+'>'+(d.faltante === null ? '—' : '-'+S(d.faltante))+'</td></tr>'+
+    '<tr><td '+th+'><strong>ABONOS RECIBIDOS</strong></td><td style="padding:6px 8px;border:1px solid #cfd8de;text-align:center;background:#d5f0d9;">'+(d.recibido === null ? 'Cargando…' : S(d.recibido))+'</td></tr>'+
+    '<tr><td '+th+'><strong>ABONOS POR RECIBIR</strong></td><td '+td+'><input class="text-input" type="number" inputmode="decimal" min="0" data-ui="reportePorRecibir" data-rerender="1" value="'+esc(ui.reportePorRecibir || '')+'" placeholder="Escribe el monto" style="max-width:150px;text-align:center;" /></td></tr></table>'+
+    '<p style="font-size:.78rem;color:var(--ink-faint);margin:8px 0 10px;">Abonos recibidos = separaciones + inicial de las casas del mes (sin cobranza). Abonos por recibir lo llena Juan Carlos.</p>'+
+    '<button type="button" class="btn btn-secondary btn-block" data-action="reporte-excel">📊 Exportar reporte a Excel</button></div>';
+  return h;
+}
+function xlsxReporteBlob(filas, mesTxt, d){
+  function x(t){ return String(t).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  var rows = [], merges = [];
+  function cell(c, r, v, s, f){
+    var ref = String.fromCharCode(65 + c) + r;
+    if (f) return '<c r="'+ref+'" s="'+s+'"><f>'+f+'</f>'+(v !== null && v !== undefined ? '<v>'+v+'</v>' : '')+'</c>';
+    if (v === null || v === undefined || v === '') return '<c r="'+ref+'" s="'+s+'"/>';
+    if (typeof v === 'number') return '<c r="'+ref+'" s="'+s+'"><v>'+v+'</v></c>';
+    return '<c r="'+ref+'" s="'+s+'" t="inlineStr"><is><t xml:space="preserve">'+x(v)+'</t></is></c>';
+  }
+  var r = 1;
+  rows.push('<row r="1" ht="22" customHeight="1">'+cell(0,1,'ASESORES MES DE '+mesTxt,1)+cell(1,1,'',1)+cell(2,1,'',1)+cell(3,1,'',1)+'</row>'); merges.push('A1:D1');
+  rows.push('<row r="2" ht="32" customHeight="1">'+cell(0,2,'ASESOR',2)+cell(1,2,'VENTA',2)+cell(2,2,'SEPARACIONES',2)+cell(3,2,'TOTAL VTAS + SEPARACIONES',2)+'</row>');
+  r = 3;
+  filas.forEach(function(f){
+    rows.push('<row r="'+r+'">'+cell(0,r,f.nombre,3)+cell(1,r,f.ventas,4)+cell(2,r,f.separadas,4)+cell(3,r,null,5,'B'+r+'+C'+r)+'</row>'.replace('</row>','</row>')); r++;
+  });
+  var a = 3, b = r - 1, tot = r;
+  rows.push('<row r="'+tot+'" ht="26" customHeight="1">'+cell(0,tot,'',6)+cell(1,tot,null,6,'SUM(B'+a+':B'+b+')')+cell(2,tot,null,6,'SUM(C'+a+':C'+b+')')+cell(3,tot,null,7,'SUM(D'+a+':D'+b+')')+'</row>');
+  var m = tot + 2;   // fila de meta
+  rows.push('<row r="'+m+'">'+cell(0,m,'META RECAUDO:',8)+cell(1,m,'',8)+cell(2,m,'',8)+cell(3,m,REPORTE_META,9)+'</row>'); merges.push('A'+m+':C'+m);
+  rows.push('<row r="'+(m+1)+'">'+cell(0,m+1,'PROYECTADO A LA FECHA',8)+cell(1,m+1,'',8)+cell(2,m+1,'',8)+cell(3,m+1,d.proyectado,10,'D'+(m+3)+'+D'+(m+4))+'</row>'); merges.push('A'+(m+1)+':C'+(m+1));
+  rows.push('<row r="'+(m+2)+'">'+cell(0,m+2,'FALTANTE META DE RECAUDO',8)+cell(1,m+2,'',8)+cell(2,m+2,'',8)+cell(3,m+2,d.faltante,11,'MAX(0,D'+m+'-D'+(m+1)+')')+'</row>'); merges.push('A'+(m+2)+':C'+(m+2));
+  rows.push('<row r="'+(m+3)+'">'+cell(0,m+3,'ABONOS RECIBIDOS',8)+cell(1,m+3,'',8)+cell(2,m+3,'',8)+cell(3,m+3,d.recibido === null ? null : Math.round(d.recibido),10)+'</row>'); merges.push('A'+(m+3)+':C'+(m+3));
+  rows.push('<row r="'+(m+4)+'">'+cell(0,m+4,'ABONOS POR RECIBIR',8)+cell(1,m+4,'',8)+cell(2,m+4,'',8)+cell(3,m+4,d.porRecibir,12)+'</row>'); merges.push('A'+(m+4)+':C'+(m+4));
+  var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n', NS = 'http://schemas.openxmlformats.org/';
+  var border = '<border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="thin"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border>';
+  function xf(font, fill, numFmt, h, wrap){ return '<xf numFmtId="'+numFmt+'" fontId="'+font+'" fillId="'+fill+'" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1" applyNumberFormat="1"><alignment horizontal="'+h+'" vertical="center"'+(wrap ? ' wrapText="1"' : '')+'/></xf>'; }
+  var styles = H+'<styleSheet xmlns="'+NS+'spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="&quot;S/ &quot;#,##0"/><numFmt numFmtId="165" formatCode="&quot;-S/ &quot;#,##0"/></numFmts>'+
+    '<fonts count="5"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="12"/><name val="Calibri"/></font><font><b/><sz val="18"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="12"/><name val="Calibri"/></font></fonts>'+
+    '<fills count="6"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFBDE3F4"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFF0000"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFC6EFCE"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFF2CC"/></patternFill></fill></fills>'+
+    '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'+border+'</borders>'+
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'+
+    '<cellXfs count="13"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'+
+      xf(2,2,0,'center') +            // 1 titulo
+      xf(1,0,0,'center',true) +       // 2 encabezado
+      xf(0,0,0,'left') +              // 3 asesor
+      xf(0,0,0,'center') +            // 4 numero
+      xf(1,0,0,'center') +            // 5 total por asesor
+      xf(1,2,0,'center') +            // 6 fila total azul
+      xf(3,3,0,'center') +            // 7 total general rojo
+      xf(4,2,0,'right') +             // 8 etiqueta
+      xf(0,0,164,'center') +          // 9 dinero
+      xf(1,4,164,'center') +          // 10 dinero verde
+      xf(0,0,165,'center') +          // 11 faltante
+      xf(0,5,164,'center') +          // 12 por recibir (amarillo, se llena)
+    '</cellXfs></styleSheet>';
+  var sheet = H+'<worksheet xmlns="'+NS+'spreadsheetml/2006/main"><cols><col min="1" max="1" width="30" customWidth="1"/><col min="2" max="3" width="16" customWidth="1"/><col min="4" max="4" width="24" customWidth="1"/></cols><sheetData>'+rows.join('')+'</sheetData><mergeCells count="'+merges.length+'">'+merges.map(function(q){ return '<mergeCell ref="'+q+'"/>'; }).join('')+'</mergeCells></worksheet>';
+  return xlsxZip([
+    { name: '[Content_Types].xml', data: H+'<Types xmlns="'+NS+'package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>' },
+    { name: '_rels/.rels', data: H+'<Relationships xmlns="'+NS+'package/2006/relationships"><Relationship Id="rId1" Type="'+NS+'officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+    { name: 'xl/workbook.xml', data: H+'<workbook xmlns="'+NS+'spreadsheetml/2006/main" xmlns:r="'+NS+'officeDocument/2006/relationships"><sheets><sheet name="Reporte" sheetId="1" r:id="rId1"/></sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>' },
+    { name: 'xl/_rels/workbook.xml.rels', data: H+'<Relationships xmlns="'+NS+'package/2006/relationships"><Relationship Id="rId1" Type="'+NS+'officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="'+NS+'officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+    { name: 'xl/styles.xml', data: styles },
+    { name: 'xl/worksheets/sheet1.xml', data: sheet }
+  ]);
+}
+function exportarReporteVentasExcel(){
+  if (!puedeReporteVentas()) return;
+  var d = reporteDatos(), mes = '', hoy = '';
+  try { mes = new Date().toLocaleDateString('es-PE', { month: 'long', timeZone: 'America/Lima' }).toUpperCase(); hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }); } catch(e){}
+  var nombre = 'Reporte_Ventas_Sullana_' + (hoy || 'hoy') + '.xlsx';
+  var blob = xlsxReporteBlob(d.filas, mes, d);
+  try {
+    var file = new File([blob], nombre, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })){ navigator.share({ files: [file], title: nombre }).catch(function(){}); return; }
+  } catch(e){}
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
 }
 function exportarVentasMesExcel(){
   var vm = ui.ventasMes; if (!vm || !vm.items || !vm.items.length) return;
@@ -7295,7 +7419,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-114050';
+var APP_BUILD = '20261123-120138';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
