@@ -6260,12 +6260,15 @@ function renderAlertaSincroHtml(){
   if (ahora - corrida > 45*60000){
     estilo = 'background:#fdecea;border:1px solid #e0463a;color:#8a1c12;';
     txt = '⚠️ <strong>La sincronización con el 2NF no se actualiza.</strong> Última vez: '+esc(hora(corrida))+' (hace '+hace(ahora-corrida)+'). Las ventas nuevas pueden no verse.';
-  } else if (venta && dow !== 0 && ahora - venta > 30*3600000){
-    estilo = 'background:#fff6e0;border:1px solid #e8a317;color:#7a5200;';
-    txt = '⚠️ <strong>El 2NF no trae ventas nuevas desde hace '+hace(ahora-venta)+'.</strong> Si hubo ventas, avisa a Iván: la copia puede estar atrasada.';
   } else {
-    estilo = 'background:#eaf6ee;border:1px solid #b6dfc4;color:#1f5a35;';
-    txt = '✅ Datos del 2NF al día · última sincronización '+esc(hora(corrida));
+    var fechaTxt = '';
+    try {
+      var dd = new Date(corrida), hoyL = new Date(ahora);
+      var ymd = function(d){ return d.toLocaleDateString('en-CA', { timeZone:'America/Lima' }); };
+      fechaTxt = ymd(dd) === ymd(hoyL) ? 'hoy' : (ymd(dd) === ymd(new Date(ahora-86400000)) ? 'ayer' : dd.toLocaleDateString('es-PE', { day:'numeric', month:'short', timeZone:'America/Lima' }));
+    } catch(e){}
+    estilo = 'background:#f1f4f8;border:1px solid #d5dce6;color:#4a5a70;';
+    txt = '🕒 Última actualización del 2NF: <strong>'+esc(fechaTxt)+' a las '+esc(hora(corrida))+'</strong>';
   }
   return '<div class="panel panel-flat" id="alerta-sincro" style="'+estilo+'padding:10px 12px;margin:0 0 10px;font-size:.85rem;">'+txt+'</div>';
 }
@@ -7554,7 +7557,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-161317';
+var APP_BUILD = '20261123-163504';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
