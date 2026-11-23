@@ -3281,7 +3281,7 @@ function renderSplash(){
     '<img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /></div>';
 }
 
-var GATE_FOTOS = ['portada/render1.jpg','portada/render5.jpg','portada/render2.jpg','portada/render6.jpg'];
+var GATE_FOTOS = ['portada/render7.jpg','portada/render1.jpg','portada/render5.jpg','portada/render2.jpg','portada/render6.jpg'];
 var gateFotoIdx = 0, gateFotoManual = 0;
 function gateFotoIr(n, manual){
   var imgs = document.querySelectorAll('.gate-car > img'); if (!imgs.length) return;
@@ -3810,6 +3810,7 @@ var VISTA_RENDER_MAP = {
   'Pasaje': ['Calle y avenida principal', 'Fachada de las viviendas']
 };
 var CASA_RENDERS_NUEVOS = [
+  {src:'casas/render7.jpg', t:'Fachada con celosía y jardinera'},
   {src:'casas/render1.jpg', t:'Fachada con terraza'},
   {src:'casas/render2.jpg', t:'Casa con jardín en la azotea'},
   {src:'casas/render4.jpg', t:'Fachada con balcones'},
@@ -7553,7 +7554,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-132253';
+var APP_BUILD = '20261123-161317';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
