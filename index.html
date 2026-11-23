@@ -1742,8 +1742,7 @@ function renderHome(){
   var greetFirst = (identity && identity.nombre) ? identity.nombre.trim().split(/\s+/)[0] : null;
   var greetLast = (!greetFirst && clienteNombreVerificado) ? clienteNombreVerificado.trim().split(/\s+/).pop() : null;
   var greetName = greetFirst || greetLast;
-  var greeting = greetName ? 'Hola, '+esc(toTitleCase(greetName)) : '¡Bienvenido/a a tu hogar!';
-  var html = '<h2 style="margin-bottom:12px;">'+greeting+'</h2>';
+  var html = '<h2 style="margin-bottom:12px;">¡Bienvenido, vecin@!</h2>';
 
   if (ui.showEtapaPrompt){
     html += etapaPromptHtml();
@@ -7418,7 +7417,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-120958';
+var APP_BUILD = '20261123-121314';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
