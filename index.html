@@ -398,10 +398,11 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .hr{height:1px;background:var(--border);margin:16px 0;border:none;}
 
 .spl{position:relative;min-height:100vh;width:100%;overflow:hidden;background:#7fb8ea;animation:fadeIn 0.4s ease;}
+.spl picture{display:contents;}
 .spl-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 85%;}
 .spl-logo{position:absolute;top:calc(15% + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(44vw,220px);height:auto;mix-blend-mode:multiply;}
 @media (min-width:900px){
-  .spl-photo{object-position:50% 46%;}
+  .spl-photo{object-position:50% 50%;}
   .spl-logo{top:50%;transform:translate(-50%,-62%);width:auto;height:150px;background:#fff;border-radius:22px;padding:14px 26px;mix-blend-mode:normal;box-shadow:0 6px 28px rgba(0,0,0,.28);}
   .spl-spin{top:calc(50% + 100px);border-color:rgba(255,255,255,.8);border-top-color:#2e7d32;width:40px;height:40px;margin-left:-20px;}
 }
@@ -1102,7 +1103,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 </head>
 <body>
 <noscript><h1>ViveHogarConecta</h1><p>Encuentra tu casa Vive Hogar en Sullana, Castilla (Piura), Ejidos y Lambayeque. Mira los lotes disponibles, el recorrido de las casas, cotiza con un asesor y separa tu casa desde el celular.</p></noscript>
-<div id="app"><div class="spl"><img class="spl-photo" src="portada/portada_splash.jpg" alt="" /><img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /><div class="spinner spl-spin"></div></div></div>
+<div id="app"><div class="spl"><picture><source media="(min-width:900px)" srcset="portada/splash_pc_a.jpg" /><img class="spl-photo" src="portada/splash_movil.jpg" alt="" /></picture><img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /><div class="spinner spl-spin"></div></div></div>
 <script>
 (function(){
 'use strict';
@@ -3255,7 +3256,7 @@ document.addEventListener('change', asesorUiBind);
 
 
 function renderSplash(){
-  return '<div class="spl"><img class="spl-photo" src="portada/portada_splash.jpg" alt="" />'+
+  return '<div class="spl"><picture><source media="(min-width:900px)" srcset="portada/splash_pc_a.jpg" /><img class="spl-photo" src="portada/splash_movil.jpg" alt="" /></picture>'+
     '<img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /></div>';
 }
 
@@ -4730,7 +4731,7 @@ function renderInteresado(){
 
 function renderApp(){
   if (loading){
-    document.getElementById('app').innerHTML = '<div class="spl"><img class="spl-photo" src="portada/portada_splash.jpg" alt="" /><img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /><div class="spinner spl-spin"></div></div>';
+    document.getElementById('app').innerHTML = '<div class="spl"><picture><source media="(min-width:900px)" srcset="portada/splash_pc_a.jpg" /><img class="spl-photo" src="portada/splash_movil.jpg" alt="" /></picture><img class="spl-logo" src="portada/logo_c.png" alt="Vive Hogar" /><div class="spinner spl-spin"></div></div>';
     return;
   }
   if (ui.showSplash){
@@ -7417,7 +7418,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261123-121314';
+var APP_BUILD = '20261123-122008';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
