@@ -6195,11 +6195,13 @@ function xlsxReporteBlob(filas, mesTxt, d){
   rows.push('<row r="1" ht="22" customHeight="1">'+cell(0,1,'ASESORES MES DE '+mesTxt,1)+cell(1,1,'',1)+cell(2,1,'',1)+cell(3,1,'',1)+'</row>'); merges.push('A1:D1');
   rows.push('<row r="2" ht="32" customHeight="1">'+cell(0,2,'ASESOR',2)+cell(1,2,'VENTA',2)+cell(2,2,'SEPARACIONES',2)+cell(3,2,'TOTAL VTAS + SEPARACIONES',2)+'</row>');
   r = 3;
+  var sV = 0, sS = 0;
   filas.forEach(function(f){
-    rows.push('<row r="'+r+'">'+cell(0,r,f.nombre,3)+cell(1,r,f.ventas,4)+cell(2,r,f.separadas,4)+cell(3,r,null,5,'B'+r+'+C'+r)+'</row>'.replace('</row>','</row>')); r++;
+    var vv = Number(f.ventas) || 0, ss = Number(f.separadas) || 0; sV += vv; sS += ss;
+    rows.push('<row r="'+r+'">'+cell(0,r,f.nombre,3)+cell(1,r,f.ventas,4)+cell(2,r,f.separadas,4)+cell(3,r,vv + ss,5,'B'+r+'+C'+r)+'</row>'); r++;
   });
   var a = 3, b = r - 1, tot = r;
-  rows.push('<row r="'+tot+'" ht="26" customHeight="1">'+cell(0,tot,'',6)+cell(1,tot,null,6,'SUM(B'+a+':B'+b+')')+cell(2,tot,null,6,'SUM(C'+a+':C'+b+')')+cell(3,tot,null,7,'SUM(D'+a+':D'+b+')')+'</row>');
+  rows.push('<row r="'+tot+'" ht="26" customHeight="1">'+cell(0,tot,'',6)+cell(1,tot,sV,6,'SUM(B'+a+':B'+b+')')+cell(2,tot,sS,6,'SUM(C'+a+':C'+b+')')+cell(3,tot,sV + sS,7,'SUM(D'+a+':D'+b+')')+'</row>');
   var m = tot + 2;   // fila de meta
   rows.push('<row r="'+m+'">'+cell(0,m,'META RECAUDO:',8)+cell(1,m,'',8)+cell(2,m,'',8)+cell(3,m,REPORTE_META,9)+'</row>'); merges.push('A'+m+':C'+m);
   rows.push('<row r="'+(m+1)+'">'+cell(0,m+1,'PROYECTADO A LA FECHA',8)+cell(1,m+1,'',8)+cell(2,m+1,'',8)+cell(3,m+1,d.proyectado,10,'D'+(m+3)+'+D'+(m+4))+'</row>'); merges.push('A'+(m+1)+':C'+(m+1));
@@ -6291,7 +6293,7 @@ function xlsxReporteCastillaBlob(items, titulo){
   function x(t){ return String(t).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function cell(c, r, v, s, f){
     var ref = String.fromCharCode(65 + c) + r;
-    if (f) return '<c r="'+ref+'" s="'+s+'"><f>'+f+'</f></c>';
+    if (f) return '<c r="'+ref+'" s="'+s+'"><f>'+f+'</f>'+(v !== null && v !== undefined ? '<v>'+v+'</v>' : '')+'</c>';
     if (v === null || v === undefined || v === '') return '<c r="'+ref+'" s="'+s+'"/>';
     if (typeof v === 'number') return '<c r="'+ref+'" s="'+s+'"><v>'+v+'</v></c>';
     return '<c r="'+ref+'" s="'+s+'" t="inlineStr"><is><t xml:space="preserve">'+x(v)+'</t></is></c>';
@@ -6302,19 +6304,22 @@ function xlsxReporteCastillaBlob(items, titulo){
   rows.push('<row r="2" ht="34" customHeight="1">'+heads.map(function(t, c){ return cell(c,2,t,c === 6 ? 3 : 2); }).join('')+'</row>');
   var lista = items.map(function(i){ return { n: String(i.nombre || '').toUpperCase(), ops: Number(i.ops) || 0, rec: Math.round(Number(i.recibido) || 0), por: Math.round(Number(i.por_recibir) || 0), vacio: false }; });
   lista.push({ n: 'Asesor por Ingresar', ops: 0, rec: 0, por: 0, vacio: true }, { n: 'Asesor por Ingresar', ops: 0, rec: 0, por: 0, vacio: true });
-  var r = 3, a = 3;
+  var r = 3, a = 3, sOps = 0, sRec = 0, sPor = 0, sE = 0, sF = 0, sG = 0, sH = 0;
   lista.forEach(function(f){
-    rows.push('<row r="'+r+'">'+cell(0,r,f.n,f.vacio ? 13 : 4)+cell(1,r,f.ops,5)+cell(2,r,f.rec,6)+cell(3,r,f.por,6)+cell(4,r,null,6,'C'+r+'+D'+r)+
-      cell(5,r,f.vacio ? 0 : CASTILLA_META_UNID,5)+cell(6,r,null,5,'MAX(0,F'+r+'-B'+r+')')+cell(7,r,null,6,'F'+r+'*'+CASTILLA_META_X_UNID)+'</row>');
+    // Se guardan tambien los valores calculados: el visor de archivos del iPhone no recalcula formulas
+    var meta = f.vacio ? 0 : CASTILLA_META_UNID, ev = f.rec + f.por, gv = Math.max(0, meta - f.ops), hv = meta * CASTILLA_META_X_UNID;
+    sOps += f.ops; sRec += f.rec; sPor += f.por; sE += ev; sF += meta; sG += gv; sH += hv;
+    rows.push('<row r="'+r+'">'+cell(0,r,f.n,f.vacio ? 13 : 4)+cell(1,r,f.ops,5)+cell(2,r,f.rec,6)+cell(3,r,f.por,6)+cell(4,r,ev,6,'C'+r+'+D'+r)+
+      cell(5,r,meta,5)+cell(6,r,gv,5,'MAX(0,F'+r+'-B'+r+')')+cell(7,r,hv,6,'F'+r+'*'+CASTILLA_META_X_UNID)+'</row>');
     r++;
   });
   var b = r - 1, t = r;
-  rows.push('<row r="'+t+'">'+cell(0,t,'Total general',7)+cell(1,t,null,8,'SUM(B'+a+':B'+b+')')+cell(2,t,null,9,'SUM(C'+a+':C'+b+')')+cell(3,t,null,9,'SUM(D'+a+':D'+b+')')+
-    cell(4,t,null,9,'SUM(E'+a+':E'+b+')')+cell(5,t,null,8,'SUM(F'+a+':F'+b+')')+cell(6,t,null,8,'SUM(G'+a+':G'+b+')')+cell(7,t,null,9,'SUM(H'+a+':H'+b+')')+'</row>');
+  rows.push('<row r="'+t+'">'+cell(0,t,'Total general',7)+cell(1,t,sOps,8,'SUM(B'+a+':B'+b+')')+cell(2,t,sRec,9,'SUM(C'+a+':C'+b+')')+cell(3,t,sPor,9,'SUM(D'+a+':D'+b+')')+
+    cell(4,t,sE,9,'SUM(E'+a+':E'+b+')')+cell(5,t,sF,8,'SUM(F'+a+':F'+b+')')+cell(6,t,sG,8,'SUM(G'+a+':G'+b+')')+cell(7,t,sH,9,'SUM(H'+a+':H'+b+')')+'</row>');
   var m = t + 2;
-  rows.push('<row r="'+m+'">'+cell(0,m,'',0)+cell(1,m,'RECAUDO META',11)+cell(2,m,'',11)+cell(3,m,null,12,'H'+t)+'</row>'); merges.push('B'+m+':C'+m);
-  rows.push('<row r="'+(m+1)+'">'+cell(0,m+1,'',0)+cell(1,m+1,'AVANCE',11)+cell(2,m+1,'',11)+cell(3,m+1,null,12,'E'+t)+'</row>'); merges.push('B'+(m+1)+':C'+(m+1));
-  rows.push('<row r="'+(m+2)+'">'+cell(0,m+2,'',0)+cell(1,m+2,'POR COMPLETAR',11)+cell(2,m+2,'',11)+cell(3,m+2,null,12,'D'+m+'-D'+(m+1))+'</row>'); merges.push('B'+(m+2)+':C'+(m+2));
+  rows.push('<row r="'+m+'">'+cell(0,m,'',0)+cell(1,m,'RECAUDO META',11)+cell(2,m,'',11)+cell(3,m,sH,12,'H'+t)+'</row>'); merges.push('B'+m+':C'+m);
+  rows.push('<row r="'+(m+1)+'">'+cell(0,m+1,'',0)+cell(1,m+1,'AVANCE',11)+cell(2,m+1,'',11)+cell(3,m+1,sE,12,'E'+t)+'</row>'); merges.push('B'+(m+1)+':C'+(m+1));
+  rows.push('<row r="'+(m+2)+'">'+cell(0,m+2,'',0)+cell(1,m+2,'POR COMPLETAR',11)+cell(2,m+2,'',11)+cell(3,m+2,sH - sE,12,'D'+m+'-D'+(m+1))+'</row>'); merges.push('B'+(m+2)+':C'+(m+2));
   var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n', NS = 'http://schemas.openxmlformats.org/';
   var border = '<border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="thin"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border>';
   function xf(font, fill, numFmt, h, wrap){ return '<xf numFmtId="'+numFmt+'" fontId="'+font+'" fillId="'+fill+'" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1" applyNumberFormat="1"><alignment horizontal="'+h+'" vertical="center"'+(wrap ? ' wrapText="1"' : '')+'/></xf>'; }
@@ -7760,7 +7765,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-175033';
+var APP_BUILD = '20261124-185451';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
