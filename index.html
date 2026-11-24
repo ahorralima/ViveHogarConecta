@@ -1389,12 +1389,17 @@ function gerenciaDeNombre(nombre){
   return null;
 }
 var clienteBloqueVerificado = null;
+var clienteVistaLimitada = false;   // cuenta de vista limitada: en clientes_vhs lleva bloque = 'VISTA' (sin casa ni cuotas)
 try { clienteBloqueVerificado = normBloque(localStorage.getItem('ec_cliente_bloque_v1')) || null; } catch(e) { clienteBloqueVerificado = null; }
+if (clienteBloqueVerificado && clienteBloqueVerificado.toUpperCase() === 'VISTA'){ clienteBloqueVerificado = null; clienteVistaLimitada = true; }
 function saveClienteBloque(bloque){
   bloque = normBloque(bloque);
-  clienteBloqueVerificado = bloque;
-  try { localStorage.setItem('ec_cliente_bloque_v1', bloque || ''); } catch(e){}
+  clienteVistaLimitada = !!bloque && bloque.toUpperCase() === 'VISTA';
+  if (clienteVistaLimitada) bloque = '';
+  clienteBloqueVerificado = bloque || null;
+  try { localStorage.setItem('ec_cliente_bloque_v1', clienteVistaLimitada ? 'VISTA' : (bloque || '')); } catch(e){}
 }
+function vistaLimitada(){ return clienteVistaLimitada && appGate === 'cliente-verificado'; }
 
 var clienteLoteVerificado = null;
 try { clienteLoteVerificado = normLote(localStorage.getItem('ec_cliente_lote_v1')) || null; } catch(e) { clienteLoteVerificado = null; }
@@ -1692,6 +1697,7 @@ function proyBloqueadoId(){
 function renderHeader(){
   var lockP = proyBloqueadoId();
   if (lockP) ui.fProyecto = lockP;
+  if (vistaLimitada()){ ui.fProyecto = '2'; ui.fEtapa = '1'; }
   return '<div class="header"><div class="header-row">'+
     '<div class="brand">'+houseMarkSvg()+
       '<div class="brand-text"><span class="brand-name"><span class="n1">Vive</span><span class="n2">Hogar</span><span class="n3">Conecta</span></span><span class="brand-tag">Marketplace vecinal</span></div>'+
@@ -1813,10 +1819,10 @@ function renderHome(){
 
   if (ui.showFilters){
     html += '<div class="filters-panel">'+
-      '<div class="filter-field"><label>Etapa</label><div style="display:flex;gap:6px;align-items:center;">'+
+      (vistaLimitada() ? '' : '<div class="filter-field"><label>Etapa</label><div style="display:flex;gap:6px;align-items:center;">'+
         '<input id="ec-etapa-filter" class="text-input" style="max-width:80px;" type="number" min="1" max="99" placeholder="N°" value="'+esc(ui.fEtapa)+'" />'+
         '<button type="button" class="chip'+(!ui.fEtapa?' active':'')+'" data-action="set-etapa" data-value="">Todas</button>'+
-      '</div></div>'+
+      '</div></div>')+
       '<div class="filter-field"><label>Precio</label><div class="chip-row">'+
         ['', '0-50','50-100','100-200','200+'].map(function(p){
           var lbl = p===''?'Cualquiera':(p==='200+'?'S/200+':'S/ '+p);
@@ -1979,7 +1985,7 @@ function promosActivas(){
 }
 function promosHtml(){
   return promosActivas().map(function(x){
-    return '<button type="button" class="promo-tile" data-action="ver-promo" data-img="'+esc(x.img)+'"><img src="'+esc(x.img)+'" alt="" loading="lazy" />'+
+    return '<button type="button" class="promo-tile" data-action="ver-promo" data-img="'+(vistaLimitada() ? '' : esc(x.img))+'">'+(vistaLimitada() ? '<span style="width:84px;height:84px;border-radius:12px;flex:none;background:#fff3c4;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎁</span>' : '<img src="'+esc(x.img)+'" alt="" loading="lazy" />')+
       '<span class="promo-txt"><span class="promo-tag">🎁 Promoción vigente</span><strong>'+esc(x.titulo)+'</strong><span class="promo-sub">'+esc(x.sub)+' · Toca para verla</span></span></button>';
   }).join('');
 }
@@ -4867,6 +4873,12 @@ document.addEventListener('click', async function(ev){
     var permitidas = ['nav','open','set-proyecto','set-cat','set-etapa','set-precio','toggle-filters','demo-market-toggle','faq-toggle','skip-etapa-prompt'];
     if (permitidas.indexOf(action) === -1 || (action === 'nav' && value !== 'home')){ toast('Cuenta de vista: solo lectura'); return; }
   }
+  if (vistaLimitada()){
+    if (action === 'ver-boletin'){ toast('Sin novedades por ahora.'); return; }
+    if (action === 'ver-promo'){ toast('Sin promociones por ahora.'); return; }
+    if (action === 'set-etapa' || action === 'set-proyecto' || action === 'skip-etapa-prompt'){ return; }
+    if (action === 'edit-svc' || action === 'del-svc' || (action === 'nav' && (value === 'publicar' || value === 'perfil' || value === 'mios'))){ toast('Cuenta de vista: no se puede publicar ni editar.'); return; }
+  }
   if (action === 'demo-market-toggle'){
     ui.demoMarket = !ui.demoMarket; ui.view = 'home'; render();
     window.scrollTo(0, 0);
@@ -7217,12 +7229,20 @@ document.addEventListener('change', function(ev){
   }
 });
 
+document.addEventListener('click', function(ev){
+  if (!vistaLimitada()) return;
+  var a = ev.target.closest && ev.target.closest('a[href*="wa.me"], a[href*="whatsapp"]');
+  if (!a) return;
+  ev.preventDefault(); ev.stopPropagation();
+  toast('Cuenta de vista: no se puede escribir por WhatsApp.');
+}, true);
 document.addEventListener('submit', async function(ev){
   var form = ev.target.closest('form[data-form]');
   if (!form) return;
   ev.preventDefault();
   if (modoAsesor() && asesorSoloLectura){ toast('Cuenta de vista: solo lectura'); return; }
   var kind = form.getAttribute('data-form');
+  if (vistaLimitada() && kind !== 'cliente-verificar'){ toast('Cuenta de vista: función no disponible.'); return; }
   var fd = new FormData(form);
 
   if (kind === 'cliente-verificar'){
@@ -7289,7 +7309,7 @@ document.addEventListener('submit', async function(ev){
     saveLocalPref(vProyectoId, vEtapaNum);
     saveClienteNombre(vData.nombre_completo || vNombre);
     saveClienteDni(vDni);
-    saveClienteBloque(vData.bloque || '');
+    saveClienteBloque(/vista/i.test(vData.etapa || '') ? 'VISTA' : (vData.bloque || ''));
     saveClienteLote(vData.lote || '');
     saveClienteGestora(vData.gestora_nombre || '', vData.gestora_telefono || '');
     saveClienteGerencia('');
@@ -7559,7 +7579,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-115049';
+var APP_BUILD = '20261124-145201';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
