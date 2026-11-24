@@ -3592,7 +3592,14 @@ var LAMBAYEQUE_GENERAL = {
   labels:{"1":[35.91,52.02],"2":[25.34,45.01],"3":[12.43,62.42],"4":[52.46,50.05],"5":[66.24,45.82],"6":[80.67,51.3]},
   vendido:null
 };
+var EJIDOS_GENERAL = {
+  img:'planos/ejidos-general.jpg', dim:[1738,905],
+  etapas:{"1":[[29.75,34.59],[49.19,34.59],[49.19,52.15],[29.75,52.15]],"2":[[29.75,54.48],[49.19,54.48],[49.19,71.6],[29.75,71.6]],"3":[[29.75,73.81],[49.19,73.81],[49.19,90.61],[29.75,90.61]],"4":[[50.81,73.81],[70.31,73.81],[70.31,90.61],[50.81,90.61]]},
+  labels:{"1":[39.47,43.37],"2":[39.47,63.04],"3":[39.47,82.21],"4":[60.56,82.21]},
+  vendido:null
+};
 function genCfg(){
+  if (ui.interesadoProyecto === 'ejidos') return EJIDOS_GENERAL;
   if (ui.interesadoProyecto === 'castilla') return CASTILLA_GENERAL;
   if (ui.interesadoProyecto === 'lambayeque') return LAMBAYEQUE_GENERAL;
   return {img:MAPA_GENERAL_SULLANA_DATAURI, dim:MAPA_GENERAL_DIM, etapas:MAPA_GENERAL_ETAPAS, labels:MAPA_GENERAL_LABELS, vendido:null};
@@ -4689,6 +4696,18 @@ function renderInteresadoMapa(){
       }).join('')+'</div>'+
       '</div><div class="mapa-col-etapa">'+
       (dosColL ? renderMapaEtapa5Html(String(ui.interesadoEtapaSel)) : '')+
+    '</div></div></div>';
+  } else if (proy === 'ejidos'){
+    var dosColE = !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));
+    html += '<div class="panel panel-flat'+(dosColE ? ' mapa-wide' : ' mapa-wide mapa-solo')+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
+      '<div class="map-hint-banner">👆 Toca una etapa para ver sus lotes disponibles</div>'+
+      '<div class="mapa-2col"><div class="mapa-col-gen">'+
+      renderMapaGeneralVisor()+
+      '<div class="mapa-etapas-otras">Elegir etapa: '+Object.keys(ETAPAS_PLANO_PROY.ejidos).map(function(n){
+        return '<button type="button" class="chip'+(String(ui.interesadoEtapaSel)===String(n)?' active':'')+'" data-action="interesado-etapa" data-value="'+n+'">Etapa '+n+'</button>';
+      }).join('')+'</div>'+
+      '</div><div class="mapa-col-etapa">'+
+      (dosColE ? renderMapaEtapa5Html(String(ui.interesadoEtapaSel)) : '')+
     '</div></div></div>';
   } else if (ETAPAS_PLANO_PROY[proy]){
     var etsP = Object.keys(ETAPAS_PLANO_PROY[proy]);
@@ -7579,7 +7598,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-145201';
+var APP_BUILD = '20261124-154445';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
