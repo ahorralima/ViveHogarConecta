@@ -851,6 +851,20 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .ref-step i{flex:0 0 30px;height:30px;border-radius:50%;background:#F8B132;color:#3b2a05;font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center;}
 .ref-step p{margin:0;font-size:.9rem;color:var(--ink);}
 .ref-sheet input{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:1rem;margin-top:8px;background:var(--surface);color:var(--ink);}
+.const-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:420px;margin:56px auto 0;display:grid;gap:14px;}
+.const-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.const-brand{font-weight:800;color:var(--teal);font-size:1.05rem;}
+.const-brand span{display:block;font-weight:600;color:var(--ink-soft);font-size:.78rem;}
+.const-badge{font-size:.7rem;font-weight:700;background:#FFF1E3;color:#B4540A;border-radius:8px;padding:5px 8px;text-align:center;line-height:1.25;flex:none;}
+.const-monto-l{font-size:.78rem;color:var(--ink-soft);}
+.const-monto{font-size:2rem;font-weight:800;letter-spacing:-.01em;}
+.const-dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.92rem;}
+.const-dl dt{color:var(--ink-soft);}
+.const-dl dd{margin:0;font-weight:600;text-align:right;}
+.const-note{font-size:.8rem;color:var(--ink-soft);border-top:1px dashed var(--border);padding-top:12px;}
+.const-actions{display:grid;gap:8px;}
+.const-actions .btn{width:100%;text-align:center;text-decoration:none;display:block;box-sizing:border-box;}
+.cuota-const-btn{margin-top:6px;background:none;border:0;padding:0;color:var(--teal);font-weight:700;font-size:.8rem;cursor:pointer;text-decoration:underline;}
 .ref-close{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:12px;font-size:1.5rem;line-height:1;background:var(--surface-2);border:0;border-radius:50%;width:40px;height:40px;color:var(--ink);}
 .quick-access-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:left;}
 .quick-access-tile:active{transform:scale(0.98);}
@@ -3469,7 +3483,79 @@ function donutCuotasSvg(pct){
   '</svg>';
 }
 
-function cuotaRowHtml(r, kind){
+// ---- Constancia de pago (informativa, NO es boleta oficial) ----
+function constanciaDatos(r){
+  var casa = [];
+  if (localPref && localPref.etapa) casa.push('Etapa '+localPref.etapa);
+  if (clienteBloqueVerificado) casa.push('Mz '+clienteBloqueVerificado);
+  if (clienteLoteVerificado) casa.push('Lt '+clienteLoteVerificado);
+  var slug = proySlugPref();
+  return {
+    proyecto: PROY_NOMBRES[slug] || 'Vive Hogar',
+    cliente: toTitleCase(clienteNombreVerificado || ''),
+    casa: casa.join(' · '),
+    concepto: r.tipo_cuota || 'Cuota',
+    venc: r.fecha_vencimiento ? fmtFechaAbs(r.fecha_vencimiento) : '',
+    pago: r.fecha_pago ? fmtFechaAbs(r.fecha_pago) : '',
+    monto: fmtMoney(r.monto_pagado)
+  };
+}
+function constanciaWaHref(d){
+  var slug = proySlugPref();
+  var tel = clienteGestoraTelefono || VHS_WA_PROY[slug] || VHS_WHATSAPP;
+  var msg = 'Hola, soy '+d.cliente+', cliente de '+d.proyecto+(d.casa ? ' ('+d.casa+')' : '')+'. '+
+    'Quisiera mi boleta electrónica de la cuota "'+d.concepto+'" pagada el '+d.pago+' por '+d.monto+'. ¿Me la pueden enviar, por favor?';
+  return 'https://wa.me/'+tel+'?text='+encodeURIComponent(msg);
+}
+function constanciaHtml(d){
+  function fila(k,v){ return v ? '<dt>'+k+'</dt><dd>'+esc(v)+'</dd>' : ''; }
+  return '<button type="button" class="ref-close" data-action="constancia-cerrar" aria-label="Cerrar">×</button>'+
+    '<div class="const-card">'+
+      '<div class="const-head"><div class="const-brand">'+esc(d.proyecto)+'<span>Constancia de pago</span></div>'+
+        '<div class="const-badge">Informativa<br>No es boleta oficial</div></div>'+
+      '<div><div class="const-monto-l">Monto pagado</div><div class="const-monto">'+esc(d.monto)+'</div></div>'+
+      '<dl class="const-dl">'+fila('Cliente',d.cliente)+fila('Casa',d.casa)+fila('Concepto',d.concepto)+fila('Vencimiento',d.venc)+fila('Fecha de pago',d.pago)+'</dl>'+
+      '<div class="const-note">Este documento muestra el pago registrado en el sistema. Para tu boleta electrónica oficial, pídela a tu cobradora.</div>'+
+      '<div class="const-actions">'+
+        '<button type="button" class="btn btn-secondary" data-action="constancia-imagen">Guardar como imagen</button>'+
+        '<a class="btn btn-primary" target="_blank" rel="noopener" href="'+esc(constanciaWaHref(d))+'">Pedir mi boleta oficial por WhatsApp</a>'+
+      '</div>'+
+    '</div>';
+}
+function constanciaImagen(d){
+  var W = 1000, M = 56, cv = document.createElement('canvas'), cx = cv.getContext('2d');
+  cv.width = W; cv.height = 1180;
+  cx.fillStyle = '#ffffff'; cx.fillRect(0,0,W,cv.height);
+  cx.fillStyle = '#1f4f7a'; cx.fillRect(0,0,W,150);
+  cx.fillStyle = '#ffffff'; cx.textBaseline = 'alphabetic'; cx.textAlign = 'left';
+  cx.font = '800 44px sans-serif'; cx.fillText(d.proyecto, M, 78);
+  cx.font = '600 28px sans-serif'; cx.fillText('Constancia de pago', M, 122);
+  cx.fillStyle = '#FFF1E3'; cx.fillRect(M, 190, W-2*M, 64);
+  cx.fillStyle = '#B4540A'; cx.font = '700 26px sans-serif'; cx.textAlign = 'center';
+  cx.fillText('INFORMATIVA · NO ES BOLETA OFICIAL', W/2, 232);
+  cx.textAlign = 'left'; cx.fillStyle = '#5b6877'; cx.font = '600 26px sans-serif'; cx.fillText('Monto pagado', M, 330);
+  cx.fillStyle = '#1d2733'; cx.font = '800 84px sans-serif'; cx.fillText(d.monto, M, 420);
+  var filas = [['Cliente',d.cliente],['Casa',d.casa],['Concepto',d.concepto],['Vencimiento',d.venc],['Fecha de pago',d.pago]].filter(function(f){ return f[1]; });
+  var y = 500;
+  filas.forEach(function(f){
+    cx.fillStyle = '#5b6877'; cx.font = '600 28px sans-serif'; cx.textAlign = 'left'; cx.fillText(f[0], M, y);
+    cx.fillStyle = '#1d2733'; cx.font = '700 30px sans-serif'; cx.textAlign = 'right'; cx.fillText(f[1], W-M, y);
+    cx.strokeStyle = '#e1e6eb'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(M, y+22); cx.lineTo(W-M, y+22); cx.stroke();
+    y += 76;
+  });
+  var nota = 'Este documento muestra el pago registrado en el sistema. Para tu boleta electrónica oficial, pídela a tu cobradora.';
+  cx.fillStyle = '#5b6877'; cx.font = '500 26px sans-serif'; cx.textAlign = 'left';
+  var palabras = nota.split(' '), linea = '', yy = y + 40;
+  palabras.forEach(function(w){
+    var t = linea ? linea+' '+w : w;
+    if (cx.measureText(t).width > W-2*M){ cx.fillText(linea, M, yy); linea = w; yy += 38; } else linea = t;
+  });
+  if (linea){ cx.fillText(linea, M, yy); yy += 38; }
+  cx.fillStyle = '#9aa7b4'; cx.font = '500 22px sans-serif'; cx.fillText('Generado en ViveHogarConecta · vivehogarconecta.com', M, cv.height-40);
+  return cv;
+}
+
+function cuotaRowHtml(r, kind, idx){
   var diasV = (kind==='atrasada' && r.fecha_vencimiento) ? Math.max(1, Math.floor((Date.now() - new Date(r.fecha_vencimiento+'T00:00:00').getTime())/86400000)) : 0;
   var chip = kind==='atrasada' ? '<span class="cuota-chip cuota-chip-danger">⚠️ Vencida'+(diasV ? ' hace '+diasV+(diasV===1?' día':' días') : '')+'</span>'
     : kind==='pendiente' ? (r.estado_pago==='PAGADO PARCIALMENTE' ? '<span class="cuota-chip cuota-chip-warn">Pago parcial</span>' : '<span class="cuota-chip cuota-chip-neutral">Por vencer</span>')
@@ -3481,6 +3567,7 @@ function cuotaRowHtml(r, kind){
     '<div class="cuota-row-main">'+
       '<div class="cuota-row-top"><strong>'+esc(r.tipo_cuota||'Cuota')+'</strong>'+chip+'</div>'+
       '<div class="cuota-row-sub">'+fechaLinea+'</div>'+
+      (kind==='pagada' && idx!=null ? '<button type="button" class="cuota-const-btn" data-action="constancia-abrir" data-value="'+idx+'">Ver constancia</button>' : '')+
     '</div>'+
     '<div class="cuota-row-monto">'+fmtMoney(kind==='pagada' ? r.monto_pagado : r.saldo)+'</div>'+
   '</div>';
@@ -3532,6 +3619,7 @@ function renderCuotas(){
   }
 
   var r = cuotasResumen(rows);
+  ui.cuotasPagadas = r.pagadas;
   var comentario = cuotasComentario(r);
 
   html += '<div class="panel cuotas-donut-card">'+
@@ -3569,7 +3657,7 @@ function renderCuotas(){
 
   if (r.pagadas.length){
     html += '<div class="panel"><h4>Historial de pagos</h4><div class="cuota-list">'+
-      r.pagadas.map(function(x){ return cuotaRowHtml(x,'pagada'); }).join('')+
+      r.pagadas.map(function(x,i){ return cuotaRowHtml(x,'pagada',i); }).join('')+
     '</div></div>';
   }
 
@@ -5278,6 +5366,29 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'ayuda-proyecto'){
     var apl = document.getElementById('ayuda-proy-lista');
     if (apl){ apl.style.display = 'block'; t.style.display = 'none'; }
+  } else if (action === 'constancia-abrir'){
+    var cRow = (ui.cuotasPagadas || [])[parseInt(value,10)];
+    if (!cRow) return;
+    var cd = constanciaDatos(cRow); ui.constanciaDatos = cd;
+    var cs = document.createElement('div');
+    cs.id = 'const-sheet'; cs.className = 'ref-sheet';
+    cs.innerHTML = constanciaHtml(cd);
+    document.body.appendChild(cs);
+  } else if (action === 'constancia-cerrar'){
+    var cs2 = document.getElementById('const-sheet'); if (cs2) cs2.remove();
+  } else if (action === 'constancia-imagen'){
+    if (!ui.constanciaDatos) return;
+    var cvs = constanciaImagen(ui.constanciaDatos);
+    cvs.toBlob(function(b){
+      if (!b){ toast('No se pudo crear la imagen.'); return; }
+      var f = null; try { f = new File([b], 'constancia-de-pago.png', {type:'image/png'}); } catch(e){}
+      if (f && navigator.canShare && navigator.canShare({files:[f]})){
+        navigator.share({files:[f], title:'Constancia de pago'}).catch(function(){});
+      } else {
+        var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'constancia-de-pago.png';
+        document.body.appendChild(a); a.click(); a.remove(); toast('Imagen guardada en tus descargas.');
+      }
+    }, 'image/png');
   } else if (action === 'ver-referidos'){
     var rpSlug = proySlugPref(); var rfp2 = REF_PREMIOS[rpSlug] || REF_PREMIOS.castilla;
     var rs = document.createElement('div');
@@ -7599,7 +7710,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-170419';
+var APP_BUILD = '20261124-172359';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
