@@ -4236,7 +4236,7 @@ function limpioBordesSvg(){
     var pp = r.p.map(function(q){ return (q[0]/100*W).toFixed(1)+','+(q[1]/100*H).toFixed(1); }).join(' ');
     var at = r.k && AREA_TIPOS[r.k];
     if (at) return '<polygon points="'+pp+'" fill="'+at.fill+'" stroke="'+at.stroke+'" stroke-width="'+(W*0.0024).toFixed(1)+'" stroke-dasharray="'+(W*0.008).toFixed(1)+' '+(W*0.005).toFixed(1)+'" stroke-linejoin="round"/>';
-    if (planoProy() === 'ejidos') return '<polygon points="'+pp+'" fill="#cde8bb" stroke="#4f9a5c" stroke-width="'+(W*0.0026).toFixed(1)+'" stroke-dasharray="'+(W*0.0045).toFixed(1)+' '+(W*0.0035).toFixed(1)+'" stroke-linejoin="round"/>';
+    if (planoProy() !== 'sullana') return '<polygon points="'+pp+'" fill="#cde8bb" stroke="#4f9a5c" stroke-width="'+(W*0.0026).toFixed(1)+'" stroke-dasharray="'+(W*0.0045).toFixed(1)+' '+(W*0.0035).toFixed(1)+'" stroke-linejoin="round"/>';
     return '<polygon points="'+pp+'" fill="#bfe2a6" stroke="none"/><polygon points="'+pp+'" fill="url(#park-hatch)" stroke="none"/>'+
       '<polygon points="'+pp+'" fill="none" stroke="#2f7a45" stroke-width="'+(W*0.0024).toFixed(1)+'" stroke-linejoin="round"/>';
   }).join('');
@@ -4415,7 +4415,7 @@ function renderMapaEtapa5Html(etapaN){
     (isFull ? '<button type="button" class="mapa-full-close" data-action="etapa5-full-cerrar" aria-label="Cerrar plano">✕</button>' : '')+
     (isFull ? '<img class="mapa-full-logo" src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />' : '')+
     '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
-    '<div class="mapa-vhs-wrap mapa-lotes-wrap'+(etapaPlanoCfg().real?' mapa-real':' mapa-calles')+(etapaPlanoCfg().limpio?' limpio':'')+(planoProy()==='ejidos'?' park-prop':'')+'">'+
+    '<div class="mapa-vhs-wrap mapa-lotes-wrap'+(etapaPlanoCfg().real?' mapa-real':' mapa-calles')+(etapaPlanoCfg().limpio?' limpio':'')+(planoProy()!=='sullana'?' park-prop':'')+'">'+
       '<img class="mapa-vhs-img" src="'+etapaPlanoCfg().img+'" alt="Plano de la Etapa '+esc(ETAPA_ACTUAL)+' de '+esc(PROY_NOMBRES[planoProy()])+'" />'+
       (etapaPlanoCfg().real ? '' : (etapaPlanoCfg().limpio ? limpioMzSvg() : mzBlocks))+
       ETAPA5_RECREACION_PLANO.map(function(r){
@@ -7760,7 +7760,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-174723';
+var APP_BUILD = '20261124-175033';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
