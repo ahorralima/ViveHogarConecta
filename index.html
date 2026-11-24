@@ -3434,10 +3434,13 @@ async function cargarCuotas(){
 function cuotasResumen(rows){
   var hoy = new Date(); hoy.setHours(0,0,0,0);
   var atrasadas = [], pendientes = [], pagadas = [];
+  // Filas de S/ 0 sin pagar no son cuotas reales: no se muestran ni cuentan (antes salian como "vencida por S/ 0")
+  rows = rows.filter(function(r){ return !((Number(r.monto_a_pagar)||0) <= 0 && (Number(r.saldo)||0) <= 0 && r.estado_pago !== 'PAGADO'); });
   rows.forEach(function(r){
     // "PAGADO" = saldo en 0. "PENDIENTE" o "PAGADO PARCIALMENTE" siguen
     // teniendo saldo por cobrar aunque ya tengan una fecha de pago parcial.
-    if (r.estado_pago === 'PAGADO'){
+    // Una cuota con monto y saldo en 0 ya esta pagada, aunque el estado no lo diga.
+    if (r.estado_pago === 'PAGADO' || ((Number(r.saldo)||0) <= 0 && (Number(r.monto_a_pagar)||0) > 0)){
       pagadas.push(r);
     } else {
       var venc = new Date(r.fecha_vencimiento+'T00:00:00');
@@ -3456,7 +3459,7 @@ function cuotasResumen(rows){
   var saldoTotalPendiente = atrasadas.concat(pendientes).reduce(function(s,r){ return s + (Number(r.saldo)||0); }, 0);
   var proxima = atrasadas.concat(pendientes)[0] || null;
 
-  return {atrasadas:atrasadas, pendientes:pendientes, pagadas:pagadas, montoVencidoSinPagar:montoVencidoSinPagar, montoTotalPactado:montoTotalPactado, montoTotalPagado:montoTotalPagado, pctMorosidad:pctMorosidad, pctPagado:pctPagado, saldoTotalPendiente:saldoTotalPendiente, proxima:proxima};
+  return {total:rows.length, atrasadas:atrasadas, pendientes:pendientes, pagadas:pagadas, montoVencidoSinPagar:montoVencidoSinPagar, montoTotalPactado:montoTotalPactado, montoTotalPagado:montoTotalPagado, pctMorosidad:pctMorosidad, pctPagado:pctPagado, saldoTotalPendiente:saldoTotalPendiente, proxima:proxima};
 }
 
 function cuotasComentario(r){
@@ -3626,7 +3629,7 @@ function renderCuotas(){
     donutCuotasSvg(r.pctPagado)+
     '<p style="text-align:center;font-size:0.85rem;color:var(--ink-faint);margin-top:6px;">'+fmtMoney(r.montoTotalPagado)+' pagado de '+fmtMoney(r.montoTotalPactado)+'</p>'+
     '<div class="cuota-prog" role="progressbar" aria-valuenow="'+Math.round(r.pctPagado)+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+Math.max(2, Math.round(r.pctPagado))+'%"></i></div>'+
-    '<p class="cuota-prog-txt"><span class="cuota-carita">'+(r.pctPagado >= 99.5 ? '🎉' : r.atrasadas.length ? '🙂' : r.pagadas.length ? '😄' : '🙂')+'</span> '+r.pagadas.length+' de '+rows.length+' cuotas pagadas · '+Math.round(r.pctPagado)+'%</p>'+
+    '<p class="cuota-prog-txt"><span class="cuota-carita">'+(r.pctPagado >= 99.5 ? '🎉' : r.atrasadas.length ? '🙂' : r.pagadas.length ? '😄' : '🙂')+'</span> '+r.pagadas.length+' de '+r.total+' cuotas pagadas · '+Math.round(r.pctPagado)+'%</p>'+
     '<div class="cuota-comentario '+(comentario.tono==='danger'?'cuota-comentario-danger':'cuota-comentario-ok')+'">'+esc(comentario.texto)+'</div>'+
   '</div>';
 
@@ -7710,7 +7713,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-172359';
+var APP_BUILD = '20261124-172628';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
