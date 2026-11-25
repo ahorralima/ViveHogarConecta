@@ -3156,7 +3156,11 @@ function renderAsesorPanelHtml(){
   if (cuentas.length > 1){
     h += '<div class="as-cuentas">'+cuentas.map(function(c){
       return '<button type="button" class="as-cuenta'+(String(c.id)===String(p.yo.id)?' on':'')+'" data-action="asesor-cuenta" data-value="'+c.id+'">'+esc(toTitleCase(c.proyecto))+'</button>';
-    }).join('')+(ui.cobPuede ? '<button type="button" class="as-cuenta" data-action="cob-ver">💰 Cobranza</button>' : '')+(ui.cosPuede ? '<button type="button" class="as-cuenta" data-action="cos-ver">💼 Costos</button>' : '')+'</div>';
+    }).join('')+'</div>';
+    if (ui.cobPuede || ui.cosPuede){
+      h += '<div class="as-cuentas as-gestion"><button type="button" class="as-cuenta'+(ui.hdrMas?' on':'')+'" data-action="hdr-mas">Gestión '+(ui.hdrMas?'▴':'▾')+'</button>'+
+        (ui.hdrMas ? (ui.cobPuede ? '<button type="button" class="as-cuenta" data-action="cob-ver">💰 Cobranza</button>' : '')+(ui.cosPuede ? '<button type="button" class="as-cuenta" data-action="cos-ver">💼 Costos</button>' : '') : '')+'</div>';
+    }
   }
   if (!jefe && !vistaEquipo){
     var vv = yo ? yo.ventas : 0, sp = yo ? (yo.separadas || 0) : 0, v = vv + sp, m = yo ? yo.meta : 0;
@@ -8076,7 +8080,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-122603';
+var APP_BUILD = '20261125-122904';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
