@@ -100,6 +100,8 @@ input,select,textarea{font-family:inherit;font-size:0.95rem;}
 }
 .proyecto-switch{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;max-width:100%;overflow-x:auto;scrollbar-width:none;}
 .proyecto-switch::-webkit-scrollbar{display:none;}
+.header-admin{margin-top:8px;}
+.header-admin .proyecto-switch button{font-size:0.8rem;padding:6px 14px;}
 .proyecto-switch button{
   border:none;background:transparent;color:var(--ink-soft);font-size:0.74rem;font-weight:600;
   padding:6px 9px;border-radius:999px;cursor:pointer;white-space:nowrap;flex:none;
@@ -1001,6 +1003,50 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cob-kpi span{display:block;font-size:0.64rem;color:#5b6b78;margin-top:2px;}
 .cob-card{background:#fff;border:1px solid #d9e2ea;border-radius:14px;padding:12px;margin-bottom:6px;}
 .cob-tit{font-weight:700;color:#1f3b52;font-size:0.95rem;margin-bottom:8px;}
+.cs-lab{font-weight:700;color:#1f3b52;font-size:0.82rem;margin:10px 2px 4px;}
+.cs-lab span{font-weight:500;color:#7a8893;font-size:0.72rem;}
+.cs-tot{font-size:1.5rem;font-weight:800;color:#1f3b52;margin:2px 0 8px;}
+.cs-res{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid #eef2f6;padding:8px 0 6px;cursor:pointer;}
+.cs-res-a{display:flex;justify-content:space-between;gap:8px;font-size:0.8rem;color:#44525e;}
+.cs-res-a b{color:#1f3b52;}
+.cs-res-b{display:block;height:6px;border-radius:4px;background:#eef2f6;margin-top:5px;overflow:hidden;}
+.cs-res-b i{display:block;height:100%;background:#397EAD;}
+.cs-res-d{background:#f4f7fa;border-radius:10px;padding:6px 10px;margin:2px 0 6px;}
+.cs-res-d div{display:flex;justify-content:space-between;gap:8px;font-size:0.74rem;color:#44525e;padding:3px 0;}
+.cs-res-d b{color:#1f3b52;white-space:nowrap;}
+.cs-mes-b{flex:1;width:auto !important;font-size:0.95rem !important;font-weight:700;color:#1f3b52 !important;background:none !important;}
+.cs-pick{background:#fff;border:1px solid #d9e2ea;border-radius:12px;padding:10px;margin:-4px 0 10px;}
+.cs-pick-top{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.cs-sel{border:1px solid #c5d2dd;border-radius:8px;padding:6px 8px;font-size:0.85rem;background:#fff;}
+.cs-q.on{background:#397EAD;border-color:#397EAD;color:#fff;font-weight:700;}
+.cs-q{border:1px solid #c5d2dd;background:#f4f7fa;border-radius:8px;padding:6px 9px;font-size:0.76rem;color:#1f3b52;}
+.cs-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+.cs-m{border:1px solid #c5d2dd;background:#fff;border-radius:9px;padding:9px 0;font-size:0.85rem;color:#1f3b52;text-transform:capitalize;}
+.cs-m.on{background:#397EAD;border-color:#397EAD;color:#fff;font-weight:700;}
+.cs-m:disabled{opacity:0.3;}
+.cs-aviso{background:#fff7e0;border:1px solid #f0d58a;color:#6b5200;border-radius:12px;padding:9px 11px;font-size:0.78rem;margin:0 0 10px;line-height:1.35;}
+.cs-mes{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #d9e2ea;border-radius:12px;padding:4px 6px;margin:6px 0 10px;}
+.cs-mes b{font-size:1rem;color:#1f3b52;text-transform:capitalize;}
+.cs-mes button{border:0;background:#eef2f6;border-radius:9px;width:40px;height:34px;font-size:1.3rem;color:#1f3b52;}
+.cs-mes button:disabled{opacity:0.35;}
+.cs-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0 0 10px;}
+.cs-kpis .cob-kpi b{font-size:1.02rem;}
+.cs-acu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.cs-acu div{background:#f4f7fa;border-radius:10px;padding:8px 4px;text-align:center;}
+.cs-acu span{display:block;font-size:0.64rem;color:#5b6b78;}
+.cs-acu b{display:block;font-size:0.9rem;color:#1f3b52;margin-top:2px;}
+.cs-nota,.cs-ayuda{font-size:0.72rem;color:#5b6b78;margin:8px 2px 4px;}
+.cs-svg{width:100%;height:auto;display:block;}
+.cs-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+.cs-gt{display:block;font-weight:500;font-size:0.76rem;color:#5b6b78;margin-top:2px;}
+.cs-r{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 8px;align-items:end;padding:7px 0;border-top:1px solid #eef2f6;font-size:0.76rem;}
+.cs-n{grid-column:1 / -1;display:flex;align-items:flex-start;gap:6px;color:#1f3b52;font-weight:600;line-height:1.25;}
+.cs-n i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:4px;}
+.cs-c{display:flex;flex-direction:column;align-items:flex-end;min-width:0;}
+.cs-c em{font-style:normal;font-size:0.62rem;color:#7a8893;margin-bottom:1px;}
+.cs-num{text-align:right;font-variant-numeric:tabular-nums;color:#1f3b52;}
+.cs-ver{width:100%;border:1px dashed #b8c6d2;background:#fff;color:#397EAD;border-radius:10px;padding:8px;font-size:0.8rem;margin:2px 0 8px;}
+.cs-in{width:100%;box-sizing:border-box;border:1px solid #c5d2dd;border-radius:8px;padding:5px 6px;font-size:0.74rem;text-align:right;background:#fff;}
 .cob-bar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#eef2f6;}
 .cob-bar i{display:block;height:100%;}
 .cob-leg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:0.74rem;color:#44525e;}
@@ -1744,9 +1790,17 @@ function renderHeader(){
       '<button type="button" data-action="set-proyecto" data-value="2" class="'+(ui.fProyecto==='2'?'active':'')+'">Sullana</button>'+
       '<button type="button" data-action="set-proyecto" data-value="3" class="'+(ui.fProyecto==='3'?'active':'')+'">Ejidos</button>'+
       '<button type="button" data-action="set-proyecto" data-value="4" class="'+(ui.fProyecto==='4'?'active':'')+'">Lambayeque</button>'+
-      (esAdmin() ? '<button type="button" data-action="cob-abrir" class="'+(ui.cobAdmin?'active':'')+'">Cobranza</button>' : '')+
     '</div>')+
-  '</div></div>';
+  '</div>'+
+  ((!lockP && esAdmin()) ? (function(){
+    var abierto = ui.hdrMas || ui.cobAdmin || ui.cosAdmin;
+    return '<div class="header-row header-admin"><div class="proyecto-switch">'+
+      '<button type="button" data-action="hdr-mas" class="'+(abierto?'active':'')+'">Gestión '+(abierto?'▴':'▾')+'</button>'+
+      (abierto ? '<button type="button" data-action="cob-abrir" class="'+(ui.cobAdmin?'active':'')+'">Cobranza</button>'+
+                 '<button type="button" data-action="cos-abrir" class="'+(ui.cosAdmin?'active':'')+'">Costos</button>' : '')+
+    '</div></div>';
+  })() : '')+
+  '</div>';
 }
 
 function renderTabbar(){
@@ -2474,6 +2528,214 @@ function asesorCargarPanel(){
     if (cambio || ui.renderPendiente) renderSiLibre();
   });
 }
+
+// ---------- Costos (solo admin, vista de prueba): presupuesto de la factibilidad vs gasto real ----------
+var COS_REAL_KEY = 'ec_costos_real_v1';
+ui.cosAdmin = false; ui.cosEtapas = []; ui.cosMeses = []; ui.cosPre = false; ui.cosPick = false; ui.cosAnio = ''; ui.cosResAbierto = {}; ui.cosTodas = false;
+ui.cosData = null; ui.cosErr = ''; ui.hdrMas = false; ui.cosProy = 'sullana'; ui.cosCache = {};
+var COS_MESES_TXT = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function cosMesTxt(ym){ var p = String(ym).split('-'), m = COS_MESES_TXT[(parseInt(p[1], 10) || 1) - 1]; return m.charAt(0).toUpperCase() + m.slice(1) + ' ' + p[0]; }
+function cosS(n){ n = Math.round(Number(n) || 0); return (n < 0 ? '-' : '') + 'S/ ' + Math.abs(n).toLocaleString('es-PE'); }
+function cosRealGet(){ try { return JSON.parse(localStorage.getItem(COS_REAL_KEY) || '{}') || {}; } catch (e){ return {}; } }
+function cosRealSet(m){ try { localStorage.setItem(COS_REAL_KEY, JSON.stringify(m)); } catch (e){} }
+function cosIdx(){
+  var d = ui.cosData, out = [];
+  (ui.cosMeses || []).forEach(function(m){ var k = d.meses.indexOf(m); if (k >= 0) out.push(k); });
+  out.sort(function(a, b){ return a - b; });
+  return out;
+}
+function cosSetIdx(arr){ ui.cosMeses = arr.map(function(k){ return ui.cosData.meses[k]; }); if (arr.length) ui.cosAnio = ui.cosMeses[arr.length - 1].slice(0, 4); }
+function cosRender(){ var y = window.pageYOffset || 0; render(); window.scrollTo(0, y); }
+function cosCargar(){
+  var proy = ui.cosProy || 'sullana';
+  function listo(d){
+    ui.cosCache[proy] = d; ui.cosData = d; ui.cosErr = '';
+    if (!ui.cosMeses.length){
+      var n = new Date(), ym = n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2);
+      ui.cosMeses = [d.meses.indexOf(ym) >= 0 ? ym : d.meses[0]];
+      ui.cosAnio = ui.cosMeses[0].slice(0, 4);
+    }
+    render();
+  }
+  if (ui.cosCache[proy]){ ui.cosData = ui.cosCache[proy]; render(); return; }
+  var local = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  function desdeArchivo(){
+    fetch('costos_' + proy + '.json?v=' + Date.now()).then(function(r){ if (!r.ok) throw new Error('x'); return r.json(); }).then(listo)
+      .catch(function(){ ui.cosErr = 'No se encontró el archivo de costos.'; render(); });
+  }
+  if (!sessionToken){ if (local){ desdeArchivo(); return; } ui.cosErr = 'Entra como administrador para ver Costos.'; render(); return; }
+  sb.rpc('ec_costos_get', { p_token: sessionToken, p_proyecto: proy }).then(function(r){
+    var d = r.data;
+    if (r.error){ if (local){ desdeArchivo(); return; } ui.cosErr = 'Falta activar Costos en Supabase (v55).'; render(); return; }
+    if (d && d.ok && d.datos){ listo(d.datos); return; }
+    ui.cosErr = (d && d.error === 'codigo') ? 'No tienes acceso a Costos.' : ((d && d.error === 'sin_datos') ? 'Aún no hay presupuesto cargado para este proyecto.' : 'No se pudo cargar Costos.');
+    render();
+  });
+}
+function cosSem(bud, real){
+  if (!real) return { c: '#9aa7b2', t: 'Sin gasto cargado' };
+  if (!bud) return { c: '#c0392b', t: 'Sin presupuesto en el período' };
+  var x = real / bud;
+  if (x <= 1) return { c: '#2e8b57', t: 'Dentro del presupuesto' };
+  if (x <= 1.1) return { c: '#e0a100', t: 'Hasta 10% sobre lo presupuestado' };
+  return { c: '#c0392b', t: 'Más de 10% sobre lo presupuestado' };
+}
+function cosCalc(){
+  var d = ui.cosData, real = cosRealGet(), sel = ui.cosEtapas || [], PFX = (ui.cosProy || 'sullana') + '#';
+  var bl = d.bloques.filter(function(b){ return !sel.length || sel.indexOf(b.id) >= 0; });
+  var ids = {}; bl.forEach(function(b){ ids[PFX + b.id] = 1; });
+  var idx = cosIdx(), inS = {}; idx.forEach(function(k){ inS[d.meses[k]] = 1; });
+  var maxK = idx.length ? idx[idx.length - 1] : -1, maxYm = maxK >= 0 ? d.meses[maxK] : '';
+  var preIn = !!ui.cosPre, editable = bl.length === 1 && ((idx.length === 1 && !preIn) || (!idx.length && preIn));
+  function mb(p, j){ var i = j - p.i; return (i >= 0 && i < p.v.length) ? p.v[i] * (1 + p.r) : 0; }
+  var out = { idx: idx, maxK: maxK, editable: editable, totBud: 0, totReal: 0, acBud: 0, acReal: 0, total: 0, grupos: [], pre: [], serie: [], resumen: [] };
+  var grupos = {}, orden = [], res = {}, resOrden = [];
+  bl.forEach(function(b){
+    b.partidas.forEach(function(p){
+      var g = grupos[p.g]; if (!g){ g = grupos[p.g] = { g: p.g, bud: 0, real: 0, ps: {}, po: [] }; orden.push(p.g); }
+      var q = g.ps[p.n]; if (!q){ q = g.ps[p.n] = { n: p.n, bud: 0, real: 0, keys: [] }; g.po.push(p.n); }
+      var bud = 0, rv = 0;
+      var sv = 0; p.v.forEach(function(v){ sv += v; });
+      var pr = (p.t - sv) * (1 + p.r); if (pr < 1) pr = 0;
+      var kp = PFX + b.id + '|' + p.n + '|pre';
+      idx.forEach(function(k){ bud += mb(p, k); rv += Number(real[PFX + b.id + '|' + p.n + '|' + d.meses[k]]) || 0; });
+      if (preIn){ bud += pr; rv += Number(real[kp]) || 0; }
+      q.bud += bud; g.bud += bud; out.totBud += bud; q.real += rv; g.real += rv; out.totReal += rv;
+      if (editable) q.keys = [idx.length ? (PFX + b.id + '|' + p.n + '|' + d.meses[idx[0]]) : kp];
+      var s = 0; for (var j = 0; j <= maxK; j++) s += mb(p, j);
+      out.acBud += s + pr;
+      var tot = p.t * (1 + p.r); out.total += tot;
+      var rg = res[p.g]; if (!rg){ rg = res[p.g] = { g: p.g, tot: 0, ps: {}, po: [] }; resOrden.push(p.g); }
+      rg.tot += tot; if (rg.ps[p.n] === undefined){ rg.ps[p.n] = 0; rg.po.push(p.n); } rg.ps[p.n] += tot;
+    });
+  });
+  out.grupos = orden.map(function(n){ var g = grupos[n]; g.partidas = g.po.map(function(x){ return g.ps[x]; }); return g; });
+  out.resumen = resOrden.map(function(n){ var r = res[n]; r.partidas = r.po.map(function(x){ return { n: x, v: r.ps[x] }; }); return r; });
+  var rm = {};
+  Object.keys(real).forEach(function(key){
+    var a = key.split('|'); if (!ids[a[0]]) return; var v = Number(real[key]) || 0;
+    if (a[2] === 'pre' || a[2] <= maxYm) out.acReal += v;
+    if (a[2] !== 'pre') rm[a[2]] = (rm[a[2]] || 0) + v;
+  });
+  var span = idx.length ? maxK - idx[0] + 1 : 1, n0 = idx.length ? (span >= 12 ? idx[0] : idx[0] - Math.floor((12 - span) / 2)) : 0;
+  n0 = Math.max(0, Math.min(n0, d.meses.length - 12));
+  for (var j2 = n0; j2 < Math.min(n0 + 12, d.meses.length); j2++){
+    var sb = 0; bl.forEach(function(b){ b.partidas.forEach(function(p){ sb += mb(p, j2); }); });
+    out.serie.push({ ym: d.meses[j2], bud: sb, real: rm[d.meses[j2]] || 0, sel: !!inS[d.meses[j2]] });
+  }
+  return out;
+}
+function cosFila(q, editable){
+  var s = cosSem(q.bud, q.real), dif = q.real ? q.real - q.bud : null;
+  var inp = (editable && q.keys.length) ? '<input class="cs-in" type="text" inputmode="decimal" placeholder="0" value="' + (q.real ? Math.round(q.real) : '') + '" data-cos="' + esc(q.keys[0]) + '" />'
+    : '<span class="cs-num">' + (q.real ? cosS(q.real) : '—') + '</span>';
+  return '<div class="cs-r"><span class="cs-n"><i style="background:' + s.c + '" title="' + esc(s.t) + '"></i>' + esc(q.n) + '</span>' +
+    '<span class="cs-c"><em>Presupuesto</em><span class="cs-num">' + cosS(q.bud) + '</span></span>' +
+    '<span class="cs-c"><em>Real</em>' + inp + '</span>' +
+    '<span class="cs-c"><em>Diferencia</em><span class="cs-num" style="color:' + (dif === null ? '#9aa7b2' : (dif > 0 ? '#c0392b' : '#2e8b57')) + '">' + (dif === null ? '—' : cosS(dif)) + '</span></span></div>';
+}
+function cosCorto(n){
+  n = Math.round(Number(n) || 0); if (n <= 0) return '';
+  if (n >= 1000000) return (n / 1000000).toFixed(n >= 10000000 ? 0 : 1) + 'M';
+  if (n >= 1000) return Math.round(n / 1000) + 'K';
+  return String(n);
+}
+function cosGrafico(serie){
+  var mx = 1; serie.forEach(function(s){ mx = Math.max(mx, s.bud, s.real); });
+  var W = 340, H = 110, P = 24, gw = W / serie.length, base = P + H, AZ = '#4aa3df', AZT = '#2a78b5';
+  var h = '<svg viewBox="0 0 ' + W + ' ' + (base + 18) + '" class="cs-svg">';
+  serie.forEach(function(s, i){
+    var x = i * gw, bh = s.bud / mx * H, rh = s.real / mx * H, cx = x + gw / 2;
+    if (s.sel) h += '<rect x="' + x + '" y="0" width="' + gw + '" height="' + (base + 18) + '" fill="#eef6fc"/>';
+    h += '<rect x="' + (x + gw * 0.12) + '" y="' + (base - bh) + '" width="' + (gw * 0.36) + '" height="' + bh + '" fill="' + AZ + '" rx="2"/>' +
+      '<rect x="' + (x + gw * 0.52) + '" y="' + (base - rh) + '" width="' + (gw * 0.36) + '" height="' + rh + '" fill="#e07b00" rx="2"/>';
+    if (s.bud > 0) h += '<text x="' + (x + gw * 0.3) + '" y="' + (base - bh - (s.real > 0 ? 10 : 3)) + '" text-anchor="middle" font-size="7.5" font-weight="700" fill="' + AZT + '">' + cosCorto(s.bud) + '</text>';
+    if (s.real > 0) h += '<text x="' + (x + gw * 0.7) + '" y="' + (base - rh - 3) + '" text-anchor="middle" font-size="7.5" font-weight="700" fill="#c26600">' + cosCorto(s.real) + '</text>';
+    h += '<text x="' + cx + '" y="' + (base + 13) + '" text-anchor="middle" font-size="8" fill="#5b6b78">' + esc(cosMesTxt(s.ym).slice(0, 3)) + '</text>';
+  });
+  return h + '</svg><div class="cob-leg"><span><i style="background:' + AZ + '"></i>Presupuestado</span><span><i style="background:#e07b00"></i>Gasto real</span></div>';
+}
+function cosMesesTxt(idx){
+  var d = ui.cosData;
+  var pre = ui.cosPre ? 'Previo a ago-2026' : '';
+  if (!idx.length) return pre || 'Elige un mes';
+  if (idx.length === 1) return cosMesTxt(d.meses[idx[0]]) + (pre ? ' + previo' : '');
+  var cont = idx[idx.length - 1] - idx[0] === idx.length - 1;
+  return idx.length + ' meses' + (cont ? ' · ' + cosMesTxt(d.meses[idx[0]]) + ' a ' + cosMesTxt(d.meses[idx[idx.length - 1]]) : '') + (pre ? ' + previo' : '');
+}
+function cosEtapasTxt(){ var s = ui.cosEtapas || []; return s.length ? s.map(function(x){ return x.replace('Etapas ', 'Et. ').replace('Etapa ', 'Et. '); }).join(', ') : 'Todas las etapas'; }
+function cosPicker(){
+  var d = ui.cosData, years = [];
+  d.meses.forEach(function(m){ var y = m.slice(0, 4); if (years.indexOf(y) < 0) years.push(y); });
+  var anio = ui.cosAnio || years[0], sel = {}; (ui.cosMeses || []).forEach(function(m){ sel[m] = 1; });
+  var h = '<div class="cs-pick"><div class="cs-pick-top"><select class="cs-sel" data-cos-anio="1">' +
+    years.map(function(y){ return '<option value="' + y + '"' + (y === anio ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select>' +
+    '<button type="button" class="cs-q" data-action="cos-manio">Año completo</button><button type="button" class="cs-q" data-action="cos-mall">Todo el período</button>' +
+    '<button type="button" class="cs-q' + (ui.cosPre ? ' on' : '') + '" data-action="cos-pre">Previo a ago-2026</button></div><div class="cs-grid">';
+  for (var m = 1; m <= 12; m++){
+    var ym = anio + '-' + ('0' + m).slice(-2), ok = d.meses.indexOf(ym) >= 0;
+    h += '<button type="button" class="cs-m' + (sel[ym] ? ' on' : '') + '" ' + (ok ? '' : 'disabled ') + 'data-action="cos-mtoggle" data-value="' + ym + '">' + COS_MESES_TXT[m - 1] + '</button>';
+  }
+  return h + '</div><div class="cs-nota">Toca varios meses para sumarlos. Puedes cambiar de año y seguir sumando. "Previo a ago-2026" suma lo pagado antes del flujo (terreno, iniciales usadas en preoperativos).</div><button type="button" class="cs-ver" data-action="cos-pick">Listo</button></div>';
+}
+function renderCostosHtml(){
+  var salir = '<button type="button" class="as-salir" data-action="cos-cerrar">Volver</button>';
+  if (!ui.cosData){
+    return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">' + esc(ui.cosErr || 'Cargando costos…') + '</div></div>' + salir + '</div></div>';
+  }
+  var d = ui.cosData, c = cosCalc(), idx = c.idx, sel = ui.cosEtapas || [];
+  var ej = c.totBud ? Math.round(c.totReal * 100 / c.totBud) : 0, sm = cosSem(c.totBud, c.totReal);
+  var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Costos 💼</div><div class="as-sub">Vive Hogar ' + esc(toTitleCase(ui.cosProy || 'sullana')) + ' · presupuesto vs gasto real (con IGV)</div></div>' + salir + '</div></div>' +
+    '<div class="cs-aviso">🔒 Vista de prueba, solo para ti. Presupuesto = Flujo de Caja de la factibilidad (25-nov). El gasto real saldrá del EJB cuando esté conectado; por ahora es editable a mano (se guarda solo en este navegador).</div>';
+  // resumen consolidado
+  h += '<div class="cob-card"><div class="cob-tit">Resumen del presupuesto<span class="cs-gt">' + esc(cosEtapasTxt()) + ' · todo el período</span></div>' +
+    '<div class="cs-tot">' + cosS(c.total) + '</div>' +
+    c.resumen.map(function(r){
+      var ab = !!ui.cosResAbierto[r.g], pc = c.total ? Math.round(r.tot * 1000 / c.total) / 10 : 0;
+      return '<button type="button" class="cs-res" data-action="cos-res" data-value="' + esc(r.g) + '"><span class="cs-res-a"><b>' + esc(r.g) + '</b><span>' + cosS(r.tot) + ' · ' + pc + '%</span></span>' +
+        '<span class="cs-res-b"><i style="width:' + Math.min(100, pc) + '%"></i></span></button>' +
+        (ab ? '<div class="cs-res-d">' + r.partidas.filter(function(x){ return x.v > 0.5; }).map(function(x){ return '<div><span>' + esc(x.n) + '</span><b>' + cosS(x.v) + '</b></div>'; }).join('') + '</div>' : '');
+    }).join('') + '<div class="cs-nota">Toca un grupo para ver sus partidas.</div></div>';
+  // etapas (varias)
+  h += '<div class="cs-lab">Etapas <span>(toca varias para sumarlas)</span></div><div class="cob-chips"><button type="button" class="cob-chip' + (!sel.length ? ' on' : '') + '" data-action="cos-etapa" data-value="todas">Todas</button>' +
+    d.bloques.map(function(b){ return '<button type="button" class="cob-chip' + (sel.indexOf(b.id) >= 0 ? ' on' : '') + '" data-action="cos-etapa" data-value="' + esc(b.id) + '">' + esc(b.id.replace('Etapas ', 'Et. ').replace('Etapa ', 'Et. ')) + '</button>'; }).join('') + '</div>';
+  // meses
+  h += '<div class="cs-lab">Meses <span>(flechas, o abre el menú para elegir varios)</span></div>' +
+    '<div class="cs-mes"><button type="button" data-action="cos-mes" data-value="-1" ' + ((!idx.length || idx[0] <= 0) ? 'disabled' : '') + '>‹</button>' +
+    '<button type="button" class="cs-mes-b" data-action="cos-pick">' + esc(cosMesesTxt(idx)) + ' ▾</button>' +
+    '<button type="button" data-action="cos-mes" data-value="1" ' + ((!idx.length || idx[idx.length - 1] >= d.meses.length - 1) ? 'disabled' : '') + '>›</button></div>' +
+    (ui.cosPick ? cosPicker() : '');
+  if (!idx.length && !ui.cosPre) return h + '<div class="cs-ayuda">Elige al menos un mes.</div>';
+  h += '<div class="cs-kpis">' +
+      '<div class="cob-kpi"><b>' + cosS(c.totBud) + '</b><span>Presupuestado del período</span></div>' +
+      '<div class="cob-kpi"><b>' + (c.totReal ? cosS(c.totReal) : '—') + '</b><span>Gasto real del período</span></div>' +
+      '<div class="cob-kpi"><b style="color:' + (c.totReal ? (c.totReal > c.totBud ? '#c0392b' : '#2e8b57') : '#9aa7b2') + '">' + (c.totReal ? cosS(c.totReal - c.totBud) : '—') + '</b><span>Diferencia</span></div>' +
+      '<div class="cob-kpi" style="border-color:' + sm.c + '"><b style="color:' + sm.c + '">' + (c.totReal ? ej + '%' : '—') + '</b><span>Ejecutado</span></div></div>' +
+    '<div class="cob-card"><div class="cob-tit">Acumulado ' + (c.maxK >= 0 ? 'hasta ' + esc(cosMesTxt(d.meses[c.maxK])) : 'previo a ago-2026') + '</div>' +
+      '<div class="cs-acu"><div><span>Presupuestado</span><b>' + cosS(c.acBud) + '</b></div><div><span>Gasto real</span><b>' + (c.acReal ? cosS(c.acReal) : '—') + '</b></div><div><span>Avance</span><b>' + (c.acBud && c.acReal ? Math.round(c.acReal * 100 / c.acBud) + '%' : '—') + '</b></div></div>' +
+      '<div class="cs-nota">Suma todo hasta el último mes elegido, incluido lo previo a ago-2026 (terreno y otras partidas sin calendario en el flujo).</div></div>' +
+    '<div class="cob-card"><div class="cob-tit">Mes a mes · ' + esc(cosEtapasTxt()) + '</div>' + cosGrafico(c.serie) + '</div>';
+  h += '<div class="cs-ayuda">' + (c.editable ? 'Escribe el gasto real del mes (con IGV) en cada partida.' : 'Estás viendo ' + ((idx.length + (ui.cosPre ? 1 : 0)) > 1 ? 'varios períodos' : '') + ((idx.length + (ui.cosPre ? 1 : 0)) > 1 && sel.length !== 1 ? ' y ' : '') + (sel.length !== 1 ? (sel.length ? 'varias etapas' : 'todas las etapas') : '') + ' sumados (solo lectura). Para cargar gasto real elige 1 etapa y 1 mes (o solo el previo).') + '</div>';
+  var ocultas = 0;
+  c.grupos.forEach(function(g){
+    var ps = g.partidas.filter(function(q){ return ui.cosTodas || q.bud > 0.5 || q.real; });
+    ocultas += g.partidas.length - ps.length;
+    if (!ps.length) return;
+    var s = cosSem(g.bud, g.real);
+    h += '<div class="cob-card"><div class="cob-tit"><i class="cs-dot" style="background:' + s.c + '"></i>' + esc(g.g) + ' <span class="cs-gt">Presupuesto ' + cosS(g.bud) + (g.real ? ' · real ' + cosS(g.real) : '') + '</span></div>' +
+      ps.map(function(q){ return cosFila(q, c.editable); }).join('') + '</div>';
+  });
+  if (ui.cosTodas || ocultas) h += '<button type="button" class="cs-ver" data-action="cos-todas">' + (ui.cosTodas ? 'Ocultar partidas sin presupuesto en el período' : 'Ver también ' + ocultas + ' partidas sin presupuesto en el período') + '</button>';
+  return h;
+}
+document.addEventListener('change', function(ev){
+  var t = ev.target; if (!t || !t.getAttribute) return;
+  if (t.getAttribute('data-cos-anio') !== null){ ui.cosAnio = t.value; cosRender(); return; }
+  var key = t.getAttribute('data-cos'); if (key === null) return;
+  var v = parseFloat(String(t.value).replace(/[^0-9.\-]/g, '')), m = cosRealGet();
+  if (isFinite(v) && v !== 0) m[key] = v; else delete m[key];
+  cosRealSet(m); cosRender();
+});
 
 // ---------- Cobranza: dashboard de cartera para cobradoras y jefatura ----------
 ui.cob = null; ui.cobErr = ''; ui.cobGestora = ''; ui.cobNivel = 'todos'; ui.cobEtapa = ''; ui.cobAdmin = false; ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cobProy = 'sullana'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {};
@@ -4961,6 +5223,7 @@ function renderApp(){
   else body = renderHome();
 
   if (ui.cobAdmin && esAdmin()) body = '<div class="interesado-screen cob-wrap">'+renderCobranzaHtml()+'</div>';
+  if (ui.cosAdmin && esAdmin()) body = '<div class="interesado-screen cob-wrap">'+renderCostosHtml()+'</div>';
   var html = renderHeader() + '<div class="main">'+body+'</div>' + renderTabbar();
   if (demoMarket) html = '<div class="demo-banner">👁️ Cuenta de vista · solo lectura <button type="button" class="as-lotechip" data-action="demo-market-toggle">← Volver a la vista de asesor</button></div>' + html;
   var app = document.getElementById('app');
@@ -5224,8 +5487,41 @@ document.addEventListener('click', async function(ev){
     cobranzaAbrirCliente(t.getAttribute('data-value'));
   } else if (action === 'cob-etapa'){
     ui.cobEtapa = t.getAttribute('data-value') || ''; ui.cobAbierto = null; render();
+  } else if (action === 'hdr-mas'){
+    ui.hdrMas = !ui.hdrMas; render();
+  } else if (action === 'cos-abrir'){
+    ui.cosAdmin = true; ui.cobAdmin = false; ui.cobVer = false; ui.hdrMas = true; window.scrollTo(0,0); render(); cosCargar();
+  } else if (action === 'cos-cerrar'){
+    ui.cosAdmin = false; render();
+  } else if (action === 'cos-todas'){
+    ui.cosTodas = !ui.cosTodas; cosRender();
+  } else if (action === 'cos-res'){
+    var cosG = t.getAttribute('data-value'); ui.cosResAbierto[cosG] = !ui.cosResAbierto[cosG]; cosRender();
+  } else if (action === 'cos-etapa'){
+    var cosE = t.getAttribute('data-value') || 'todas';
+    if (cosE === 'todas'){ ui.cosEtapas = []; } else { var cosI = ui.cosEtapas.indexOf(cosE); if (cosI >= 0) ui.cosEtapas.splice(cosI, 1); else ui.cosEtapas.push(cosE); }
+    cosRender();
+  } else if (action === 'cos-pick'){
+    ui.cosPick = !ui.cosPick; cosRender();
+  } else if (action === 'cos-mtoggle'){
+    var cosM = t.getAttribute('data-value'), cosJ = ui.cosMeses.indexOf(cosM);
+    if (cosJ >= 0){ if (ui.cosMeses.length > 1 || ui.cosPre) ui.cosMeses.splice(cosJ, 1); } else ui.cosMeses.push(cosM);
+    ui.cosMeses.sort(); cosRender();
+  } else if (action === 'cos-manio'){
+    if (ui.cosData){ ui.cosData.meses.forEach(function(m){ if (m.slice(0, 4) === ui.cosAnio && ui.cosMeses.indexOf(m) < 0) ui.cosMeses.push(m); }); ui.cosMeses.sort(); cosRender(); }
+  } else if (action === 'cos-mall'){
+    if (ui.cosData){ ui.cosMeses = ui.cosData.meses.slice(); ui.cosPre = true; cosRender(); }
+  } else if (action === 'cos-pre'){
+    if (ui.cosPre){ if (ui.cosMeses.length) ui.cosPre = false; } else ui.cosPre = true;
+    cosRender();
+  } else if (action === 'cos-mes'){
+    if (ui.cosData){
+      var cosD = parseInt(t.getAttribute('data-value'), 10), cosX = cosIdx(), cosOk = cosX.length > 0;
+      cosX.forEach(function(k){ if (k + cosD < 0 || k + cosD >= ui.cosData.meses.length) cosOk = false; });
+      if (cosOk){ cosSetIdx(cosX.map(function(k){ return k + cosD; })); cosRender(); }
+    }
   } else if (action === 'cob-abrir'){
-    ui.cobAdmin = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
+    ui.cosAdmin = false; ui.cobAdmin = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
   } else if (action === 'cob-proy'){
     ui.cobProy = t.getAttribute('data-value') || 'sullana'; ui.cobGestora = ''; ui.cobEtapa = ''; ui.cobNivel = 'todos'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {}; ui.cob = null; render(); cobranzaCargar();
   } else if (action === 'cob-ver'){
@@ -7765,7 +8061,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261124-185451';
+var APP_BUILD = '20261125-121831';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
