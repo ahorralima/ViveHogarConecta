@@ -2389,7 +2389,7 @@ ui.sepOp = '';
 ui.sepMonto = '';
 ui.sepImg = '';
 ui.descLote = null; ui.descInfo = {}; ui._descCarg = {}; ui.descMonto = '';
-ui.ventas2nf = null; ui.ventas2nfId = null; ui.v2nfAbierta = null; ui.ventasMes = null; ui.ventasMesId = null; ui.ventasErr = false; ui.ventaAbierta = null; ui.ventaImg = {}; ui.ventaImg2 = {};
+ui.frescura2nf = null; ui._frescCarg = false; ui.ventas2nf = null; ui.ventas2nfId = null; ui.v2nfAbierta = null; ui.ventasMes = null; ui.ventasMesId = null; ui.ventasErr = false; ui.ventaAbierta = null; ui.ventaImg = {}; ui.ventaImg2 = {};
 ui.misVentas = null; ui.misVentasId = null; ui.misVentasErr = false; ui.mvAbierta = null;
 ui.pago2Op = ''; ui.pago2Monto = ''; ui.pago2Img = ''; ui.pago2ImgBusy = false; ui.pago2ImgErr = false;
 ui.vmAbierto = false; ui.vmEtapa = ''; ui.vmMz = ''; ui.vmLote = ''; ui.vmNombre = ''; ui.vmDni = ''; ui.vmOp = ''; ui.vmImg = ''; ui.vmImgBusy = false; ui.vmImgErr = false;
@@ -2532,12 +2532,42 @@ function asesorCargarPanel(){
 // ---------- Costos (solo admin, vista de prueba): presupuesto de la factibilidad vs gasto real ----------
 var COS_REAL_KEY = 'ec_costos_real_v1';
 ui.cosAdmin = false; ui.cosEtapas = []; ui.cosMeses = []; ui.cosPre = false; ui.cosPick = false; ui.cosAnio = ''; ui.cosResAbierto = {}; ui.cosTodas = false;
-ui.cosData = null; ui.cosErr = ''; ui.hdrMas = false; ui.cosProy = 'sullana'; ui.cosCache = {}; ui.cosVer = false; ui.cosPuede = false; ui.cosPuedeId = null;
+ui.cosData = null; ui.cosErr = ''; ui.hdrMas = false; ui.cosProy = 'sullana'; ui.cosCache = {}; ui.cosVer = false; ui.cosPuede = false; ui.cosPuedeId = null; ui.cosReal = null; ui.cosRealSrv = {};
 var COS_MESES_TXT = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function cosMesTxt(ym){ var p = String(ym).split('-'), m = COS_MESES_TXT[(parseInt(p[1], 10) || 1) - 1]; return m.charAt(0).toUpperCase() + m.slice(1) + ' ' + p[0]; }
 function cosS(n){ n = Math.round(Number(n) || 0); return (n < 0 ? '-' : '') + 'S/ ' + Math.abs(n).toLocaleString('es-PE'); }
-function cosRealGet(){ try { return JSON.parse(localStorage.getItem(COS_REAL_KEY) || '{}') || {}; } catch (e){ return {}; } }
-function cosRealSet(m){ try { localStorage.setItem(COS_REAL_KEY, JSON.stringify(m)); } catch (e){} }
+function cosRealGet(){
+  if (!ui.cosReal){ try { ui.cosReal = JSON.parse(localStorage.getItem(COS_REAL_KEY) || '{}') || {}; } catch (e){ ui.cosReal = {}; } }
+  return ui.cosReal;
+}
+function cosRealSet(m){
+  ui.cosReal = m;
+  if (!ui.cosRealSrv[ui.cosProy || 'sullana']){ try { localStorage.setItem(COS_REAL_KEY, JSON.stringify(m)); } catch (e){} }
+}
+function cosComoAsesor(){ return !!(ui.cosVer && asesoraPin && asesoraIdActual); }
+// El gasto real vive en el servidor (igual en todos los dispositivos). Si el servidor aun no lo tiene activado, queda solo en este navegador.
+function cosRealCargar(proy){
+  var rq = cosComoAsesor() ? sb.rpc('ec_costos_real_get_asesor', { p_id: asesoraIdActual, p_pin: asesoraPin, p_proyecto: proy })
+                           : (sessionToken ? sb.rpc('ec_costos_real_get', { p_token: sessionToken, p_proyecto: proy }) : null);
+  if (!rq) return;
+  rq.then(function(r){
+    var d = r.data;
+    if (r.error || !d || !d.ok){ ui.cosRealSrv[proy] = false; return; }
+    var m = {}, pre = proy + '#', loc = cosRealGet();
+    Object.keys(loc).forEach(function(k){ if (k.indexOf(pre) !== 0) m[k] = loc[k]; });
+    Object.keys(d.datos || {}).forEach(function(k){ m[k] = Number(d.datos[k]); });
+    ui.cosRealSrv[proy] = true; ui.cosReal = m; render();
+  });
+}
+function cosGuardar(key, v){
+  var proy = ui.cosProy || 'sullana';
+  if (!ui.cosRealSrv[proy]) return;
+  var rq = cosComoAsesor() ? sb.rpc('ec_costos_real_set_asesor', { p_id: asesoraIdActual, p_pin: asesoraPin, p_proyecto: proy, p_clave: key, p_monto: v || 0 })
+                           : sb.rpc('ec_costos_real_set', { p_token: sessionToken, p_proyecto: proy, p_clave: key, p_monto: v || 0 });
+  rq.then(function(r){
+    if (r.error || !r.data || !r.data.ok){ ui.cosRealSrv[proy] = false; try { localStorage.setItem(COS_REAL_KEY, JSON.stringify(cosRealGet())); } catch (e){} toast('No se pudo guardar en el servidor. Queda en este navegador.'); render(); }
+  });
+}
 function cosIdx(){
   var d = ui.cosData, out = [];
   (ui.cosMeses || []).forEach(function(m){ var k = d.meses.indexOf(m); if (k >= 0) out.push(k); });
@@ -2549,7 +2579,7 @@ function cosRender(){ var y = window.pageYOffset || 0; render(); window.scrollTo
 function cosCargar(){
   var proy = ui.cosProy || 'sullana';
   function listo(d){
-    ui.cosCache[proy] = d; ui.cosData = d; ui.cosErr = '';
+    ui.cosCache[proy] = d; ui.cosData = d; ui.cosErr = ''; cosRealCargar(proy);
     if (!cosIdx().length && !ui.cosPre){
       var n = new Date(), ym = n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2);
       ui.cosMeses = [d.meses.indexOf(ym) >= 0 ? ym : d.meses[0]];
@@ -2557,7 +2587,7 @@ function cosCargar(){
     }
     render();
   }
-  if (ui.cosCache[proy]){ ui.cosData = ui.cosCache[proy]; render(); return; }
+  if (ui.cosCache[proy]){ ui.cosData = ui.cosCache[proy]; render(); cosRealCargar(proy); return; }
   var local = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
   function desdeArchivo(){
     fetch('costos_' + proy + '.json?v=' + Date.now()).then(function(r){ if (!r.ok) throw new Error('x'); return r.json(); }).then(listo)
@@ -2689,7 +2719,7 @@ function renderCostosHtml(){
   var d = ui.cosData, c = cosCalc(), idx = c.idx, sel = ui.cosEtapas || [];
   var ej = c.totBud ? Math.round(c.totReal * 100 / c.totBud) : 0, sm = cosSem(c.totBud, c.totReal);
   var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Costos 💼</div><div class="as-sub">Vive Hogar ' + esc(toTitleCase(ui.cosProy || 'sullana')) + ' · presupuesto vs gasto real (con IGV)</div></div>' + salir + '</div></div>' +
-    '<div class="cs-aviso">🔒 Vista de prueba, solo para ti. Presupuesto = Flujo de Caja de la factibilidad (25-nov). El gasto real saldrá del EJB cuando esté conectado; por ahora es editable a mano (se guarda solo en este navegador).</div>' +
+    '<div class="cs-aviso">🔒 Vista de prueba, solo para ti. Presupuesto = Flujo de Caja de la factibilidad (25-nov). El gasto real saldrá del EJB cuando esté conectado; por ahora es editable a mano (' + (ui.cosRealSrv[ui.cosProy || 'sullana'] ? 'se guarda en el servidor y lo ves igual en todos tus dispositivos' : 'se guarda solo en este navegador') + ').</div>' +
     '<div class="cob-chips">' + ['sullana', 'castilla'].map(function(x){ return '<button type="button" class="cob-chip' + ((ui.cosProy || 'sullana') === x ? ' on' : '') + '" data-action="cos-proy" data-value="' + x + '">' + esc(toTitleCase(x)) + '</button>'; }).join('') + '</div>';
   // resumen consolidado
   h += '<div class="cob-card"><div class="cob-tit">Resumen del presupuesto<span class="cs-gt">' + esc(cosEtapasTxt()) + ' · todo el período</span></div>' +
@@ -2738,7 +2768,7 @@ document.addEventListener('change', function(ev){
   var key = t.getAttribute('data-cos'); if (key === null) return;
   var v = parseFloat(String(t.value).replace(/[^0-9.\-]/g, '')), m = cosRealGet();
   if (isFinite(v) && v !== 0) m[key] = v; else delete m[key];
-  cosRealSet(m); cosRender();
+  cosRealSet(m); cosGuardar(key, (isFinite(v) && v !== 0) ? v : 0); cosRender();
 });
 
 // ---------- Cobranza: dashboard de cartera para cobradoras y jefatura ----------
@@ -3005,7 +3035,7 @@ async function asesorLogin(){
 }
 
 function salirAsesorTotal(msg){
-  ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cob = null; ui.cosVer = false; ui.cosPuede = false; ui.cosPuedeId = null; ui.cosCache = {}; ui.cosData = null;
+  ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cob = null; ui.cosVer = false; ui.cosPuede = false; ui.cosPuedeId = null; ui.cosCache = {}; ui.cosData = null; ui.cosReal = null; ui.cosRealSrv = {};
   salirModoAsesora();
   ui.asesorPanel = null; ui._panelJson = ''; ui.asesorCuentas = null;
   ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null; ui.sepMsg = ''; ui.asesoraError = '';
@@ -3203,7 +3233,7 @@ function renderAsesorPanelHtml(){
   if (p.resumen2nf){
     var so = p.resumen2nf.solo_app || [];
     h += '<div class="as-note" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line, #e3e8ee);">📊 En el 2NF: <strong>'+(p.resumen2nf.en_2nf || 0)+'</strong> casa'+((p.resumen2nf.en_2nf || 0)===1?'':'s')+
-      '<br>📱 Solo en la app (falta registrar en el 2NF): <strong>'+so.length+'</strong>'+(so.length ? ' · '+so.map(esc).join(', ') : '')+'</div>';
+      '<br>📱 Solo en la app (falta registrar en el 2NF): <strong>'+so.length+'</strong>'+(so.length ? ' · '+so.map(esc).join(', ') : '')+'</div>'+htmlFrescura2nf(null);
   }
   h += '</div>';
 
@@ -3576,6 +3606,7 @@ function asesorIniciarRelojes(){
     if (modoAsesor() && esJefe() && ui.histAbierto && !document.hidden) cargarHistorial().then(function(){ renderSiLibre(); });
     if (modoAsesor() && !asesorSoloLectura && !document.hidden) cargarVentasMes().then(function(cambio){ if (cambio) renderSiLibre(); });
     if (modoAsesor() && !document.hidden) cargarVentas2nf().then(function(cambio){ if (cambio) renderSiLibre(); });
+    if (modoAsesor() && !document.hidden) cargarFrescura2nf().then(function(cambio){ if (cambio) renderSiLibre(); });
     if (modoAsesor() && !document.hidden) Object.keys(ui.descInfo).forEach(function(k){ cargarDescInfo(k); });
     if (modoAsesor() && ui.presupuestoTxt && ui.presupAlcance !== 'etapa' && !document.hidden && document.getElementById('presupuesto-input')) cargarPresupTodas().then(function(){ renderSiLibre(); });
   }, 8000);
@@ -6733,6 +6764,31 @@ function exportarVentasMesExcel(){
   var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
   setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
 }
+// Fecha REAL de los datos del 2NF (ultima separacion o venta que llego), distinta de la hora en que corrio la sincronizacion
+async function cargarFrescura2nf(){
+  if (!asesoraPin || !asesoraIdActual) return false;
+  try {
+    var r = await sb.rpc('ec_2nf_frescura', { p_id: asesoraIdActual, p_pin: asesoraPin });
+    if (!r.error && r.data && r.data.ok){
+      var antes = JSON.stringify(ui.frescura2nf); ui.frescura2nf = r.data;
+      return antes !== JSON.stringify(ui.frescura2nf);
+    }
+  } catch(e){}
+  return false;
+}
+function htmlFrescura2nf(sincro){
+  var f = ui.frescura2nf, st = 'font-size:0.75rem;color:var(--ink-faint);margin:8px 0 0;';
+  if (!f || !f.ultima){
+    if (!f && !ui._frescCarg){ ui._frescCarg = true; cargarFrescura2nf().then(function(){ ui._frescCarg = false; renderSiLibre(); }); }
+    return sincro ? '<p style="'+st+'">Datos del 2NF al '+esc(fmtFechaCorta(sincro))+'</p>' : '';
+  }
+  var d = new Date(f.ultima), dias = Math.floor((Date.now() - d.getTime()) / 86400000);
+  var cuando = '';
+  try { cuando = d.toLocaleString('es-PE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'America/Lima'}); } catch(e){}
+  var h = '<p style="'+st+'">Último movimiento que llegó del 2NF: <strong>'+esc(cuando)+'</strong>'+(sincro ? ' · sincronizado '+esc(fmtFechaCorta(sincro)) : '')+'</p>';
+  if (dias >= 2) h += '<p style="font-size:0.78rem;color:#9a5b00;background:#fff4dc;border-radius:8px;padding:6px 9px;margin:6px 0 0;">⚠️ La copia del 2NF no recibe movimientos desde hace '+dias+' días. Lo que se registre ahora en el 2NF puede tardar en aparecer aquí.</p>';
+  return h;
+}
 // Ventas hechas en el 2NF que todavía no están en la app (solo se muestra si el servidor ya las envió)
 async function cargarVentas2nf(){
   if (!asesoraPin || !asesoraIdActual) return false;
@@ -6818,7 +6874,7 @@ function renderVentas2nfHtml(){
     }
     h += '</div>';
   });
-  if (vm.actualizado){ h += '<p style="font-size:0.75rem;color:var(--ink-faint);margin:8px 0 0;">Datos del 2NF al '+esc(fmtFechaCorta(vm.actualizado))+'</p>'; }
+  h += htmlFrescura2nf(vm.actualizado);
   return h+'</div>';
 }
 function renderVentasMesHtml(){
@@ -8085,7 +8141,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-124106';
+var APP_BUILD = '20261125-125758';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
