@@ -1092,6 +1092,15 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .cob-cuota.venc em{color:#c0392b;}
 .cob-cuota-m{font-size:0.74rem;color:#5b6b78;margin-top:2px;}
 .cob-vacio{font-size:0.82rem;color:#5b6b78;margin:8px 2px;}
+.cart-drop{display:block;border:2px dashed #9fb4c6;border-radius:14px;padding:22px 12px;text-align:center;cursor:pointer;background:#f6f9fc;color:#1f3b52;}
+.cart-drop b{display:block;font-size:0.95rem;margin-bottom:4px;}
+.cart-drop span{font-size:0.8rem;color:#5b6b78;}
+.cart-drop.sobre{background:#e6f0f8;border-color:#397EAD;}
+.cart-fila{display:flex;justify-content:space-between;gap:8px;font-size:0.85rem;padding:6px 0;border-bottom:1px solid #eef2f6;}
+.cart-aviso{font-size:0.8rem;border-radius:8px;padding:8px 10px;margin:8px 0;background:#fff4dc;color:#7a4b00;}
+.cart-ok{font-size:0.85rem;border-radius:8px;padding:10px;margin:8px 0;background:#e5f4ec;color:#1d6a43;}
+.cart-btn{display:block;width:100%;border:0;border-radius:12px;background:#397EAD;color:#fff;font-size:0.95rem;padding:12px;margin-top:10px;cursor:pointer;}
+.cart-btn[disabled]{opacity:0.5;cursor:default;}
 .as-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 .as-hello{font-size:1.2rem;font-weight:800;line-height:1.2;}
 .as-sub{font-size:0.8rem;opacity:0.88;margin-top:3px;}
@@ -2817,6 +2826,148 @@ function cobranzaCargar(){
     if (antes !== JSON.stringify(ui.cob) || ui.renderPendiente) renderSiLibre();
   });
 }
+// ---------- Subir cartera de cobranza (Luis Salazar y Edwin Orbegoso) ----------
+// Lector minimo de .xlsx (sin librerias): saca de la hoja "Hoja1" las columnas Operacion / Etapa / Analista Cobranza.
+function cartXmlDec(s){ return String(s).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);}).replace(/&amp;/g,'&'); }
+function cartAttrs(s){ var o = {}, m, re = /([\w:.-]+)="([^"]*)"/g; while ((m = re.exec(s))) o[m[1]] = cartXmlDec(m[2]); return o; }
+function cartNorm(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim(); }
+function cartColNum(ref){ var l = (/^[A-Z]+/.exec(ref) || [''])[0], n = 0; for (var i = 0; i < l.length; i++) n = n * 26 + (l.charCodeAt(i) - 64); return n; }
+async function cartInflar(data){
+  var st = new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Response(st).arrayBuffer();
+}
+async function xlsxLeerCartera(buffer){
+  var u8 = new Uint8Array(buffer), dv = new DataView(buffer), dec = new TextDecoder('utf-8');
+  var eocd = -1;
+  for (var i = u8.length - 22; i >= Math.max(0, u8.length - 66000); i--){ if (dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; } }
+  if (eocd < 0) throw new Error('No parece un archivo Excel (.xlsx).');
+  var n = dv.getUint16(eocd + 10, true), p = dv.getUint32(eocd + 16, true), ent = {};
+  for (var k = 0; k < n; k++){
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    var method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lho = dv.getUint32(p + 42, true);
+    ent[dec.decode(u8.subarray(p + 46, p + 46 + nl))] = { method: method, csize: csize, lho: lho };
+    p += 46 + nl + el + cl;
+  }
+  async function leer(name){
+    var e = ent[name]; if (!e) return null;
+    var lh = e.lho, start = lh + 30 + dv.getUint16(lh + 26, true) + dv.getUint16(lh + 28, true), data = u8.subarray(start, start + e.csize);
+    return dec.decode(e.method === 0 ? data : await cartInflar(data));
+  }
+  var wb = await leer('xl/workbook.xml'), rels = await leer('xl/_rels/workbook.xml.rels');
+  if (!wb || !rels) throw new Error('El archivo no tiene el formato esperado.');
+  var relDe = {}; (rels.match(/<Relationship\b[^>]*>/g) || []).forEach(function(t){ var a = cartAttrs(t); relDe[a.Id] = a.Target; });
+  var hojas = (wb.match(/<sheet\b[^>]*>/g) || []).map(function(t){ var a = cartAttrs(t); var tg = relDe[a['r:id']] || ''; return { nombre: a.name, ruta: 'xl/' + tg.replace(/^\/?(xl\/)?/, '') }; });
+  var shared = [], ss = await leer('xl/sharedStrings.xml');
+  if (ss) (ss.match(/<si\b[\s\S]*?<\/si>/g) || []).forEach(function(si){ shared.push(cartXmlDec((si.match(/<t\b[^>]*>[\s\S]*?<\/t>/g) || []).map(function(t){ return t.replace(/<[^>]+>/g, ''); }).join(''))); });
+  // primero "Hoja1"; si no existe, la primera hoja que tenga las 3 columnas
+  var orden = hojas.filter(function(h){ return cartNorm(h.nombre) === 'hoja1'; }).concat(hojas.filter(function(h){ return cartNorm(h.nombre) !== 'hoja1' && cartNorm(h.nombre) !== 'base'; }));
+  for (var hi = 0; hi < orden.length; hi++){
+    var xml = await leer(orden[hi].ruta); if (!xml) continue;
+    var filas = [], cab = null;
+    (xml.match(/<row\b[\s\S]*?<\/row>/g) || []).forEach(function(rw){
+      var cel = {};
+      (rw.match(/<c\b[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g) || []).forEach(function(c){
+        var a = cartAttrs((c.match(/^<c\b([^>]*?)\/?>/) || ['', ''])[1]), v = (c.match(/<v>([\s\S]*?)<\/v>/) || [])[1], val = null;
+        if (a.t === 's' && v != null) val = shared[+v];
+        else if (a.t === 'inlineStr') val = cartXmlDec((c.match(/<t\b[^>]*>([\s\S]*?)<\/t>/) || [])[1] || '');
+        else if (v != null) val = cartXmlDec(v);
+        if (a.r && val != null) cel[cartColNum(a.r)] = val;
+      });
+      if (!cab){
+        var cols = {}; Object.keys(cel).forEach(function(c){ var t = cartNorm(cel[c]); if (t === 'operacion') cols.op = +c; else if (t === 'etapa') cols.et = +c; else if (t === 'analista cobranza') cols.an = +c; });
+        if (cols.op && cols.an) cab = cols;
+        return;
+      }
+      var op = parseInt(cel[cab.op], 10), an = cab.an ? String(cel[cab.an] || '').trim() : '';
+      if (isFinite(op) && an) filas.push({ op: op, etapa: cab.et ? String(cel[cab.et] || '') : '', gestora: an });
+    });
+    if (cab && filas.length) return { hoja: orden[hi].nombre, filas: filas };
+  }
+  throw new Error('No encontré la hoja con las columnas Operación, Etapa y Analista Cobranza.');
+}
+
+ui.cartPuede = false; ui.cartPuedeId = null; ui.cartOpen = false; ui.cartArch = []; ui.cartFilas = []; ui.cartPrev = null; ui.cartBusy = false; ui.cartMsg = ''; ui.cartHecho = null;
+function cartPuedeCheck(){
+  if (!asesoraPin || !asesoraIdActual || ui.cartPuedeId === String(asesoraIdActual)) return;
+  var id = String(asesoraIdActual); ui.cartPuedeId = id;
+  sb.rpc('ec_cartera_puede', { p_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
+    if (String(asesoraIdActual) !== id) return;
+    var ok = !r.error && r.data === true;
+    if (ok !== ui.cartPuede){ ui.cartPuede = ok; render(); }
+  });
+}
+function cartErrTxt(res){
+  if (res.error) return (res.error.code === 'PGRST202') ? 'Falta activar la carga de carteras en Supabase (v62).' : 'Sin conexión. Revisa tu internet.';
+  var e = res.data && res.data.error;
+  if (e === 'permiso') return 'Tu cuenta no tiene permiso para subir carteras.';
+  if (e === 'no_aplicado') return 'No se aplicó: ' + (res.data.gestoras_desconocidas && res.data.gestoras_desconocidas.length ? 'hay cobradoras que no existen en la app (' + res.data.gestoras_desconocidas.join(', ') + ')' : 'no pude identificar suficientes clientes (' + res.data.identificadas + ' de ' + res.data.total + ').');
+  return 'No se pudo completar. Intenta de nuevo.';
+}
+async function cartArchivos(files){
+  ui.cartMsg = ''; ui.cartHecho = null; ui.cartPrev = null; ui.cartBusy = true; ui.cartArch = []; ui.cartFilas = []; render();
+  var vistos = {};
+  for (var i = 0; i < files.length; i++){
+    var f = files[i];
+    try {
+      var r = await xlsxLeerCartera(await f.arrayBuffer());
+      var nuevos = 0; r.filas.forEach(function(x){ if (!vistos[x.op]){ vistos[x.op] = 1; ui.cartFilas.push({ op: x.op, gestora: x.gestora }); nuevos++; } });
+      ui.cartArch.push({ nombre: f.name, n: r.filas.length });
+    } catch (e) { ui.cartArch.push({ nombre: f.name, n: 0, error: String((e && e.message) || e) }); }
+  }
+  if (!ui.cartFilas.length){ ui.cartBusy = false; ui.cartMsg = 'No pude leer clientes de esos archivos. Revisa que sean los Excel de cartera (con la hoja Hoja1).'; render(); return; }
+  var res = await sb.rpc('ec_cartera_subir', { p_id: asesoraIdActual, p_pin: asesoraPin, p_filas: ui.cartFilas, p_aplicar: false, p_proyecto: 'sullana' });
+  ui.cartBusy = false;
+  if (res.error || !res.data || !res.data.ok){ ui.cartMsg = cartErrTxt(res); } else { ui.cartPrev = res.data; }
+  render();
+}
+async function cartAplicar(){
+  if (!ui.cartPrev || ui.cartBusy) return;
+  if (!window.confirm('¿Aplicar esta cartera? Los clientes de las cobradoras se actualizarán ahora mismo.')) return;
+  ui.cartBusy = true; render();
+  var res = await sb.rpc('ec_cartera_subir', { p_id: asesoraIdActual, p_pin: asesoraPin, p_filas: ui.cartFilas, p_aplicar: true, p_proyecto: 'sullana' });
+  ui.cartBusy = false;
+  if (res.error || !res.data || !res.data.ok || !res.data.aplicado){ ui.cartMsg = cartErrTxt(res); render(); return; }
+  ui.cartHecho = res.data; ui.cartPrev = null; ui.cartArch = []; ui.cartFilas = []; ui.cartMsg = '';
+  ui.cob = null; render(); cobranzaCargar();
+}
+function renderCarteraHtml(){
+  var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Cartera de cobranza</div><div class="as-sub">Vive Hogar Sullana · sube los Excel del mes</div></div>'+
+    '<button type="button" class="as-salir" data-action="cart-cerrar">Volver</button></div></div>';
+  h += '<div class="cob-card"><div class="cob-tit">1. Sube los Excel de las cobradoras</div>'+
+    '<p class="cob-vacio">Uno por cobradora (Cinthia, Grimaldina y Romy), los mismos que se mandan cada mes. Se leen en tu navegador y a la app solo viajan el número de operación y la cobradora.</p>'+
+    '<label id="cartDrop" class="cart-drop"><input type="file" id="cartFile" accept=".xlsx" multiple style="display:none"><b>Suelta aquí los archivos</b><span>o toca para elegirlos</span></label>'+
+    (ui.cartBusy ? '<p class="cob-vacio">Leyendo y revisando…</p>' : '')+
+    (ui.cartMsg ? '<div class="cart-aviso">'+esc(ui.cartMsg)+'</div>' : '')+
+    ui.cartArch.map(function(a){ return '<div class="cart-fila"><span>'+esc(a.nombre)+'</span><b>'+(a.error ? esc(a.error) : a.n+' clientes')+'</b></div>'; }).join('')+'</div>';
+  if (ui.cartPrev){
+    var pv = ui.cartPrev, pc = pv.por_cobradora || {};
+    h += '<div class="cob-card"><div class="cob-tit">2. Revisa los cambios</div>'+
+      Object.keys(pc).sort().map(function(g){ return '<div class="cart-fila"><span>'+esc(primerNombre(toTitleCase(g)))+'</span><b>'+pc[g].antes+' → '+pc[g].despues+'</b></div>'; }).join('')+
+      '<div class="cart-fila"><span>Clientes nuevos en una cartera</span><b>'+pv.nuevos+'</b></div>'+
+      '<div class="cart-fila"><span>Cambian de cobradora</span><b>'+pv.cambian+'</b></div>'+
+      '<div class="cart-fila"><span>Salen de las carteras</span><b>'+pv.salen+'</b></div>'+
+      (pv.sin_identificar && pv.sin_identificar.length ? '<div class="cart-aviso">'+pv.sin_identificar.length+' operaciones no se encontraron en las cuotas (clientes muy nuevos o sin cuotas todavía): '+esc(pv.sin_identificar.slice(0, 12).join(', '))+(pv.sin_identificar.length > 12 ? '…' : '')+'. Se pueden asignar luego.</div>' : '')+
+      (pv.gestoras_desconocidas && pv.gestoras_desconocidas.length ? '<div class="cart-aviso">Hay cobradoras que no existen en la app: '+esc(pv.gestoras_desconocidas.join(', '))+'. No se puede aplicar.</div>' : '')+
+      '<button type="button" class="cart-btn" data-action="cart-aplicar"'+((ui.cartBusy || (pv.gestoras_desconocidas && pv.gestoras_desconocidas.length)) ? ' disabled' : '')+'>Aplicar cartera</button></div>';
+  }
+  if (ui.cartHecho){
+    var hh = ui.cartHecho;
+    h += '<div class="cart-ok">✅ Cartera aplicada: '+hh.identificadas+' clientes asignados ('+hh.nuevos+' nuevos, '+hh.cambian+' cambian, '+hh.salen+' salen). Ya la ven las cobradoras.</div>';
+  }
+  return h;
+}
+document.addEventListener('change', function(ev){
+  var t = ev.target; if (t && t.id === 'cartFile' && t.files && t.files.length) cartArchivos(Array.prototype.slice.call(t.files));
+});
+document.addEventListener('dragover', function(ev){ var d = ev.target && ev.target.closest && ev.target.closest('#cartDrop'); if (d){ ev.preventDefault(); d.classList.add('sobre'); } });
+document.addEventListener('dragleave', function(ev){ var d = ev.target && ev.target.closest && ev.target.closest('#cartDrop'); if (d) d.classList.remove('sobre'); });
+document.addEventListener('drop', function(ev){
+  var d = ev.target && ev.target.closest && ev.target.closest('#cartDrop'); if (!d) return;
+  ev.preventDefault(); d.classList.remove('sobre');
+  var fs = Array.prototype.slice.call((ev.dataTransfer && ev.dataTransfer.files) || []).filter(function(f){ return /\.xlsx$/i.test(f.name); });
+  if (fs.length) cartArchivos(fs);
+});
+
 // Probabilidad de que el cliente pague a tiempo, según su historial (cuotas ya vencidas; las más recientes pesan más)
 function cobProbPago(cuotas, hoy, proxima){
   var DIA = 86400000, GRACIA = 3;
@@ -2881,6 +3032,8 @@ function cobDona(vals, cols, labs, tot){
 function renderCobranzaHtml(){
   var salir = (ui.cobAdmin || ui.cobVer) ? '<button type="button" class="as-salir" data-action="cob-cerrar">Volver</button>' : '<button type="button" class="as-salir" data-action="asesor-salir">Salir</button>';
   var nombre = ui.cobAdmin ? ((identity && (identity.nombre || identity.name)) || '') : (asesoraNombreActual || '');
+  cartPuedeCheck();
+  if (ui.cartOpen && ui.cartPuede) return renderCarteraHtml();
   if (!ui.cob){
     var msg = ui.cobErr === 'sin_v18' ? 'Falta activar la actualización de cobranza en Supabase.' : (ui.cobErr === 'red' ? 'Sin conexión. Revisa tu internet.' : 'Cargando tu cartera…');
     return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">'+esc(msg)+'</div></div>'+salir+'</div></div>';
@@ -2894,6 +3047,7 @@ function renderCobranzaHtml(){
     (((ui.cobVer || ui.cobAdmin) && !d.fijo) ? '<div class="cob-chips">'+['sullana','castilla','ejidos','lambayeque'].map(function(p){
       return '<button type="button" class="cob-chip'+(ui.cobProy === p ? ' on' : '')+'" data-action="cob-proy" data-value="'+p+'">'+esc(toTitleCase(p))+'</button>'; }).join('')+'</div>' : '')+
     '</div>';
+  if (ui.cartPuede && (d.proyecto || 'sullana') === 'sullana') h += '<div class="cob-chips"><button type="button" class="cob-chip on" data-action="cart-abrir">⬆ Subir cartera</button></div>';
   if (!tot){
     return h + '<div class="cob-card"><div class="cob-tit">Sin cartera de cobranza</div><p class="cob-vacio">Todavía no hay clientes con cobradora asignada en este proyecto.</p></div>';
   }
@@ -5575,6 +5729,12 @@ document.addEventListener('click', async function(ev){
       cosX.forEach(function(k){ if (k + cosD < 0 || k + cosD >= ui.cosData.meses.length) cosOk = false; });
       if (cosOk){ cosSetIdx(cosX.map(function(k){ return k + cosD; })); cosRender(); }
     }
+  } else if (action === 'cart-abrir'){
+    ui.cartOpen = true; ui.cartArch = []; ui.cartFilas = []; ui.cartPrev = null; ui.cartMsg = ''; ui.cartHecho = null; window.scrollTo(0,0); render();
+  } else if (action === 'cart-cerrar'){
+    ui.cartOpen = false; render();
+  } else if (action === 'cart-aplicar'){
+    cartAplicar();
   } else if (action === 'cob-abrir'){
     ui.cosAdmin = false; ui.cobAdmin = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
   } else if (action === 'cob-proy'){
@@ -8147,7 +8307,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-171108';
+var APP_BUILD = '20261125-183531';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
