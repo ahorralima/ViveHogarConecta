@@ -2532,7 +2532,7 @@ function asesorCargarPanel(){
 // ---------- Costos (solo admin, vista de prueba): presupuesto de la factibilidad vs gasto real ----------
 var COS_REAL_KEY = 'ec_costos_real_v1';
 ui.cosAdmin = false; ui.cosEtapas = []; ui.cosMeses = []; ui.cosPre = false; ui.cosPick = false; ui.cosAnio = ''; ui.cosResAbierto = {}; ui.cosTodas = false;
-ui.cosData = null; ui.cosErr = ''; ui.hdrMas = false; ui.cosProy = 'sullana'; ui.cosCache = {};
+ui.cosData = null; ui.cosErr = ''; ui.hdrMas = false; ui.cosProy = 'sullana'; ui.cosCache = {}; ui.cosVer = false; ui.cosPuede = false; ui.cosPuedeId = null;
 var COS_MESES_TXT = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function cosMesTxt(ym){ var p = String(ym).split('-'), m = COS_MESES_TXT[(parseInt(p[1], 10) || 1) - 1]; return m.charAt(0).toUpperCase() + m.slice(1) + ' ' + p[0]; }
 function cosS(n){ n = Math.round(Number(n) || 0); return (n < 0 ? '-' : '') + 'S/ ' + Math.abs(n).toLocaleString('es-PE'); }
@@ -2563,10 +2563,12 @@ function cosCargar(){
     fetch('costos_' + proy + '.json?v=' + Date.now()).then(function(r){ if (!r.ok) throw new Error('x'); return r.json(); }).then(listo)
       .catch(function(){ ui.cosErr = 'No se encontró el archivo de costos.'; render(); });
   }
-  if (!sessionToken){ if (local){ desdeArchivo(); return; } ui.cosErr = 'Entra como administrador para ver Costos.'; render(); return; }
-  sb.rpc('ec_costos_get', { p_token: sessionToken, p_proyecto: proy }).then(function(r){
+  var comoAsesor = ui.cosVer && asesoraPin && asesoraIdActual;
+  if (!comoAsesor && !sessionToken){ if (local){ desdeArchivo(); return; } ui.cosErr = 'Entra como administrador para ver Costos.'; render(); return; }
+  (comoAsesor ? sb.rpc('ec_costos_get_asesor', { p_id: asesoraIdActual, p_pin: asesoraPin, p_proyecto: proy })
+              : sb.rpc('ec_costos_get', { p_token: sessionToken, p_proyecto: proy })).then(function(r){
     var d = r.data;
-    if (r.error){ if (local){ desdeArchivo(); return; } ui.cosErr = 'Falta activar Costos en Supabase (v55).'; render(); return; }
+    if (r.error){ if (local){ desdeArchivo(); return; } ui.cosErr = 'Falta activar Costos en Supabase (v55 y v56).'; render(); return; }
     if (d && d.ok && d.datos){ listo(d.datos); return; }
     ui.cosErr = (d && d.error === 'codigo') ? 'No tienes acceso a Costos.' : ((d && d.error === 'sin_datos') ? 'Aún no hay presupuesto cargado para este proyecto.' : 'No se pudo cargar Costos.');
     render();
@@ -2747,7 +2749,17 @@ function esCobranza(){
 function cobS(n){ return 'S/ ' + Number(n || 0).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
 function cobF(iso){ if (!iso) return '—'; var p = String(iso).slice(0, 10).split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : '—'; }
 function cobKey(c){ return String(c.dni) + '|' + String(c.manzana) + '|' + String(c.lote); }
+function cosPuede(){
+  if (!asesoraPin || !asesoraIdActual || ui.cosPuedeId === String(asesoraIdActual)) return;
+  var id = String(asesoraIdActual); ui.cosPuedeId = id;
+  sb.rpc('ec_costos_puede', { p_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
+    if (String(asesoraIdActual) !== id) return;
+    var ok = !r.error && r.data === true;
+    if (ok !== ui.cosPuede){ ui.cosPuede = ok; render(); }
+  });
+}
 function cobranzaPuede(){
+  cosPuede();
   if (!asesoraPin || !asesoraIdActual || ui.cobPuedeId === String(asesoraIdActual)) return;
   var id = String(asesoraIdActual); ui.cobPuedeId = id;
   sb.rpc('ec_cobranza_puede', { p_id: asesoraIdActual, p_pin: asesoraPin }).then(function(r){
@@ -2991,7 +3003,7 @@ async function asesorLogin(){
 }
 
 function salirAsesorTotal(msg){
-  ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cob = null;
+  ui.cobVer = false; ui.cobPuede = false; ui.cobPuedeId = null; ui.cob = null; ui.cosVer = false; ui.cosPuede = false; ui.cosPuedeId = null; ui.cosCache = {}; ui.cosData = null;
   salirModoAsesora();
   ui.asesorPanel = null; ui._panelJson = ''; ui.asesorCuentas = null;
   ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null; ui.sepMsg = ''; ui.asesoraError = '';
@@ -3144,7 +3156,7 @@ function renderAsesorPanelHtml(){
   if (cuentas.length > 1){
     h += '<div class="as-cuentas">'+cuentas.map(function(c){
       return '<button type="button" class="as-cuenta'+(String(c.id)===String(p.yo.id)?' on':'')+'" data-action="asesor-cuenta" data-value="'+c.id+'">'+esc(toTitleCase(c.proyecto))+'</button>';
-    }).join('')+(ui.cobPuede ? '<button type="button" class="as-cuenta" data-action="cob-ver">💰 Cobranza</button>' : '')+'</div>';
+    }).join('')+(ui.cobPuede ? '<button type="button" class="as-cuenta" data-action="cob-ver">💰 Cobranza</button>' : '')+(ui.cosPuede ? '<button type="button" class="as-cuenta" data-action="cos-ver">💼 Costos</button>' : '')+'</div>';
   }
   if (!jefe && !vistaEquipo){
     var vv = yo ? yo.ventas : 0, sp = yo ? (yo.separadas || 0) : 0, v = vv + sp, m = yo ? yo.meta : 0;
@@ -5013,6 +5025,7 @@ function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var esAsesor = modoAsesor();
   var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
+  if (esAsesor && ui.cosVer && ui.cosPuede) return '<div class="interesado-screen cob-wrap" style="padding-bottom:64px;">'+renderCostosHtml()+'</div>';
   if (esAsesor && esCobranza()) return '<div class="interesado-screen cob-wrap" style="padding-bottom:64px;">'+renderCobranzaHtml()+'</div>';
   var html = '<div class="interesado-screen" style="padding-bottom:64px;">';
   if (esAsesor){
@@ -5490,9 +5503,11 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'hdr-mas'){
     ui.hdrMas = !ui.hdrMas; render();
   } else if (action === 'cos-abrir'){
-    ui.cosAdmin = true; ui.cobAdmin = false; ui.cobVer = false; ui.hdrMas = true; window.scrollTo(0,0); render(); cosCargar();
+    ui.cosAdmin = true; ui.cosVer = false; ui.cobAdmin = false; ui.cobVer = false; ui.hdrMas = true; window.scrollTo(0,0); render(); cosCargar();
+  } else if (action === 'cos-ver'){
+    ui.cosVer = true; ui.cobVer = false; ui.cosAdmin = false; window.scrollTo(0,0); render(); cosCargar();
   } else if (action === 'cos-cerrar'){
-    ui.cosAdmin = false; render();
+    ui.cosAdmin = false; ui.cosVer = false; render();
   } else if (action === 'cos-todas'){
     ui.cosTodas = !ui.cosTodas; cosRender();
   } else if (action === 'cos-res'){
@@ -5525,7 +5540,7 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'cob-proy'){
     ui.cobProy = t.getAttribute('data-value') || 'sullana'; ui.cobGestora = ''; ui.cobEtapa = ''; ui.cobNivel = 'todos'; ui.cobBusca = ''; ui.cobAbierto = null; ui.cobDet = {}; ui.cob = null; render(); cobranzaCargar();
   } else if (action === 'cob-ver'){
-    ui.cobVer = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
+    ui.cosVer = false; ui.cobVer = true; ui.cobProy = 'sullana'; ui.cobDet = {}; ui.cob = null; ui.cobGestora = ''; ui.cobAbierto = null; window.scrollTo(0,0); render(); cobranzaCargar();
   } else if (action === 'cob-cerrar'){
     ui.cobAdmin = false; ui.cobVer = false; ui.cob = null; render(); if (modoAsesor()) asesorCargarPanel();
   } else if (action === 'cob-nivel'){
@@ -8061,7 +8076,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-121831';
+var APP_BUILD = '20261125-122603';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
