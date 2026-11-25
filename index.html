@@ -6770,7 +6770,7 @@ async function cargarFrescura2nf(){
   try {
     var r = await sb.rpc('ec_2nf_frescura', { p_id: asesoraIdActual, p_pin: asesoraPin });
     if (!r.error && r.data && r.data.ok){
-      var antes = JSON.stringify(ui.frescura2nf); ui.frescura2nf = r.data;
+      var antes = JSON.stringify(ui.frescura2nf); r.data._min = Math.floor(Date.now() / 60000); ui.frescura2nf = r.data;
       return antes !== JSON.stringify(ui.frescura2nf);
     }
   } catch(e){}
@@ -6786,7 +6786,13 @@ function htmlFrescura2nf(sincro){
   var cuando = '';
   try { cuando = d.toLocaleString('es-PE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'America/Lima'}); } catch(e){}
   var h = '<p style="'+st+'">Último movimiento que llegó del 2NF: <strong>'+esc(cuando)+'</strong>'+(sincro ? ' · sincronizado '+esc(fmtFechaCorta(sincro)) : '')+'</p>';
-  if (dias >= 2) h += '<p style="font-size:0.78rem;color:#9a5b00;background:#fff4dc;border-radius:8px;padding:6px 9px;margin:6px 0 0;">⚠️ La copia del 2NF no recibe movimientos desde hace '+dias+' días. Lo que se registre ahora en el 2NF puede tardar en aparecer aquí.</p>';
+  if (f.copia_restaurada){
+    var cm = Math.floor((Date.now() - new Date(f.copia_restaurada).getTime()) / 60000);
+    var hace = cm < 90 ? cm + ' min' : (cm < 2880 ? Math.floor(cm / 60) + ' h' : Math.floor(cm / 1440) + ' días');
+    if (cm >= 60) h += '<p style="font-size:0.78rem;color:#8a1c12;background:#fdecea;border-radius:8px;padding:6px 9px;margin:6px 0 0;">⚠️ <strong>La copia del 2NF está atrasada:</strong> se hizo hace '+hace+'. Lo que se registre ahora en el 2NF no se verá aquí hasta que se renueve.</p>';
+    else if (cm >= 30) h += '<p style="font-size:0.78rem;color:#9a5b00;background:#fff4dc;border-radius:8px;padding:6px 9px;margin:6px 0 0;">⚠️ La copia del 2NF tiene '+hace+' (lo normal es 10 a 15 min). Puede haber ventas recientes que aún no se ven.</p>';
+    else h += '<p style="font-size:0.75rem;color:var(--ink-faint);margin:2px 0 0;">Copia del 2NF de hace '+hace+'</p>';
+  } else if (dias >= 2) h += '<p style="font-size:0.78rem;color:#9a5b00;background:#fff4dc;border-radius:8px;padding:6px 9px;margin:6px 0 0;">⚠️ La copia del 2NF no recibe movimientos desde hace '+dias+' días. Lo que se registre ahora en el 2NF puede tardar en aparecer aquí.</p>';
   return h;
 }
 // Ventas hechas en el 2NF que todavía no están en la app (solo se muestra si el servidor ya las envió)
@@ -8141,7 +8147,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-125758';
+var APP_BUILD = '20261125-171108';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
