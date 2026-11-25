@@ -2550,7 +2550,7 @@ function cosCargar(){
   var proy = ui.cosProy || 'sullana';
   function listo(d){
     ui.cosCache[proy] = d; ui.cosData = d; ui.cosErr = '';
-    if (!ui.cosMeses.length){
+    if (!cosIdx().length && !ui.cosPre){
       var n = new Date(), ym = n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2);
       ui.cosMeses = [d.meses.indexOf(ym) >= 0 ? ym : d.meses[0]];
       ui.cosAnio = ui.cosMeses[0].slice(0, 4);
@@ -2683,12 +2683,14 @@ function cosPicker(){
 function renderCostosHtml(){
   var salir = '<button type="button" class="as-salir" data-action="cos-cerrar">Volver</button>';
   if (!ui.cosData){
-    return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">' + esc(ui.cosErr || 'Cargando costos…') + '</div></div>' + salir + '</div></div>';
+    return '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">' + esc(ui.cosErr || 'Cargando costos…') + '</div></div>' + salir + '</div></div>' +
+      '<div class="cob-chips">' + ['sullana', 'castilla'].map(function(x){ return '<button type="button" class="cob-chip' + ((ui.cosProy || 'sullana') === x ? ' on' : '') + '" data-action="cos-proy" data-value="' + x + '">' + esc(toTitleCase(x)) + '</button>'; }).join('') + '</div>';
   }
   var d = ui.cosData, c = cosCalc(), idx = c.idx, sel = ui.cosEtapas || [];
   var ej = c.totBud ? Math.round(c.totReal * 100 / c.totBud) : 0, sm = cosSem(c.totBud, c.totReal);
   var h = '<div class="as-hero"><div class="as-hero-top"><div><div class="as-hello">Costos 💼</div><div class="as-sub">Vive Hogar ' + esc(toTitleCase(ui.cosProy || 'sullana')) + ' · presupuesto vs gasto real (con IGV)</div></div>' + salir + '</div></div>' +
-    '<div class="cs-aviso">🔒 Vista de prueba, solo para ti. Presupuesto = Flujo de Caja de la factibilidad (25-nov). El gasto real saldrá del EJB cuando esté conectado; por ahora es editable a mano (se guarda solo en este navegador).</div>';
+    '<div class="cs-aviso">🔒 Vista de prueba, solo para ti. Presupuesto = Flujo de Caja de la factibilidad (25-nov). El gasto real saldrá del EJB cuando esté conectado; por ahora es editable a mano (se guarda solo en este navegador).</div>' +
+    '<div class="cob-chips">' + ['sullana', 'castilla'].map(function(x){ return '<button type="button" class="cob-chip' + ((ui.cosProy || 'sullana') === x ? ' on' : '') + '" data-action="cos-proy" data-value="' + x + '">' + esc(toTitleCase(x)) + '</button>'; }).join('') + '</div>';
   // resumen consolidado
   h += '<div class="cob-card"><div class="cob-tit">Resumen del presupuesto<span class="cs-gt">' + esc(cosEtapasTxt()) + ' · todo el período</span></div>' +
     '<div class="cs-tot">' + cosS(c.total) + '</div>' +
@@ -5512,6 +5514,9 @@ document.addEventListener('click', async function(ev){
     ui.cosVer = true; ui.cobVer = false; ui.cosAdmin = false; window.scrollTo(0,0); render(); cosCargar();
   } else if (action === 'cos-cerrar'){
     ui.cosAdmin = false; ui.cosVer = false; render();
+  } else if (action === 'cos-proy'){
+    var cosP = t.getAttribute('data-value') || 'sullana';
+    if (cosP !== ui.cosProy){ ui.cosProy = cosP; ui.cosEtapas = []; ui.cosPick = false; ui.cosResAbierto = {}; ui.cosData = ui.cosCache[cosP] || null; ui.cosErr = ''; cosRender(); cosCargar(); }
   } else if (action === 'cos-todas'){
     ui.cosTodas = !ui.cosTodas; cosRender();
   } else if (action === 'cos-res'){
@@ -8080,7 +8085,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-122904';
+var APP_BUILD = '20261125-124106';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
