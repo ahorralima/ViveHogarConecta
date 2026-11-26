@@ -36,14 +36,14 @@ var HS={
  dorm2:[{to:'sala',u:.21,v:.52,t:'Salir a la sala'}],
  bano:[{to:'sala',u:.69,v:.52,t:'Salir a la sala'}]
 };
-var START={sala:6,dorm1:180,dorm2:180,bano:180};
-var START_LAT={sala:6};
+var START={sala:4,dorm1:180,dorm2:180,bano:180};
+var START_LAT={sala:3};
 var cv=document.getElementById('c'),ld=document.getElementById('ld'),hsBox=document.getElementById('hs');
 var r=new THREE.WebGLRenderer({canvas:cv,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio||1,2));
 var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(75,1,0.1,100);
 var geo=new THREE.SphereGeometry(10,64,40);geo.scale(-1,1,1);
 var mat=new THREE.MeshBasicMaterial({color:0xffffff});sc.add(new THREE.Mesh(geo,mat));
-var lon=270,lat=0,fov=100,cache={},cur=null,tl=new THREE.TextureLoader(),hsEls=[];
+var lon=270,lat=0,fov=110,cache={},cur=null,tl=new THREE.TextureLoader(),hsEls=[];
 function dir(u,v){var th=2*Math.PI*u,ph=Math.PI*v;return new THREE.Vector3(Math.cos(th)*Math.sin(ph),Math.cos(ph),Math.sin(th)*Math.sin(ph));}
 function buildHS(k){
  hsBox.innerHTML='';hsEls=[];
@@ -75,7 +75,7 @@ cv.addEventListener('pointermove',function(e){
  if(!pts[e.pointerId])return;pts[e.pointerId]=[e.clientX,e.clientY];
  var ids=Object.keys(pts);
  if(ids.length>=2){var a=pts[ids[0]],b=pts[ids[1]],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pd)fov=Math.max(50,Math.min(110,fov-(d-pd)*0.15));pd=d;return;}
- var k=fov/90*0.22;lon-=(e.clientX-px)*k;lat=Math.max(-85,Math.min(85,lat+(e.clientY-py)*k));px=e.clientX;py=e.clientY;
+ var k=fov/90*0.15;lon-=(e.clientX-px)*k;lat=Math.max(-85,Math.min(85,lat+(e.clientY-py)*k));px=e.clientX;py=e.clientY;
 });
 function up(e){delete pts[e.pointerId];pd=0;}
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
