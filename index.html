@@ -4811,35 +4811,28 @@ function renderMapaEtapa5Html(etapaN){
   html += '<h4 style="margin-bottom:2px;">Etapa '+esc(ETAPA_ACTUAL)+'</h4>';
   var vistaCliente = !modoAsesor() && !!ui.miCasaKey;
   if (vistaCliente){
-    html += '<div class="etapa5-header-sub">Tu casa está marcada en amarillo en el plano.'+(planoProy() === 'castilla' ? ' Verde: disponible · Gris: no disponible.' : '')+' Puedes acercar y mover el plano con los botones.</div>';
+    html += '<div class="etapa5-header-sub">Tu casa está marcada en amarillo en el plano.'+' Verde: disponible · Naranja: separada · Plateado: vendida.'+' Puedes acercar y mover el plano con los botones.</div>';
     var mlP = String(ui.miCasaKey).split('|');
     html += '<div class="mi-lote-ficha"><div><small>📍 Mi casa</small><strong>Mz. '+esc(mlP[0])+' · Casa '+esc(mlP[1])+'</strong><div style="font-size:0.78rem;color:#7a5a10;">Etapa '+esc(ETAPA_ACTUAL)+'</div></div>'+
       '<button type="button" class="btn btn-primary" style="white-space:nowrap;" data-action="etapa5-ir-mi-lote">Ir a mi casa</button></div>';
     html += '<div class="lote-legend mi-lote-leyenda">'+
       '<span><i class="lote-dot lote-dot-mine"></i> <strong>Tu casa</strong></span>'+
-      (planoProy() === 'sullana'
-        ? '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-vend"></i> Vendida</span>'
-        : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-neutral"></i> No disponible</span>')+
+      '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
       '<span><i class="lote-dot lote-dot-area"></i> Parque</span></div>';
   } else {
   html += '<div class="etapa5-header-sub">'+(etapa5Disponibles === 0 ? 'Por ahora no hay lotes disponibles en esta etapa (los demás están vendidos o separados)' : 'Elige tu casa · '+etapa5Disponibles+(etapa5Disponibles === 1 ? ' lote disponible' : ' lotes disponibles'))+'</div>';
-  html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>'+(planoProy() === 'sullana' ? 'blanca' : 'verde')+'</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
+  html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>'+'verde'+'</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
   var nSep = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'SEPARADO' || l.e === 'BLOQUEADO'; }).length;
   var nVen = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'VENDIDO'; }).length;
   html += '<div class="e5-conteo"><span class="e5-c-ok">✔ '+etapa5Disponibles+' disponibles</span>'+
-    (planoProy() === 'sullana' ? '<span class="e5-c-sep">◔ '+nSep+' separadas</span><span class="e5-c-ven">✖ '+nVen+' vendidas</span>' : '<span class="e5-c-ven">'+(ETAPA5_LOTES_PLANO.length-etapa5Disponibles)+' no disponibles</span>')+'</div>';
+    '<span class="e5-c-sep">◔ '+nSep+' separadas</span><span class="e5-c-ven">✖ '+nVen+' vendidas</span></div>';
   html += '<div class="e5-buscar"><span class="e5-b-t">🔎 Buscar casa</span>'+
     '<input id="e5-b-mz" class="e5-b-in" type="text" inputmode="text" autocapitalize="characters" maxlength="4" placeholder="Mz" aria-label="Manzana" />'+
     '<input id="e5-b-lt" class="e5-b-in" type="text" inputmode="numeric" maxlength="4" placeholder="Lt" aria-label="Número de lote" />'+
     '<button type="button" class="btn btn-primary e5-b-go" data-action="etapa5-buscar">Ir</button></div>'+
     (ui.etapa5BuscarMsg ? '<div class="e5-b-msg">'+esc(ui.etapa5BuscarMsg)+'</div>' : '');
   html += '<div class="lote-legend">'+
-    (planoProy() === 'sullana'
-      ? '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span>'+
-        '<span><i class="lote-dot lote-dot-sep"></i> Separación</span>'+
-        '<span><i class="lote-dot lote-dot-vend"></i> Venta (vendida)</span>'
-      : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span>'+
-        '<span><i class="lote-dot lote-dot-neutral"></i> No disponible (vendida o separada)</span>')+
+    '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
     '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
     '<span><i class="lote-dot lote-dot-area"></i> Parque</span>'+
   '</div>';
@@ -4961,9 +4954,8 @@ function renderMapaEtapa5Html(etapaN){
       }).join('')+
       ETAPA5_LOTES_PLANO.map(function(l){
         var key = l.m+'|'+l.l;
-        var cls = planoProy() === 'sullana'
-          ? (l.e === 'DISPONIBLE' ? 'lote-libre' : (l.e === 'VENDIDO' ? 'lote-vend' : 'lote-sep'))
-          : (l.e === 'DISPONIBLE' ? 'lote-ok' : 'lote-neutral');
+        // Colores iguales en todos los planos: verde = disponible, plateado = vendida, naranja = separada
+        var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : (l.e === 'VENDIDO' ? 'lote-neutral' : 'lote-warn');
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
         
         var isSel = ui.interesadoLoteSel === key;
@@ -7489,7 +7481,7 @@ function computeEtapa5FitZoom(outer){
   if (isFull){
     // Plano muy ancho (como la Etapa 1) en pantalla alta: se acerca y se empieza por la izquierda,
     // en vez de mostrarlo diminuto con mucho espacio vacío arriba y abajo
-    if (bboxWidthPx/bboxHeightPx > 1.4){
+    if (bboxWidthPx/bboxHeightPx > 1.4 && ch > cw){   // solo en pantalla vertical; en horizontal se ve el plano completo
       var sc2 = Math.min(4, scale*2.2);
       return clampZoom({scale:sc2, x: cw*0.03 - bboxLeftPx*sc2, y: ch/2 - (bboxTopPx + bboxHeightPx/2)*sc2}, cw, ch);
     }
@@ -7904,9 +7896,7 @@ function pdfPlanoCanvas(mz, loteNum){
 function cotTelGuardado(){ try { return localStorage.getItem('ec_asesora_tel_v1') || ''; } catch(e){ return ''; } }
 function etapaLeyendaOverlay(){
   return '<div class="mapa-gen-leyenda" style="bottom:calc(env(safe-area-inset-bottom,0px) + 8px);">'+
-    (planoProy() === 'sullana'
-      ? '<span><i class="lote-dot lote-dot-libre"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-vend"></i> Vendida</span>'
-      : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-neutral"></i> No disponible</span>')+
+    '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
     '<span><i class="lote-dot lote-dot-sel"></i> Seleccionada</span><span><i class="lote-dot lote-dot-area"></i> Parque</span></div>';
 }
 function etapaKeysOrden(){ return Object.keys(planosDeProy()).sort(function(a,b){ return parseInt(a,10)-parseInt(b,10); }); }
@@ -8406,7 +8396,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-183824';
+var APP_BUILD = '20261126-184320';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
