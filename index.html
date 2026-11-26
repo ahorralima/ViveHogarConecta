@@ -2306,16 +2306,19 @@ function renderMiCasa(){
     '</div>'+
   '</div>';
 
-  if (miProySlug() === 'castilla' || esSullana){
+  if (miProySlug() === 'castilla' || esSullana || miProySlug() === 'ejidos'){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Así se entrega tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Así recibes tu vivienda. Imagen <strong>referencial</strong>.</p>'+
       '<div class="media-img-wrap"><a href="casas/entrega-patio.jpg" target="_blank" rel="noopener"><img src="casas/entrega-patio.jpg" alt="Patio posterior de tu casa, con lavadero y tendedero" loading="lazy" style="width:100%;max-width:520px;border-radius:12px;display:block;margin:0 auto;" /></a></div>'+
       '<p style="font-size:0.8rem;color:var(--ink-faint);margin-top:6px;text-align:center;">Patio posterior con lavadero y tendedero</p></div>';
+    // Las opciones de fachada y el recorrido 3D son de Sullana y Castilla; Ejidos solo muestra la foto de entrega
+    if (miProySlug() !== 'ejidos'){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Opciones para tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda. Imágenes y recorrido 3D <strong>referenciales</strong>: la casa que se entrega puede variar en acabados y detalles.</p>'+
       galeriaCasaHtml()+
       '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a>'+
       '<p style="font-size:0.78rem;color:var(--ink-faint);margin-top:6px;text-align:center;">Recorre la casa por dentro, cuarto por cuarto.</p></div>';
+    }
   }
 
   if (esSullana && etapaTienePlano(etapaNum)){
@@ -8354,7 +8357,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-171651';
+var APP_BUILD = '20261126-171927';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
