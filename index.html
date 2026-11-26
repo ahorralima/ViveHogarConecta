@@ -820,6 +820,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .entrega-next{right:8px;}
 .entrega-fin .entrega-prev{display:block;}
 .entrega-fin .entrega-next{display:none;}
+.as-num{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--surface-2,#eef2f6);color:var(--ink-soft);font-size:0.74rem;font-weight:700;margin-right:8px;}
 .renders-gallery{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
 .renders-gallery-item{flex:none;width:240px;scroll-snap-align:start;}
 .renders-gallery-item .media-img-wrap{position:relative;}
@@ -6446,6 +6447,10 @@ document.addEventListener('click', async function(ev){
   } else if (action === 'entrega-flecha'){
     var carE = document.getElementById('entrega-car');
     if (carE){ carE.scrollBy({left: parseInt(t.getAttribute('data-value'),10) * carE.clientWidth, behavior:'smooth'}); }
+  } else if (action === 'v2nf-todas'){
+    ui.v2nfTodas = !ui.v2nfTodas; render();
+  } else if (action === 'ventas-todas'){
+    ui.ventasTodas = !ui.ventasTodas; render();
   } else if (action === 'etapa5-zoom'){
     var dir = t.getAttribute('data-value');
     var z = ui.etapa5Zoom || {scale:1,x:0,y:0};
@@ -7105,10 +7110,11 @@ function renderVentas2nfHtml(){
   if (!vm.items.length) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">No hay ventas de '+esc(mesTxt)+' en el 2NF que falten en la app.</p></div>';
   var total = 0; vm.items.forEach(function(v){ total += Number(v.monto) || 0; });
   h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' de '+esc(mesTxt)+' registrada'+(vm.items.length===1?'':'s')+' en el 2NF que aún no aparece'+(vm.items.length===1?'':'n')+' en la app · separaciones: <strong>'+fmtMoney(total)+'</strong>. Si la casa ya está en la app, no se repite aquí. Toca una venta para ver el detalle.</p>';
-  vm.items.forEach(function(v){
+  var lim2 = ui.v2nfTodas ? vm.items.length : 5;
+  vm.items.slice(0, lim2).forEach(function(v, i){
     var abierta = String(ui.v2nfAbierta) === String(v.id);
     h += '<div class="as-hist" style="cursor:pointer;" role="button" tabindex="0" data-action="v2nf-toggle" data-value="'+esc(v.id)+'">'+
-      '<div class="as-hist-top"><span><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+esc(v.estatus_desc || '')+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
+      '<div class="as-hist-top"><span><b class="as-num">'+(i+1)+'</b><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+esc(v.estatus_desc || '')+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
       '<div>Asesor: <b>'+esc(toTitleCase(v.asesor || '—'))+'</b> · Separación <b>'+(v.monto != null ? fmtMoney(v.monto) : '—')+'</b></div>';
     if (abierta){
       h += '<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">'+
@@ -7120,6 +7126,7 @@ function renderVentas2nfHtml(){
     }
     h += '</div>';
   });
+  if (vm.items.length > 5) h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="v2nf-todas">'+(ui.v2nfTodas ? 'Ver menos' : 'Ver todas ('+vm.items.length+')')+'</button>';
   h += htmlFrescura2nf(vm.actualizado);
   return h+'</div>';
 }
@@ -7136,11 +7143,12 @@ function renderVentasMesHtml(){
   var total = 0, nPend = 0; vm.items.forEach(function(v){ if (v.aprobacion === 'pendiente') nPend++; else total += Number(v.monto) || 0; });
   h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+vm.items.length+'</strong> casa'+(vm.items.length===1?'':'s')+' · separaciones cobradas: <strong>'+fmtMoney(total)+'</strong>.'+(nPend ? ' <strong style="color:var(--danger,#b3261e);">⏳ '+nPend+' por aprobar.</strong>' : '')+' Toca una venta para ver el detalle.</p>'+
     (esJefe() && !puedeReporteVentas() && !puedeReporteCastilla() ? '<button type="button" class="btn btn-secondary btn-block" style="margin:0 0 10px;" data-action="ventas-excel">📊 Exportar a Excel</button>' : '');
-  vm.items.forEach(function(v){
+  var limV = ui.ventasTodas ? vm.items.length : 5;
+  vm.items.slice(0, limV).forEach(function(v, i){
     var abierta = String(ui.ventaAbierta) === String(v.id);
     var chip = (v.aprobacion === 'pendiente' ? '⏳ Por aprobar' : (v.estado === 'comprada' ? 'Vendida' : 'Separada')) + (v.exige_pago2 ? (v.pago2_en ? ' · 2.ª boleta ✅' : ' · ⏳ falta 2.ª boleta') : '') + ((esJefe() && !v.dni) ? ' · ⚠️ DNI pendiente' : '');
     h += '<div class="as-hist" style="cursor:pointer;" role="button" tabindex="0" data-action="venta-toggle" data-value="'+v.id+'">'+
-      '<div class="as-hist-top"><span><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+chip+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
+      '<div class="as-hist-top"><span><b class="as-num">'+(i+1)+'</b><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+chip+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
       '<div>Asesor: <b>'+esc(toTitleCase(v.asesor || '—'))+'</b></div>';
     if (abierta){
       var img = ui.ventaImg[v.id];
@@ -7173,6 +7181,7 @@ function renderVentasMesHtml(){
     }
     h += '</div>';
   });
+  if (vm.items.length > 5) h += '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="ventas-todas">'+(ui.ventasTodas ? 'Ver menos' : 'Ver todas ('+vm.items.length+')')+'</button>';
   return h+'</div>';
 }
 
@@ -8387,7 +8396,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-182640';
+var APP_BUILD = '20261126-183348';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
