@@ -477,6 +477,19 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   .gn-b1,.gn-b2{padding:18px 20px;font-size:1.15rem;}
   .gn-ref{display:none;}
 }
+/* Pantallas grandes (Mac / monitor): logo, textos y botones crecen con el ancho de la pantalla */
+@media (min-width:1500px){
+  .gn-herologo{height:clamp(120px,7.5vw,300px);top:clamp(24px,2vw,60px);padding:clamp(10px,.8vw,26px) clamp(18px,1.4vw,44px);border-radius:clamp(18px,1.4vw,36px);}
+  .gn-card{flex:0 0 clamp(640px,36vw,1300px);max-width:none;padding:clamp(40px,3.6vw,130px);gap:clamp(18px,1.5vw,44px);}
+  .gn-card h1{font-size:clamp(2.3rem,2.7vw,5rem);}
+  .gn-card h1 em::after{height:clamp(4px,.35vw,9px);}
+  .gn-trust{gap:clamp(12px,1vw,30px);}
+  .gn-trust div{font-size:clamp(.9rem,1.05vw,1.9rem);padding:clamp(16px,1.3vw,40px) clamp(12px,1vw,30px);border-radius:clamp(14px,1.1vw,30px);gap:clamp(8px,.8vw,24px);}
+  .gn-trust div:first-child span b{font-size:clamp(1.3rem,1.7vw,3.2rem);}
+  .gn-trust svg{width:clamp(30px,2.2vw,64px);height:clamp(30px,2.2vw,64px);}
+  .gn-b1,.gn-b2{font-size:clamp(1.15rem,1.4vw,2.6rem);padding:clamp(18px,1.6vw,52px) clamp(20px,1.6vw,52px);border-radius:clamp(14px,1.1vw,32px);}
+  .gn-b1 svg,.gn-b2 svg{width:clamp(22px,1.7vw,52px);height:clamp(22px,1.7vw,52px);}
+}
 .gate-new{min-height:100vh;display:flex;justify-content:center;background:#e9efe6;}
 .gate-new-in{width:100%;max-width:520px;background:#fff;display:flex;flex-direction:column;min-height:100vh;}
 .gate-car{position:relative;flex:1 1 auto;min-height:300px;background:#cfd8cf;overflow:hidden;touch-action:pan-y;}
@@ -3821,7 +3834,7 @@ setTimeout(gnSiguiente, 9000);
 function renderGate(){
   var ico = 'width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3f9a3a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
   return '<div class="gn"><div class="gn-in">'+
-    '<div class="gn-herow"><picture><source media="(min-width:900px)" srcset="portada/portada_hero.jpg" /><img class="gn-hero" src="portada/portada_hero_tel.jpg" alt="Vive Hogar Castilla" /></picture>'+GATE_FOTOS.map(function(src){ return '<img class="gn-alt" src="'+src+'" alt="Vive Hogar Castilla" />'; }).join('')+'<img class="gn-herologo" src="portada/logo_c.png" alt="Vive Hogar" /></div>'+
+    '<div class="gn-herow"><picture><source media="(min-width:900px)" srcset="portada/portada_pc_hd.jpg" /><img class="gn-hero" src="portada/portada_hero_tel.jpg" alt="Vive Hogar Castilla" /></picture>'+GATE_FOTOS.map(function(src){ return '<img class="gn-alt" src="'+src+'" alt="Vive Hogar Castilla" />'; }).join('')+'<img class="gn-herologo" src="portada/logo_c_hd.png" alt="Vive Hogar" /></div>'+
     '<div class="gn-card">'+
       '<h1>Tu casa propia,<em>cada vez más cerca</em></h1>'+
       '<div class="gn-trust">'+
@@ -8307,7 +8320,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-183531';
+var APP_BUILD = '20261125-191311';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
