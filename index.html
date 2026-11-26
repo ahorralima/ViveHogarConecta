@@ -4965,6 +4965,25 @@ function renderMapaEtapa5Html(etapaN){
         lote = null;
       }
     }
+    // Cliente viendo SU casa: ficha simple con solo lo suyo (sin precio total, Bono ni descuentos)
+    if (lote && !modoAsesor() && ui.miCasaKey && ui.miCasaKey === lote.m+'|'+lote.l){
+      html += '<div class="lote-detail-card" style="margin-top:12px;">'+
+        '<div class="lote-summary-strip">'+
+          '<div class="lote-summary-label">📍 Tu casa</div>'+
+          '<div class="lote-summary-top"><span class="lote-summary-id">Mz. '+esc(lote.m)+' · Lt. '+esc(String(lote.l).padStart(2,'0'))+'</span></div>'+
+          '<div class="lote-summary-sub">Etapa '+esc(ETAPA_ACTUAL)+' · Vista '+(lote.v ? 'a '+esc(lote.v.toLowerCase()) : 'interior')+'</div>'+
+          '<div class="lote-summary-grid">'+
+            '<div><span>Área del terreno</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
+            '<div><span>Tu pago (precio cliente)</span><strong>'+fmtMoney(loteInicial(lote))+'</strong></div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="padding:12px 16px 16px;">'+
+          '<p style="font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;">Mira tus cuotas, las fechas de pago y cómo pagar.</p>'+
+          '<button type="button" class="btn btn-primary btn-block" data-action="nav" data-value="cuotas">Ver mis cuotas →</button>'+
+        '</div>'+
+      '</div>';
+      lote = null;
+    }
     if (lote){
       var estadoInfo = estInfo(lote.e);
       html += '<div class="lote-detail-card" style="margin-top:12px;">';
@@ -4974,7 +4993,7 @@ function renderMapaEtapa5Html(etapaN){
           '<span class="cuota-chip cuota-chip-'+estadoInfo.cls+'">'+estadoInfo.txt+'</span>'+
           '<span class="lote-summary-id">Mz. '+esc(lote.m)+' · Lt. '+esc(String(lote.l).padStart(2,'0'))+'</span>'+
         '</div>'+
-        '<div class="lote-summary-sub">Etapa '+esc(ETAPA_ACTUAL)+' · Vista '+(lote.v ? 'a '+esc(lote.v.toLowerCase()) : '—')+'</div>'+
+        '<div class="lote-summary-sub">Etapa '+esc(ETAPA_ACTUAL)+' · Vista '+(lote.v ? 'a '+esc(lote.v.toLowerCase()) : 'interior')+'</div>'+
         '<div class="lote-summary-grid">'+
           '<div><span>Área del terreno</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
           '<div><span>Precio total</span><strong>'+precioHtml(lote)+'</strong></div>'+
@@ -4985,7 +5004,7 @@ function renderMapaEtapa5Html(etapaN){
       html += '<div class="lote-detail-section">'+
         '<div class="lote-detail-section-title">✅ Información</div>'+
         '<div class="lote-detail-grid">'+
-          '<div class="lote-detail-tile"><span>Vista</span><strong>'+esc(lote.v||'—')+'</strong></div>'+
+          '<div class="lote-detail-tile"><span>Vista</span><strong>'+esc(lote.v||'Interior')+'</strong></div>'+
           '<div class="lote-detail-tile"><span>Área</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div>'+
         '</div>'+
       '</div>';
@@ -8331,7 +8350,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-170946';
+var APP_BUILD = '20261126-171437';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
