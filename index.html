@@ -4788,6 +4788,14 @@ function limpioMzSvg(){
 function renderMapaEtapa5Html(etapaN){
   etapaPlanoActivar(etapaN || '5');
   asegurarEtapa5Lotes();
+  if ((etapa5LotesEstado === 'pendiente' || etapa5LotesEstado === 'cargando') && ui.etapa5Full){
+    // Al pasar de etapa con el plano a pantalla completa, se queda a pantalla completa mientras carga
+    return '<div class="mapa-zoom-outer mapa-full" id="etapa5-carga">'+
+      '<button type="button" class="mapa-full-close" data-action="etapa5-full-cerrar" aria-label="Cerrar plano">✕</button>'+
+      (!ui.miCasaKey ? etapaNavHtml() : '')+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">'+
+        '<div class="spinner"></div><p style="margin-top:12px;color:var(--ink-soft);">Cargando el mapa de lotes…</p></div></div>';
+  }
   if (etapa5LotesEstado === 'pendiente' || etapa5LotesEstado === 'cargando'){
     return '<div class="mapa-vhs-detail"><div class="interesado-loading" style="position:static;min-height:240px;padding:24px;">'+
       '<div class="spinner"></div><p style="margin-top:12px;color:var(--ink-soft);">Cargando el mapa de lotes…</p></div></div>';
@@ -4938,6 +4946,8 @@ function renderMapaEtapa5Html(etapaN){
   html += '<div class="mapa-zoom-outer'+(isFull?' mapa-full':'')+'" id="etapa5-zoom">'+
     (isFull ? '<button type="button" class="mapa-full-close" data-action="etapa5-full-cerrar" aria-label="Cerrar plano">✕</button>' : '')+
     (isFull ? '<img class="mapa-full-logo" src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />' : '')+
+    // Título de la etapa y flechas para pasar a la anterior/siguiente (no para el cliente que ve solo su casa)
+    (isFull && !ui.miCasaKey ? etapaNavHtml() : '')+
     '<div class="mapa-zoom-inner" id="etapa5-zoom-inner">'+
     '<div class="mapa-vhs-wrap mapa-lotes-wrap'+(etapaPlanoCfg().real?' mapa-real':' mapa-calles')+(etapaPlanoCfg().limpio?' limpio':'')+(planoProy()!=='sullana'?' park-prop':'')+'">'+
       '<img class="mapa-vhs-img" src="'+etapaPlanoCfg().img+'" alt="Plano de la Etapa '+esc(ETAPA_ACTUAL)+' de '+esc(PROY_NOMBRES[planoProy()])+'" />'+
@@ -5528,7 +5538,7 @@ function renderApp(){
 function render(){
   if (apagadaOn) return;
   renderApp();
-  var planoAbierto = !!document.getElementById('etapa5-zoom');
+  var planoAbierto = !!document.getElementById('etapa5-zoom') || !!document.getElementById('etapa5-carga');
   if (!planoAbierto) ui.etapa5Full = false;
   document.body.style.overflow = (planoAbierto && ui.etapa5Full) ? 'hidden' : '';
 }
@@ -8396,7 +8406,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-183348';
+var APP_BUILD = '20261126-183824';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
