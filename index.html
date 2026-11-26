@@ -2285,7 +2285,9 @@ function renderMiCasa(){
   var etapaNum = (localPref && localPref.etapa) ? String(localPref.etapa) : '';
   if (clienteEsDemo()) etapaNum = DEMO_ETAPA_POR_PROY[miProySlug()] || '1';
   // Por ahora solo la Etapa 16 de Castilla tiene plano para el cliente; las demas muestran "en preparacion"
-  var planoCastilla = (miProySlug() === 'castilla' && ETAPAS_PLANO_PROY.castilla && etapaNum === '16') ? '16' : '';
+  // Ejidos: sus etapas con plano (1 a 4) tambien se muestran, con la casa del cliente marcada
+  var planoCastilla = ((miProySlug() === 'castilla' && ETAPAS_PLANO_PROY.castilla && etapaNum === '16') ||
+    (miProySlug() === 'ejidos' && ETAPAS_PLANO_PROY.ejidos && ETAPAS_PLANO_PROY.ejidos[etapaNum])) ? etapaNum : '';
   // Si el plano es el de la etapa del cliente, se marca su casa; si es otro (p. ej. Etapa 16), se muestra sin marca
   var planoEsSuyo = esSullana ? etapaTienePlano(etapaNum) : (!!planoCastilla && planoCastilla === etapaNum);
   if (!clienteEsDemo() && planoEsSuyo && clienteBloqueVerificado && clienteLoteVerificado){
@@ -8320,7 +8322,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261125-194159';
+var APP_BUILD = '20261126-170620';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
