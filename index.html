@@ -2326,21 +2326,6 @@ function renderMiCasa(){
     '</div></div>';
   }
 
-  if (clienteGestoraNombre && clienteGestoraTelefono){
-    html += '<div class="panel"><h4 style="margin-bottom:10px;">Pagar mi cuota</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Tu gestora de cobranza es <strong>'+esc(toTitleCase(clienteGestoraNombre))+'</strong>. Paga con cualquiera de estas opciones y envíale el comprobante por WhatsApp.</p>'+
-      '<div class="pago-opcion">'+
-        '<div class="pago-opcion-label">Yape o Plin</div>'+
-        '<div class="lote-row-precio" style="font-size:1.2rem;">'+esc(clienteGestoraTelefono.replace(/^51/,''))+'</div>'+
-      '</div>'+
-      '<div class="pago-opcion">'+
-        '<div class="pago-opcion-label">Depósito o transferencia bancaria</div>'+
-        '<div class="pago-cuenta"><span>Cuenta corriente</span><strong>193-2532588-0-95</strong></div>'+
-        '<div class="pago-cuenta"><span>Cuenta recaudadora</span><strong>194-9912210-0-32</strong></div>'+
-      '</div>'+
-      '<a class="btn btn-primary btn-block" style="margin-top:4px;" href="https://wa.me/'+esc(clienteGestoraTelefono)+'?text='+encodeURIComponent('Hola, te acabo de hacer el pago de mi cuota, te comparto el comprobante.')+'" target="_blank" rel="noopener">💬 Enviar comprobante por WhatsApp</a>'+
-    '</div>';
-  }
   return html;
 }
 
@@ -4103,6 +4088,27 @@ function cuotaRowHtml(r, kind, idx){
   '</div>';
 }
 
+// Datos para pagar (gestora de cobranza, Yape/Plin, cuentas): se muestran en Mis cuotas
+function pagarMiCuotaHtml(){
+  var html = '';
+  if (clienteGestoraNombre && clienteGestoraTelefono){
+    html += '<div class="panel"><h4 style="margin-bottom:10px;">Pagar mi cuota</h4>'+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Tu gestora de cobranza es <strong>'+esc(toTitleCase(clienteGestoraNombre))+'</strong>. Paga con cualquiera de estas opciones y envíale el comprobante por WhatsApp.</p>'+
+      '<div class="pago-opcion">'+
+        '<div class="pago-opcion-label">Yape o Plin</div>'+
+        '<div class="lote-row-precio" style="font-size:1.2rem;">'+esc(clienteGestoraTelefono.replace(/^51/,''))+'</div>'+
+      '</div>'+
+      '<div class="pago-opcion">'+
+        '<div class="pago-opcion-label">Depósito o transferencia bancaria</div>'+
+        '<div class="pago-cuenta"><span>Cuenta corriente</span><strong>193-2532588-0-95</strong></div>'+
+        '<div class="pago-cuenta"><span>Cuenta recaudadora</span><strong>194-9912210-0-32</strong></div>'+
+      '</div>'+
+      '<a class="btn btn-primary btn-block" style="margin-top:4px;" href="https://wa.me/'+esc(clienteGestoraTelefono)+'?text='+encodeURIComponent('Hola, te acabo de hacer el pago de mi cuota, te comparto el comprobante.')+'" target="_blank" rel="noopener">💬 Enviar comprobante por WhatsApp</a>'+
+    '</div>';
+  }
+  return html;
+}
+
 function renderCuotas(){
   var html = '<div class="back-row"><button type="button" class="back-btn" data-action="nav" data-value="home">← Volver</button></div>';
   html += '<h2 style="margin-bottom:4px;">Mis cuotas</h2>';
@@ -4145,6 +4151,7 @@ function renderCuotas(){
       '<p style="color:var(--ink-faint);font-size:0.82rem;margin-top:4px;">Si ya realizaste pagos, podemos ayudarte a asociar tu historial. Al escribirnos, ten a mano tu nombre completo, tu DNI y tu manzana y lote.</p>'+
       '<a class="btn btn-primary btn-block" style="margin-top:14px;" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, no veo mis cuotas registradas en la app y ya hice pagos. ¿Me ayudan a asociar mi historial?')+'" target="_blank" rel="noopener">Solicitar ayuda</a>'+
     '</div>';
+    html += pagarMiCuotaHtml();
     return html;
   }
 
@@ -4172,6 +4179,8 @@ function renderCuotas(){
       '<p style="font-size:0.85rem;color:var(--ink-soft);">Vence '+fmtFechaAbs(r.proxima.fecha_vencimiento)+'</p>'+
     '</div>';
   }
+
+  html += pagarMiCuotaHtml();
 
   if (r.atrasadas.length){
     html += '<div class="panel"><h4>⚠️ Cuotas vencidas ('+r.atrasadas.length+')</h4><div class="cuota-list">'+
@@ -8322,7 +8331,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-170620';
+var APP_BUILD = '20261126-170946';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
