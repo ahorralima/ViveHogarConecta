@@ -459,6 +459,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .gn-b1,.gn-b2{display:flex;align-items:center;justify-content:space-between;width:100%;border-radius:14px;padding:16px 18px;font-size:1.05rem;font-weight:700;font-family:inherit;cursor:pointer;}
 .gn-b1{background:#2e7d32;color:#fff;border:0;}
 .gn-b2{background:#fff;color:#2e7d32;border:2px solid #2e7d32;}
+.gn-b3{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:14px;padding:15px 18px;font-size:1.05rem;font-weight:700;font-family:inherit;cursor:pointer;background:#eaf5e8;color:#2e7d32;border:0;margin-top:2px;}
 .gn-b1 span,.gn-b2 span{flex:1;text-align:center;}
 .gn-b1 svg,.gn-b2 svg{flex:none;}
 .gn-ref{display:flex;align-items:center;justify-content:center;gap:12px;font-size:.95rem;font-weight:500;color:#2e7d32;margin-top:6px;}
@@ -1343,7 +1344,7 @@ var GATE_AERIAL_DATAURI = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2w
 var PROYECTOS = [
   {id:1, nombre:'Vive Hogar Castilla', ciudad:'Piura', lat:-5.1593648, lng:-80.5039108},
   {id:2, nombre:'Vive Hogar Sullana', ciudad:'Sullana', lat:-4.9493673, lng:-80.6961149},
-  {id:3, nombre:'Vive Hogar Ejidos', ciudad:'', lat:null, lng:null},
+  {id:3, nombre:'Vive Hogar Ejidos', ciudad:'Piura', lat:-5.1348125, lng:-80.6795625},
   {id:4, nombre:'Vive Hogar Lambayeque', ciudad:'', lat:null, lng:null}
 ];
 var PROY_SLUG_POR_ID = {1:'castilla', 2:'sullana', 3:'ejidos', 4:'lambayeque'};
@@ -2449,6 +2450,18 @@ ui.ofMz = '';
 ui.newAsesor = '';
 
 function modoAsesor(){ return appGate === 'asesor' && !!asesoraPin && !!asesoraIdActual; }
+// Visitante = entró por "Quiero mi casa" (sin cuenta): ve planos y casas, pero NUNCA precios ni simulador
+// Prueba privada: el botón "Quiero mi casa" y el modo sin precios solo se activan en el teléfono donde se abrió el enlace con ?quiero=1
+function betaVisitante(){
+  try {
+    if (/[?&]quiero=1/.test(location.search)) localStorage.setItem('ec_beta_visitante', '1');
+    if (/[?&]quiero=0/.test(location.search)) localStorage.removeItem('ec_beta_visitante');
+    return localStorage.getItem('ec_beta_visitante') === '1';
+  } catch(e){ return false; }
+}
+function esVisitante(){ return betaVisitante() && appGate === 'interesado' && !modoAsesor() && !ui.miCasaKey; }
+var VHS_WA_VISITA = { castilla: '51966704021', sullana: '51934042610', ejidos: '51965302079' };
+function waVisita(proy, texto){ return 'https://wa.me/'+(VHS_WA_VISITA[proy] || VHS_WHATSAPP)+'?text='+encodeURIComponent(texto); }
 function esJefe(){ return !!(ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.rol === 'jefe'); }
 function sepMonto(){
   return SEPARACION_LOTE;   // la separación es S/ 500 en todos los proyectos
@@ -2464,6 +2477,7 @@ function lotePrecio(l){ return l.of ? l.of : l.pv; }
 // Inicial del cliente = precio de la casa menos el Bono Familiar Habitacional (lo paga el Estado)
 function loteInicial(l){ return Math.max(0, lotePrecio(l) - VHS_BFH_SULLANA); }
 function precioHtml(l){
+  if (esVisitante()) return '';
   if (l.e === 'DISPONIBLE' && l.of) return '<span class="precio-oferta"><s>'+fmtMoney(l.pv)+'</s><b>'+fmtMoney(l.of)+'</b></span>';
   return fmtMoney(l.pv);
 }
@@ -3865,6 +3879,7 @@ function renderGate(){
       '</div>'+
       '<button type="button" class="gn-b1" data-action="gate-cliente"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Ingresar como cliente</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>'+
       '<button type="button" class="gn-b2" data-action="gate-asesor"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M11 13v2h2v-2"/></svg><span>Ingresar como asesor</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>'+
+      (betaVisitante() ? '<button type="button" class="gn-b3" data-action="gate-interesado">Quiero mi casa · Ver proyectos</button>' : '')+
     '</div>'+
     '<div class="gn-ref" style="padding:16px 0 calc(18px + env(safe-area-inset-bottom,0px));"><u></u>Vive Hogar<u></u></div>'+
   '</div></div>';
@@ -4563,8 +4578,8 @@ var VHS_ENTORNO = {
 function renderEntornoChips(){
   var e = VHS_ENTORNO;
   var chips = [];
-  if (e.viaPrincipal) chips.push('🛣️ Cerca de la '+esc(e.viaPrincipal));
-  (e.referencias||[]).forEach(function(r){ chips.push(esc(r.icon)+' '+esc(r.label)); });
+  if (e.viaPrincipal) chips.push('Cerca de la '+esc(e.viaPrincipal));
+  (e.referencias||[]).forEach(function(r){ chips.push(esc(r.label)); });
   var catIcons = {educacion:'🏫', comercio:'🛒', salud:'🏥', transporte:'🚌'};
   Object.keys(catIcons).forEach(function(cat){
     var items = e[cat];
@@ -4625,18 +4640,21 @@ function renderInteresadoElegir(){
   html += '<p class="interesado-elegir-sub">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
   html += '<div class="proyecto-pick-grid">'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
-      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+CASTILLA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Castilla" />'+mediaTag('real')+'</div>'+
+      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="casas/sala-castilla.jpg" alt="Sala de ventas Vive Hogar Castilla" />'+mediaTag('real')+'</div>'+
       '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent proyecto-pick-accent-celeste">Castilla</span></span></div>'+
       '<div class="proyecto-pick-location">📍 Castilla, Piura</div>'+
-      '<div class="proyecto-pick-price proyecto-pick-price-celeste">Desde S/ 20,500</div>'+
       '<div class="proyecto-pick-stats-sub">+3,500 viviendas entregadas · 7,000 viviendas proyectadas</div>'+
     '</button>'+
     '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
       '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" />'+mediaTag('real')+'</div>'+
       '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Sullana</span></span></div>'+
       '<div class="proyecto-pick-location">📍 Sullana, Piura</div>'+
-      '<div class="proyecto-pick-price">Desde S/ 20,500</div>'+
       '<div class="proyecto-pick-stats-sub">+1,200 viviendas vendidas · 5,220 viviendas proyectadas</div>'+
+    '</button>'+
+    '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="ejidos">'+
+      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="casas/sala-ejidos.jpg" alt="Sala de ventas Vive Hogar Ejidos" />'+mediaTag('real')+'</div>'+
+      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Ejidos</span></span></div>'+
+      '<div class="proyecto-pick-location">📍 Ejidos, Piura</div>'+
     '</button>'+
   '</div>';
   html += '<div class="interesado-elegir-footer">'+
@@ -4658,7 +4676,7 @@ function renderInteresadoCargando(){
 
 function renderInteresadoBienvenida(){
   var proy = ui.interesadoProyecto;
-  var nombreProy = proy === 'sullana' ? 'Vive Hogar Sullana' : 'Vive Hogar Castilla';
+  var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
   var fotoProy = proy === 'sullana' ? SULLANA_CARD_DATAURI : CASTILLA_CARD_DATAURI;
   var html = '<div class="interesado-bienvenida-wrap">';
   html += '<img class="interesado-bienvenida-photo" src="'+fotoProy+'" alt="" />';
@@ -5021,6 +5039,22 @@ function renderMapaEtapa5Html(etapaN){
       '</div>';
       lote = null;
     }
+    if (lote && esVisitante()){
+      var vMsg = 'Hola, estoy interesado en el lote Mz. '+lote.m+', Lt. '+String(lote.l).padStart(2,'0')+' de '+PROY_NOMBRES[planoProy()]+' (Etapa '+ETAPA_ACTUAL+').';
+      html += '<div class="lote-detail-card" style="margin-top:12px;">'+
+        '<div class="lote-summary-strip">'+
+          '<div class="lote-summary-label">Tu casa elegida</div>'+
+          '<div class="lote-summary-top"><span class="cuota-chip cuota-chip-ok">Disponible</span>'+
+          '<span class="lote-summary-id">Mz. '+esc(lote.m)+' · Lt. '+esc(String(lote.l).padStart(2,'0'))+'</span></div>'+
+          '<div class="lote-summary-sub">Etapa '+esc(ETAPA_ACTUAL)+' · Vista '+(lote.v ? 'a '+esc(lote.v.toLowerCase()) : 'interior')+'</div>'+
+          '<div class="lote-summary-grid"><div><span>Área del terreno</span><strong>'+parseFloat(lote.a).toFixed(2)+' m²</strong></div></div>'+
+        '</div>'+
+        '<div style="padding:12px 16px 16px;">'+
+          '<p style="font-size:0.82rem;color:var(--ink-soft);margin-bottom:10px;">¿Te gustó esta casa? Un asesor te cuenta los precios y las formas de pago.</p>'+
+          '<a class="btn btn-primary btn-block" href="'+waVisita(planoProy(), vMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>'+
+        '</div></div>';
+      lote = null;
+    }
     if (lote){
       var estadoInfo = estInfo(lote.e);
       html += '<div class="lote-detail-card" style="margin-top:12px;">';
@@ -5286,12 +5320,26 @@ function renderLoteSheetEtapa5(){
     '<div class="ls-head"><span class="cuota-chip cuota-chip-'+est.c+'">'+est.t+'</span>'+
       '<strong class="ls-id">Mz '+esc(lote.m)+' · Lt '+esc(String(lote.l).padStart(2,'0'))+'</strong>'+close+'</div>'+
     '<div class="ls-row"><div class="ls-meta">'+parseFloat(lote.a).toFixed(2)+' m²'+(lote.v ? ' · Vista '+esc(lote.v.toLowerCase()) : '')+'</div>'+
-      (disp ? '<div class="ls-price">'+precioHtml(lote)+'</div>' : '')+'</div>'+
-    (modoAsesor() ? '' : '<a class="btn btn-block ls-wa" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>')+
-    ((disp || modoAsesor()) ? '<button type="button" class="ls-link" data-action="etapa5-full-cerrar" data-value="ficha">'+(modoAsesor() ? (disp ? 'Ver detalle, simular cuotas y separar' : 'Ver detalle') : 'Ver detalle y simular cuotas')+'</button>' : '')+
+      ((disp && !esVisitante()) ? '<div class="ls-price">'+precioHtml(lote)+'</div>' : '')+'</div>'+
+    (modoAsesor() ? '' : '<a class="btn btn-block ls-wa" href="'+waVisita(planoProy(), msg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>')+
+    ((disp || modoAsesor()) ? '<button type="button" class="ls-link" data-action="etapa5-full-cerrar" data-value="ficha">'+(modoAsesor() ? (disp ? 'Ver detalle, simular cuotas y separar' : 'Ver detalle') : (esVisitante() ? 'Ver detalle de la casa' : 'Ver detalle y simular cuotas'))+'</button>' : '')+
   '</div>';
 }
 
+// "Cómo llegar": mapa + Google Maps + Street View (sin Apple Maps). Solo sale si el proyecto tiene coordenadas cargadas.
+function comoLlegarHtml(slug){
+  var pr = proyById(proyIdDeSlug(slug));
+  if (!pr || pr.lat == null) return '';
+  return '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
+    '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
+    '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View.</p>'+
+    '<p class="ubicacion-tag">📍 '+esc(pr.ciudad === 'Piura' ? 'Piura' : pr.ciudad+', Piura')+'</p>'+
+    '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+pr.lat+','+pr.lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
+    (slug === 'sullana' ? renderEntornoChips() : '')+
+    '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+pr.lat+','+pr.lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
+    '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+pr.lat+','+pr.lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
+  '</div>';
+}
 function renderInteresadoMapa(){
   var proy = ui.interesadoProyecto;
   var esAsesor = modoAsesor();
@@ -5308,16 +5356,6 @@ function renderInteresadoMapa(){
     '<h2 class="interesado-elegir-title interesado-elegir-title-split"><span class="interesado-elegir-title-sub">¡Bienvenido a</span>'+esc(nombreProy)+'!</h2>'+
   '</div>';
 
-  html += '<div class="panel panel-flat"><h4>Lo esencial</h4>'+
-    '<div class="esencial-list">'+
-      '<div class="esencial-item"><span class="esencial-icon">🏠</span><span><strong>25 m²</strong> de vivienda<span class="esencial-sub">sobre <strong>62.5 m²</strong> de terreno</span></span></div>'+
-      '<div class="esencial-item"><span class="esencial-icon">💧</span><span>Luz, agua y desagüe incluidos</span></div>'+
-      '<div class="esencial-item"><span class="esencial-icon">🏦</span><span>Bono Familiar Habitacional aplicado al precio</span></div>'+
-      '<div class="esencial-item"><span class="esencial-icon">💰</span><span>Cuotas desde <strong>S/ 450</strong> al mes</span></div>'+
-      '<div class="esencial-item"><span class="esencial-icon">📄</span><span>Título de propiedad a tu nombre</span></div>'+
-    '</div>'+
-    '<a class="cta-secondary-pill" href="#mapa-proyecto-panel">Consultar precios y disponibilidad →</a>'+
-    '</div>';
   }
 
   if (proy === 'sullana' && !esAsesor) html += renderBarraConfianza();
@@ -5351,16 +5389,6 @@ function renderInteresadoMapa(){
     }
     html += '</div></div></div>';
 
-    if (!esAsesor) html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
-      '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Descubre qué encontrarás alrededor de Vive Hogar Sullana.</p>'+
-      '<p class="ubicacion-tag">📍 '+esc(PROYECTOS[1].ciudad === 'Piura' ? 'Piura' : PROYECTOS[1].ciudad+', Piura')+'</p>'+
-      '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
-      renderEntornoChips()+
-      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[1].lat+','+PROYECTOS[1].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[1].lat+','+PROYECTOS[1].lng+'&q='+encodeURIComponent(PROYECTOS[1].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
-    '</div>';
   } else if (proy === 'castilla'){
     var dosColC = !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));
     html += '<div class="panel panel-flat'+(dosColC ? ' mapa-wide' : ' mapa-wide mapa-solo')+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
@@ -5414,15 +5442,6 @@ function renderInteresadoMapa(){
     html += renderMapaCastilla11Html();
     html += '</div>';
 
-    html += '<div class="panel panel-flat"><h4>Cómo llegar</h4>'+
-      '<p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:3px;font-weight:700;">Conoce dónde está tu próximo hogar.</p>'+
-      '<p style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:6px;">Consulta la ubicación del proyecto y explora sus alrededores con Google Maps y Street View.</p>'+
-      '<p class="ubicacion-tag">📍 '+esc(PROYECTOS[0].ciudad === 'Piura' ? 'Piura' : PROYECTOS[0].ciudad+', Piura')+'</p>'+
-      '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+PROYECTOS[0].lat+','+PROYECTOS[0].lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
-      '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://maps.apple.com/?ll='+PROYECTOS[0].lat+','+PROYECTOS[0].lng+'&q='+encodeURIComponent(PROYECTOS[0].nombre)+'" target="_blank" rel="noopener">Abrir en Apple Maps</a>'+
-    '</div>';
   }
 
   var asesorMsg = 'Hola, quiero información sobre '+nombreProy;
@@ -5434,11 +5453,10 @@ function renderInteresadoMapa(){
   } else if (ui.interesadoManzanaSel){
     asesorMsg += ' (Manzana '+ui.interesadoManzanaSel+')';
   }
-  var asesorHref = 'https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg);
+  var asesorHref = waVisita(proy, asesorMsg);
 
-  if (proy === 'sullana' && !esAsesor) html += renderVideosProyecto();
   if (proy === 'sullana' && !esAsesor) html += renderPanelConfianza();
-  if (proy === 'sullana' && !esAsesor){
+  if (proy === 'sullana' && !esAsesor && !esVisitante()){
     html += '<div class="panel panel-flat"><h4>Preguntas frecuentes</h4>'+
       renderFaqAccordion(VHS_FAQ_SULLANA, asesorHref)+
     '</div>';
@@ -5447,13 +5465,14 @@ function renderInteresadoMapa(){
   if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderReporteVentasHtml() + renderReporteCastillaHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentasManualesJefeHtml() : '');
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentaManualAsesorHtml() : '');
   if (esAsesor) html += renderApagadoHtml();
-  if (esAsesor && (proy === 'sullana' || proy === 'castilla')){
+  if ((esAsesor && (proy === 'sullana' || proy === 'castilla')) || esVisitante()){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">🏠 Así puede quedar tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Para mostrarle al cliente su casa en potencia. Imágenes referenciales.</p>'+galeriaCasaHtml()+
       '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a></div>';
   }
+  if (!esAsesor) html += comoLlegarHtml(proy);
   html += '</div>';
-  if (!esAsesor) html += '<a class="asesor-bar" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent(asesorMsg)+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
+  if (!esAsesor && ui.interesadoLoteSel) html += '<a class="asesor-bar" href="'+asesorHref+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
 }
 
@@ -6123,7 +6142,7 @@ document.addEventListener('click', async function(ev){
     }
   } else if (action === 'interesado-proyecto'){
     ui.interesadoProyecto = t.getAttribute('data-value');
-    ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null;
+    ui.interesadoEtapaSel = null; ui.genFocus = false; ui.genZoom = null; ui.interesadoLoteSel = null;
     ui.interesadoManzanaSel = null;
     ui.interesadoStep = 'cargando';
     window.scrollTo(0,0);
@@ -8396,7 +8415,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261126-184320';
+var APP_BUILD = '20261127-115503';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
