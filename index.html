@@ -2580,6 +2580,7 @@ function precioHtml(l){
   return fmtMoney(l.pv);
 }
 function estInfo(e){
+  if (esVisitante() && e !== 'DISPONIBLE') return {cls:'neutral', txt:'No disponible'};   // el interesado solo ve: disponible o no disponible
   if (e === 'DISPONIBLE') return {cls:'ok', txt:'Disponible'};
   if (e === 'VENDIDO') return {cls:'neutral', txt:'Vendida'};
   if (e === 'SEPARADO') return {cls:'neutral', txt:'Separada'};
@@ -4983,6 +4984,7 @@ function renderMapaEtapa5Html(etapaN){
   html += '<p class="lote-hint-small">'+(modoAsesor() ? '👆 Muestra el plano al cliente: toca una casa <strong>'+'verde'+'</strong> (disponible) para ver su precio y separarla' : '👆 Toca un lote para ver sus características')+'</p>';
   var nSep = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'SEPARADO' || l.e === 'BLOQUEADO'; }).length;
   var nVen = ETAPA5_LOTES_PLANO.filter(function(l){ return l.e === 'VENDIDO'; }).length;
+  if (!esVisitante()){
   html += '<div class="e5-conteo"><span class="e5-c-ok">✔ '+etapa5Disponibles+' disponibles</span>'+
     '<span class="e5-c-sep">◔ '+nSep+' separadas</span><span class="e5-c-ven">✖ '+nVen+' vendidas</span></div>';
   html += '<div class="e5-buscar"><span class="e5-b-t">🔎 Buscar casa</span>'+
@@ -4990,9 +4992,11 @@ function renderMapaEtapa5Html(etapaN){
     '<input id="e5-b-lt" class="e5-b-in" type="text" inputmode="numeric" maxlength="4" placeholder="Lt" aria-label="Número de lote" />'+
     '<button type="button" class="btn btn-primary e5-b-go" data-action="etapa5-buscar">Ir</button></div>'+
     (ui.etapa5BuscarMsg ? '<div class="e5-b-msg">'+esc(ui.etapa5BuscarMsg)+'</div>' : '');
+  }
   html += '<div class="lote-legend">'+
-    '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
-    '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>'+
+    (esVisitante() ? '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-neutral"></i> No disponible</span>'
+      : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
+        '<span><i class="lote-dot lote-dot-sel"></i> Seleccionado</span>')+
     '<span><i class="lote-dot lote-dot-area"></i> Parque</span>'+
   '</div>';
   }
@@ -5114,7 +5118,7 @@ function renderMapaEtapa5Html(etapaN){
       ETAPA5_LOTES_PLANO.map(function(l){
         var key = l.m+'|'+l.l;
         // Colores iguales en todos los planos: verde = disponible, plateado = vendida, naranja = separada
-        var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : (l.e === 'VENDIDO' ? 'lote-neutral' : 'lote-warn');
+        var cls = l.e === 'DISPONIBLE' ? 'lote-ok' : ((l.e === 'VENDIDO' || esVisitante()) ? 'lote-neutral' : 'lote-warn');
         var mine = ui.miCasaKey === key ? ' lote-hotspot-mine' : '';
         
         var isSel = ui.interesadoLoteSel === key;
@@ -8079,8 +8083,9 @@ function pdfPlanoCanvas(mz, loteNum){
 function cotTelGuardado(){ try { return localStorage.getItem('ec_asesora_tel_v1') || ''; } catch(e){ return ''; } }
 function etapaLeyendaOverlay(){
   return '<div class="mapa-gen-leyenda" style="bottom:calc(env(safe-area-inset-bottom,0px) + 8px);">'+
-    '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
-    '<span><i class="lote-dot lote-dot-sel"></i> Seleccionada</span><span><i class="lote-dot lote-dot-area"></i> Parque</span></div>';
+    (esVisitante() ? '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-neutral"></i> No disponible</span><span><i class="lote-dot lote-dot-area"></i> Parque</span></div>'
+      : '<span><i class="lote-dot lote-dot-ok"></i> Disponible</span><span><i class="lote-dot lote-dot-sep"></i> Separada</span><span><i class="lote-dot lote-dot-neutral"></i> Vendida</span>'+
+        '<span><i class="lote-dot lote-dot-sel"></i> Seleccionada</span><span><i class="lote-dot lote-dot-area"></i> Parque</span></div>');
 }
 function etapaKeysOrden(){ return Object.keys(planosDeProy()).sort(function(a,b){ return parseInt(a,10)-parseInt(b,10); }); }
 function etapaNavHtml(){
@@ -8579,7 +8584,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-131411';
+var APP_BUILD = '20261127-131646';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
