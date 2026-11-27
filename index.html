@@ -1218,6 +1218,39 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .mapa-real .lote-hotspot.lote-ok .lote-hotspot-num{color:#fff;font-size:min(var(--nf,999px),68cqh,44cqw);text-shadow:none;}
 .mapa-real .lote-hotspot.lote-neutral .lote-hotspot-num{color:#444c54;font-size:min(var(--nf,999px),68cqh,44cqw);text-shadow:none;}
 .mapa-real .lote-hotspot.active{background:#397ead;border:1px solid #0f3d63;box-shadow:0 0 0 1.5px #0f3d63;z-index:6;}
+
+.qm{width:100%;max-width:1180px;margin:0 auto;padding:16px 16px 40px;box-sizing:border-box;background:linear-gradient(#f6f9fd,#fff);min-height:100vh;}
+.qm-head{text-align:center;margin:4px 0 18px;}
+.qm-logo{height:78px;width:auto;mix-blend-mode:multiply;display:block;margin:0 auto 6px;}
+.qm-head h2{font-size:1.7rem;line-height:1.2;color:#14305a;margin:0;}
+.qm-head h2 em{font-style:normal;color:#2e7d32;text-decoration:underline;text-decoration-color:#8fd18b;text-decoration-thickness:3px;text-underline-offset:6px;}
+.qm-head p{color:#5b6b82;font-size:1.05rem;margin:10px 0 0;}
+.qm-grid{display:grid;grid-template-columns:1fr;gap:18px;}
+.qm-card{background:#fff;border-radius:22px;box-shadow:0 8px 28px -10px rgba(20,48,90,.28);overflow:hidden;display:flex;flex-direction:column;}
+.qm-photo{position:relative;aspect-ratio:16/9;overflow:hidden;background:#dfe8f2;}
+.qm-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.qm-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
+.qm-body h3{margin:0;font-size:1.5rem;color:#14305a;}
+.qm-c h3 span{color:#1976d2;}.qm-s h3 span{color:#7b2d8e;}.qm-e h3 span{color:#2e7d32;}
+.qm-loc{display:flex;align-items:center;gap:6px;margin:8px 0 6px;color:#233;font-weight:600;}
+.qm-txt{color:#5b6b82;font-size:.95rem;line-height:1.4;margin:0 0 12px;}
+.qm-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f1f5fb;border-radius:14px;padding:10px 12px;margin-bottom:14px;}
+.qm-stats div{display:flex;align-items:center;gap:8px;color:#14305a;}
+.qm-stats span{display:flex;flex-direction:column;font-size:.72rem;color:#5b6b82;line-height:1.2;}
+.qm-stats b{font-size:1.05rem;color:#14305a;}
+.qm-btn{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;padding:15px;font-size:1.05rem;font-weight:700;color:#fff;font-family:inherit;cursor:pointer;}
+.qm-c .qm-btn{background:#1565c0;}.qm-s .qm-btn{background:#7b2d8e;}.qm-e .qm-btn{background:#2e7d32;}
+.qm-pie{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px;padding-top:20px;border-top:1px solid #e3e9f2;}
+.qm-pie div{display:flex;align-items:center;gap:10px;color:#2e7d32;}
+.qm-pie span{font-size:.85rem;color:#14305a;font-weight:600;line-height:1.25;}
+@media (min-width:900px){
+  .qm{padding:24px 32px 48px;}
+  .qm-head h2{font-size:2.3rem;}
+  .qm-logo{height:96px;}
+  .qm-grid{grid-template-columns:repeat(3,1fr);gap:26px;}
+  .qm-pie{grid-template-columns:repeat(4,1fr);}
+  .qm-pie div{justify-content:center;}
+}
 </style>
 </head>
 <body>
@@ -4631,35 +4664,40 @@ function renderFaqAccordion(items, asesorHref){
 }
 
 function renderInteresadoElegir(){
-  var html = '<div class="interesado-screen">';
+  var ic = 'width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"';
+  var proys = [
+    {k:'castilla', cls:'c', foto:'casas/sala-castilla.jpg', alt:'Sala de ventas Vive Hogar Castilla', loc:'Castilla, Piura',
+      txt:'Un proyecto pensado para tu familia, con excelente ubicación y facilidades de financiamiento.',
+      a:'+3,500', al:'viviendas entregadas', b:'+7,000', bl:'viviendas proyectadas'},
+    {k:'sullana', cls:'s', foto:SULLANA_CARD_DATAURI, alt:'Sala de ventas Vive Hogar Sullana', loc:'Sullana, Piura',
+      txt:'Viviendas accesibles en una zona de gran crecimiento y con alta proyección.',
+      a:'+1,200', al:'viviendas vendidas', b:'+5,220', bl:'viviendas proyectadas'},
+    {k:'ejidos', cls:'e', foto:'casas/sala-ejidos.jpg', alt:'Sala de ventas Vive Hogar Ejidos', loc:'Ejidos, Piura',
+      txt:'Tu casa propia en preventa, con financiamiento a tu medida.', a:null}
+  ];
+  var html = '<div class="qm">';
   html += '<button type="button" class="back-btn" data-action="gate-back">← Volver</button>';
-  html += '<div class="interesado-elegir-header">'+
-    '<img src="'+LOGO_OFICIAL_DATAURI+'" alt="Vive Hogar" />'+
-    '<h2 class="interesado-elegir-title">¡Qué bueno que estés interesado!</h2>'+
-  '</div>';
-  html += '<p class="interesado-elegir-sub">Cuéntanos, ¿en qué proyecto estás interesado?</p>';
-  html += '<div class="proyecto-pick-grid">'+
-    '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="castilla">'+
-      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="casas/sala-castilla.jpg" alt="Sala de ventas Vive Hogar Castilla" />'+mediaTag('real')+'</div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent proyecto-pick-accent-celeste">Castilla</span></span></div>'+
-      '<div class="proyecto-pick-location">📍 Castilla, Piura</div>'+
-      '<div class="proyecto-pick-stats-sub">+3,500 viviendas entregadas · 7,000 viviendas proyectadas</div>'+
-    '</button>'+
-    '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="sullana">'+
-      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="'+SULLANA_CARD_DATAURI+'" alt="Sala de ventas Vive Hogar Sullana" />'+mediaTag('real')+'</div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Sullana</span></span></div>'+
-      '<div class="proyecto-pick-location">📍 Sullana, Piura</div>'+
-      '<div class="proyecto-pick-stats-sub">+1,200 viviendas vendidas · 5,220 viviendas proyectadas</div>'+
-    '</button>'+
-    '<button type="button" class="proyecto-pick-card" data-action="interesado-proyecto" data-value="ejidos">'+
-      '<div class="proyecto-pick-photo-wrap"><img class="proyecto-pick-photo" src="casas/sala-ejidos.jpg" alt="Sala de ventas Vive Hogar Ejidos" />'+mediaTag('real')+'</div>'+
-      '<div class="proyecto-pick-name-row"><span class="proyecto-pick-name"><span class="n1">Vive</span> <span class="n2">Hogar</span> <span class="proyecto-pick-name-accent">Ejidos</span></span></div>'+
-      '<div class="proyecto-pick-location">📍 Ejidos, Piura</div>'+
-    '</button>'+
-  '</div>';
-  html += '<div class="interesado-elegir-footer">'+
-    '<p>¿Tienes dudas antes de elegir?</p>'+
-    '<a class="btn btn-secondary btn-block" href="https://wa.me/'+VHS_WHATSAPP+'?text='+encodeURIComponent('Hola, tengo dudas sobre los proyectos Vive Hogar')+'" target="_blank" rel="noopener">💬 Escríbenos por WhatsApp</a>'+
+  html += '<div class="qm-head"><img class="qm-logo" src="portada/logo_c.png?v=2" alt="Vive Hogar" />'+
+    '<h2>¡Qué bueno que estés <em>interesado</em>!</h2>'+
+    '<p>Cuéntanos, ¿en qué proyecto estás interesado?</p></div>';
+  html += '<div class="qm-grid">'+proys.map(function(x){
+    return '<div class="qm-card qm-'+x.cls+'">'+
+      '<div class="qm-photo"><img src="'+x.foto+'" alt="'+x.alt+'" />'+mediaTag('real')+'</div>'+
+      '<div class="qm-body">'+
+        '<h3>Vive Hogar <span>'+esc(x.k.charAt(0).toUpperCase()+x.k.slice(1))+'</span></h3>'+
+        '<div class="qm-loc"><svg width="18" height="18" viewBox="0 0 24 24" fill="#d32f2f"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>'+esc(x.loc)+'</div>'+
+        '<p class="qm-txt">'+esc(x.txt)+'</p>'+
+        (x.a ? '<div class="qm-stats"><div><svg '+ic+'><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span><b>'+x.a+'</b>'+x.al+'</span></div>'+
+          '<div><svg '+ic+'><path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M10 21v-6h4v6"/></svg><span><b>'+x.b+'</b>'+x.bl+'</span></div></div>' : '')+
+        '<button type="button" class="qm-btn" data-action="interesado-proyecto" data-value="'+x.k+'">Ver proyecto <span>→</span></button>'+
+      '</div></div>';
+  }).join('')+'</div>';
+  var ic2 = 'width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+  html += '<div class="qm-pie">'+
+    '<div><svg '+ic2+'><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Casas propias y accesibles</span></div>'+
+    '<div><svg '+ic2+'><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg><span>Financiamiento a tu medida</span></div>'+
+    '<div><svg '+ic2+'><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/></svg><span>Proyectos con respaldo</span></div>'+
+    '<div><svg '+ic2+'><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15 14.2c.6-.2 1.3-.3 2-.3 2.2 0 4 1.8 4 4"/></svg><span>Acompañamiento en todo el proceso</span></div>'+
   '</div>';
   html += '</div>';
   return html;
@@ -8415,7 +8453,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-115801';
+var APP_BUILD = '20261127-120255';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
