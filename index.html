@@ -1305,7 +1305,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lp-casa li{display:flex;align-items:center;gap:8px;font-size:.9rem;color:#233;}
 .lp-entorno{background:#fff;border:1px solid #e3e9f2;border-radius:20px;padding:12px 14px;margin-bottom:14px;}
 .lp-entorno h3{margin:0 0 8px;font-size:1.15rem;color:#14305a;}
-.lp-entorno div{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.lp-entorno div{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
 .lp-entorno span{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:.85rem;color:#233;gap:4px;}
 .lp-mivi{display:flex;align-items:center;gap:12px;background:#eef5ee;border-radius:18px;padding:14px 16px;margin-bottom:16px;}
 .lp-mivi b{display:block;color:#14305a;font-size:1rem;}.lp-mivi span{color:#5b6b82;font-size:.85rem;}
@@ -4826,18 +4826,22 @@ function renderProyectoLanding(){
   html += '<div class="lp-foto"><img src="casas/hero-calle2.jpg?v=1" alt="Casas Vive Hogar" /></div>';
   html += '<div class="lp-stats">'+
     '<div><svg '+ic+'><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span><b>25 m²</b>de vivienda</span></div>'+
-    '<div><svg '+ic+'><path d="M4 8l16-2v12L4 17z"/></svg><span><b>62.5 m²</b>de terreno</span></div>'+
+    '<div><svg '+ic+'><path d="M4 8l16-2v12L4 17z"/></svg><span><b>62.5 m²</b>de terreno (referencial)</span></div>'+
     '<div><svg '+ic+'><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 14.5 2 2 4-4.5"/></svg><span><b>Con título</b>de propiedad</span></div>'+
   '</div>';
   var chk = '<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#2e7d32"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   html += '<div class="lp-casa"><img src="casas/plano-casa.jpg" alt="Plano de la casa" /><div><h3>Así es tu casa</h3><ul>'+
     ['Sala – comedor – cocina','2 dormitorios','1 baño','Patio y área verde posterior'].map(function(t){ return '<li>'+chk+'<span>'+t+'</span></li>'; }).join('')+
   '</ul></div></div>';
-  if (proy === 'sullana'){
-    html += '<div class="lp-entorno"><h3>Entorno</h3><div>'+
-      '<span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"><path d="M8 20 10 4M16 20 14 4M12 6v2M12 11v2M12 16v2"/></svg>Cerca de la Panamericana Norte</span>'+
-      '<span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21V3l8 3.5-8 3.5"/><path d="M5 21h8"/></svg>Cerca del Villa California Country Club</span>'+
-    '</div></div>';
+  var icPin = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.600-6-10.500a6 6 0 0 1 12 0C18 15.400 12 21 12 21z"/><circle cx="12" cy="10.500" r="2.200"/></svg>';
+  var entorno = {
+    sullana: [['<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"><path d="M8 20 10 4M16 20 14 4M12 6v2M12 11v2M12 16v2"/></svg>','Cerca de la Panamericana Norte'],
+              ['<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21V3l8 3.5-8 3.5"/><path d="M5 21h8"/></svg>','Cerca del Villa California Country Club']],
+    castilla: [[icPin,'A 6 minutos del óvalo de Chulucanas']],
+    ejidos: [[icPin,'A 6 min del cruce de Av. Chulucanas con Av. José Aguilar Santisteban – Piura']]
+  }[proy];
+  if (entorno){
+    html += '<div class="lp-entorno"><h3>Entorno</h3><div>'+entorno.map(function(e){ return '<span>'+e[0]+e[1]+'</span>'; }).join('')+'</div></div>';
   }
   html += '<button type="button" class="qm-btn lp-go qm-'+inf.cls+'" data-action="interesado-ver-mapa">Ver mapa del proyecto <span>→</span></button>';
   html += '</div>';
@@ -5587,7 +5591,7 @@ function renderInteresadoMapa(){
         '<aside class="mg-panel"><img class="mg-logo" src="portada/logo_c.png?v=2" alt="Vive Hogar" />'+
           '<div class="mg-et"><h3>Etapa 16</h3><span class="mg-tag">A la venta</span></div>'+
           '<p>Conoce las viviendas disponibles en esta etapa.</p>'+
-          '<p class="mg-dato">Casas de <b>25 m²</b> sobre terreno de <b>62.5 m²</b>, con título de propiedad.</p>'+
+          '<p class="mg-dato">Casas de <b>25 m²</b> sobre terrenos de alrededor de <b>62.5 m²</b>, con título de propiedad.</p>'+
           '<button type="button" class="qm-btn qm-e mg-btn" data-action="interesado-etapa" data-value="16">Ver viviendas disponibles <span>→</span></button>'+
         '</aside></div>'+
         '<div id="qm-lotes">'+(dosColC ? '<div class="panel panel-flat mapa-wide"><div class="mapa-col-etapa">'+renderMapaEtapa5Html(String(ui.interesadoEtapaSel))+'</div></div>' : '')+'</div>';
@@ -8633,7 +8637,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-133851';
+var APP_BUILD = '20261127-134509';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
