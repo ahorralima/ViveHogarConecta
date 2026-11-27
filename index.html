@@ -1226,30 +1226,43 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .qm-head h2 em{font-style:normal;color:#2e7d32;text-decoration:underline;text-decoration-color:#8fd18b;text-decoration-thickness:3px;text-underline-offset:6px;}
 .qm-head p{color:#5b6b82;font-size:1.05rem;margin:10px 0 0;}
 .qm-grid{display:grid;grid-template-columns:1fr;gap:18px;}
-.qm-card{background:#fff;border-radius:22px;box-shadow:0 8px 28px -10px rgba(20,48,90,.28);overflow:hidden;display:flex;flex-direction:column;}
-.qm-photo{position:relative;aspect-ratio:16/9;overflow:hidden;background:#dfe8f2;}
-.qm-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-.qm-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
-.qm-body h3{margin:0;font-size:1.5rem;color:#14305a;}
+.qm-card{background:#fff;border-radius:22px;box-shadow:0 8px 28px -10px rgba(20,48,90,.28);overflow:hidden;display:flex;flex-direction:row;padding:8px;gap:10px;}
+.qm-photo{position:relative;flex:0 0 42%;border-radius:16px;overflow:hidden;background:#dfe8f2;min-height:170px;}
+.qm-photo .media-tag,.qm-photo [class*=media]{font-size:.62rem;}
+.qm-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.qm-body{padding:6px 4px 4px 0;display:flex;flex-direction:column;flex:1;min-width:0;}
+.qm-body h3{margin:0;font-size:1.12rem;line-height:1.15;color:#14305a;}
 .qm-c h3 span{color:#1976d2;}.qm-s h3 span{color:#7b2d8e;}.qm-e h3 span{color:#2e7d32;}
-.qm-loc{display:flex;align-items:center;gap:6px;margin:8px 0 6px;color:#233;font-weight:600;}
-.qm-txt{color:#5b6b82;font-size:.95rem;line-height:1.4;margin:0 0 12px;}
-.qm-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f1f5fb;border-radius:14px;padding:10px 12px;margin-bottom:14px;}
-.qm-stats div{display:flex;align-items:center;gap:8px;color:#14305a;}
-.qm-stats span{display:flex;flex-direction:column;font-size:.72rem;color:#5b6b82;line-height:1.2;}
-.qm-stats b{font-size:1.05rem;color:#14305a;}
-.qm-btn{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;padding:15px;font-size:1.05rem;font-weight:700;color:#fff;font-family:inherit;cursor:pointer;}
+.qm-loc{display:flex;align-items:center;gap:4px;margin:5px 0 4px;color:#233;font-weight:600;font-size:.82rem;}
+.qm-loc svg{width:15px;height:15px;flex:none;}
+.qm-txt{color:#5b6b82;font-size:.76rem;line-height:1.3;margin:0 0 8px;}
+.qm-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f1f5fb;border-radius:12px;padding:6px 7px;margin-bottom:8px;}
+.qm-stats svg{width:20px;height:20px;flex:none;}
+.qm-stats div{display:flex;align-items:center;gap:4px;color:#14305a;min-width:0;}
+.qm-stats span{display:flex;flex-direction:column;font-size:.62rem;color:#5b6b82;line-height:1.15;}
+.qm-stats b{font-size:.82rem;color:#14305a;}
+.qm-btn{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:0;border-radius:12px;padding:11px 6px;font-size:.88rem;font-weight:700;color:#fff;font-family:inherit;cursor:pointer;}
 .qm-c .qm-btn{background:#1565c0;}.qm-s .qm-btn{background:#7b2d8e;}.qm-e .qm-btn{background:#2e7d32;}
-.qm-pie{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px;padding-top:20px;border-top:1px solid #e3e9f2;}
-.qm-pie div{display:flex;align-items:center;gap:10px;color:#2e7d32;}
-.qm-pie span{font-size:.85rem;color:#14305a;font-weight:600;line-height:1.25;}
+.qm-pie{display:grid;grid-template-columns:repeat(4,1fr);margin-top:20px;background:#fff;border-radius:20px;box-shadow:0 6px 22px -10px rgba(20,48,90,.25);padding:12px 4px;}
+.qm-pie div{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;color:#2e7d32;padding:0 4px;border-left:1px solid #e3e9f2;}
+.qm-pie div:first-child{border-left:0;}
+.qm-pie svg{width:30px;height:30px;}
+.qm-pie span{font-size:.66rem;color:#14305a;font-weight:600;line-height:1.2;}
 @media (min-width:900px){
   .qm{padding:24px 32px 48px;}
   .qm-head h2{font-size:2.3rem;}
   .qm-logo{height:96px;}
   .qm-grid{grid-template-columns:repeat(3,1fr);gap:26px;}
-  .qm-pie{grid-template-columns:repeat(4,1fr);}
-  .qm-pie div{justify-content:center;}
+  .qm-card{flex-direction:column;padding:0;gap:0;}
+  .qm-photo{flex:none;border-radius:0;aspect-ratio:16/9;min-height:0;}
+  .qm-body{padding:16px 18px 18px;}
+  .qm-body h3{font-size:1.5rem;}
+  .qm-loc{font-size:1rem;gap:6px;margin:8px 0 6px;}.qm-loc svg{width:18px;height:18px;}
+  .qm-txt{font-size:.95rem;line-height:1.4;margin:0 0 12px;}
+  .qm-stats{padding:10px 12px;gap:8px;margin-bottom:14px;}.qm-stats svg{width:26px;height:26px;}
+  .qm-stats div{gap:8px;}.qm-stats span{font-size:.72rem;}.qm-stats b{font-size:1.05rem;}
+  .qm-btn{padding:15px;font-size:1.05rem;border-radius:14px;gap:8px;}
+  .qm-pie{padding:18px 8px;margin-top:26px;}.qm-pie svg{width:34px;height:34px;}.qm-pie span{font-size:.85rem;}
 }
 </style>
 </head>
@@ -4668,10 +4681,10 @@ function renderInteresadoElegir(){
   var proys = [
     {k:'castilla', cls:'c', foto:'casas/sala-castilla.jpg', alt:'Sala de ventas Vive Hogar Castilla', loc:'Castilla, Piura',
       txt:'Un proyecto pensado para tu familia, con excelente ubicación y facilidades de financiamiento.',
-      a:'+3,500', al:'viviendas entregadas', b:'+7,000', bl:'viviendas proyectadas'},
+      a:'+3,500', al:'entregadas', b:'+7,000', bl:'proyectadas'},
     {k:'sullana', cls:'s', foto:SULLANA_CARD_DATAURI, alt:'Sala de ventas Vive Hogar Sullana', loc:'Sullana, Piura',
       txt:'Viviendas accesibles en una zona de gran crecimiento y con alta proyección.',
-      a:'+1,200', al:'viviendas vendidas', b:'+5,220', bl:'viviendas proyectadas'},
+      a:'+1,200', al:'vendidas', b:'+5,220', bl:'proyectadas'},
     {k:'ejidos', cls:'e', foto:'casas/sala-ejidos.jpg', alt:'Sala de ventas Vive Hogar Ejidos', loc:'Ejidos, Piura',
       txt:'Tu casa propia en preventa, con financiamiento a tu medida.', a:null}
   ];
@@ -8453,7 +8466,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-120255';
+var APP_BUILD = '20261127-120451';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
