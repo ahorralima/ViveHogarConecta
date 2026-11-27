@@ -1284,6 +1284,37 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 
 .wa-fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:60;width:54px;height:54px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.28);}
 .wa-fab-alto{bottom:calc(82px + env(safe-area-inset-bottom,0px));}
+
+.lp{max-width:860px;}
+.lp-top{margin-bottom:0;}
+.lp-head{text-align:center;margin:0 0 12px;}
+.lp-head h1{margin:2px 0 0;font-size:1.9rem;color:#14305a;line-height:1.1;}
+.lp-c{color:#1976d2;}.lp-s{color:#7b2d8e;}.lp-e{color:#2e7d32;}
+.lp-desc{color:#5b6b82;font-size:1rem;line-height:1.4;margin:4px auto 0;max-width:520px;}
+.lp-foto{border-radius:20px;overflow:hidden;box-shadow:0 8px 24px -10px rgba(20,48,90,.3);margin-bottom:14px;}
+.lp-foto img{width:100%;display:block;aspect-ratio:16/8;object-fit:cover;}
+.lp-stats{display:grid;grid-template-columns:repeat(3,1fr);background:#eef5ee;border-radius:18px;padding:12px 6px;margin-bottom:14px;}
+.lp-stats div{display:flex;align-items:center;gap:8px;justify-content:center;color:#2e7d32;padding:0 6px;border-left:1px solid #d5e4d5;}
+.lp-stats div:first-child{border-left:0;}
+.lp-stats span{display:flex;flex-direction:column;font-size:.78rem;color:#4b5d4b;line-height:1.15;}
+.lp-stats b{font-size:1.15rem;color:#2e7d32;}
+.lp-casa{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;background:#fff;border:1px solid #e3e9f2;border-radius:20px;padding:12px;margin-bottom:14px;}
+.lp-casa img{width:100%;border-radius:12px;display:block;}
+.lp-casa h3{margin:0 0 8px;font-size:1.25rem;color:#14305a;}
+.lp-casa ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.lp-casa li{display:flex;align-items:center;gap:8px;font-size:.9rem;color:#233;}
+.lp-entorno{background:#fff;border:1px solid #e3e9f2;border-radius:20px;padding:12px 14px;margin-bottom:14px;}
+.lp-entorno h3{margin:0 0 8px;font-size:1.15rem;color:#14305a;}
+.lp-entorno div{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.lp-entorno span{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:.85rem;color:#233;gap:4px;}
+.lp-mivi{display:flex;align-items:center;gap:12px;background:#eef5ee;border-radius:18px;padding:14px 16px;margin-bottom:16px;}
+.lp-mivi b{display:block;color:#14305a;font-size:1rem;}.lp-mivi span{color:#5b6b82;font-size:.85rem;}
+.lp-go{font-size:1.1rem;padding:17px;}
+.lp-maphead{margin:6px 0 14px;}.lp-maphead h2{margin:0;font-size:1.5rem;color:#14305a;}.lp-maphead p{margin:4px 0 0;color:#5b6b82;font-size:.95rem;}
+.lp-etapa16{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#eef5ee;border-radius:18px;padding:12px 14px;margin-top:12px;}
+.lp-etapa16 div{flex:1;min-width:140px;}.lp-etapa16 b{display:block;color:#2e7d32;font-size:1.05rem;}.lp-etapa16 span{color:#5b6b82;font-size:.82rem;}
+.lp-etapa16 button{background:#2e7d32;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;font-family:inherit;cursor:pointer;width:100%;}
+@media (min-width:700px){.lp-etapa16 button{width:auto;}.lp-head h1{font-size:2.3rem;}.lp-foto img{aspect-ratio:16/6;}}
 </style>
 </head>
 <body>
@@ -4745,7 +4776,46 @@ function renderInteresadoCargando(){
   '</div>';
 }
 
+var QM_PROY_INFO = {
+  castilla:{cls:'c', loc:'Castilla, Piura', txt:'Tu casa propia en una zona de crecimiento, con excelente ubicación y facilidades de financiamiento.'},
+  sullana:{cls:'s', loc:'Sullana, Piura', txt:'Viviendas accesibles en una zona de gran crecimiento y con alta proyección.'},
+  ejidos:{cls:'e', loc:'Ejidos, Piura', txt:'Tu casa propia en preventa, con financiamiento a tu medida.'}
+};
+// Pantalla de entrada a un proyecto (visitante): foto, datos de la casa, plano de la casa y botón al mapa
+function renderProyectoLanding(){
+  var proy = ui.interesadoProyecto, inf = QM_PROY_INFO[proy] || QM_PROY_INFO.castilla;
+  var nom = (PROY_NOMBRES[proy] || '').replace('Vive Hogar ','');
+  var ic = 'width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+  var html = '<div class="qm lp">';
+  html += '<div class="lp-top"><button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button></div>';
+  html += '<div class="lp-head"><img class="qm-logo" src="portada/logo_c.png?v=2" alt="Vive Hogar" />'+
+    '<h1>Vive Hogar <span class="lp-'+inf.cls+'">'+esc(nom)+'</span></h1>'+
+    '<div class="qm-loc" style="justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#d32f2f"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>'+esc(inf.loc)+'</div>'+
+    '<p class="lp-desc">'+esc(inf.txt)+'</p></div>';
+  html += '<div class="lp-foto"><img src="casas/entrega-fachada.jpg" alt="Casas Vive Hogar" /></div>';
+  html += '<div class="lp-stats">'+
+    '<div><svg '+ic+'><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span><b>25 m²</b>de vivienda</span></div>'+
+    '<div><svg '+ic+'><path d="M4 8l16-2v12L4 17z"/></svg><span><b>62.5 m²</b>de terreno</span></div>'+
+    '<div><svg '+ic+'><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 14.5 2 2 4-4.5"/></svg><span><b>Con título</b>de propiedad</span></div>'+
+  '</div>';
+  var chk = '<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#2e7d32"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  html += '<div class="lp-casa"><img src="casas/plano-casa.jpg" alt="Plano de la casa" /><div><h3>Así es tu casa</h3><ul>'+
+    ['Sala – comedor – cocina','2 dormitorios','1 baño','Patio y área verde posterior'].map(function(t){ return '<li>'+chk+'<span>'+t+'</span></li>'; }).join('')+
+  '</ul></div></div>';
+  if (proy === 'sullana'){
+    html += '<div class="lp-entorno"><h3>Entorno</h3><div>'+
+      '<span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"><path d="M8 20 10 4M16 20 14 4M12 6v2M12 11v2M12 16v2"/></svg>Cerca de la Panamericana Norte</span>'+
+      '<span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21V3l8 3.5-8 3.5"/><path d="M5 21h8"/></svg>Cerca del Villa California Country Club</span>'+
+    '</div></div>';
+  }
+  html += '<div class="lp-mivi"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg><div><b>Respaldado por el Fondo MiVivienda</b><span>Tu inversión, con el respaldo que necesitas.</span></div></div>';
+  html += '<button type="button" class="qm-btn lp-go qm-'+inf.cls+'" data-action="interesado-ver-mapa">Ver mapa del proyecto <span>→</span></button>';
+  html += '</div>';
+  html += '<a class="wa-fab" href="'+waVisita(proy, 'Hola, quiero información sobre '+(PROY_NOMBRES[proy] || 'Vive Hogar'))+'" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.8-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.100 3.200 5.100 4.500.7.3 1.300.5 1.700.6.7.2 1.400.2 1.900.1.600-.1 1.700-.7 2-1.400.2-.7.2-1.300.2-1.400-.1-.1-.3-.2-.6-.3z"/><path d="M12 2a10 10 0 0 0-8.600 15L2 22l5.200-1.400A10 10 0 1 0 12 2zm0 18.200c-1.500 0-2.900-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200z"/></svg></a>';
+  return html;
+}
 function renderInteresadoBienvenida(){
+  if (esVisitante()) return renderProyectoLanding();
   var proy = ui.interesadoProyecto;
   var nombreProy = PROY_NOMBRES[proy] || 'Vive Hogar Castilla';
   var fotoProy = proy === 'sullana' ? SULLANA_CARD_DATAURI : CASTILLA_CARD_DATAURI;
@@ -5421,7 +5491,11 @@ function renderInteresadoMapa(){
   if (esAsesor){
     html += renderAsesorPanelHtml();
   } else {
-  html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button>';
+  if (!esVisitante()) html += '<button type="button" class="back-btn" data-action="interesado-cambiar-proyecto">← Ver otros proyectos</button>';
+  if (esVisitante()){
+    html += '<button type="button" class="back-btn" data-action="interesado-volver-bienvenida">← '+esc(nombreProy)+'</button>'+
+      '<div class="lp-maphead"><h2>Mapa general del proyecto</h2><p>Conoce la distribución de etapas y revisa la etapa disponible.</p></div>';
+  } else {
   html += '<div class="qm-ph">'+
     '<img class="qm-ph-logo" src="portada/logo_c.png?v=2" alt="Vive Hogar" />'+
     '<span class="qm-ph-sub">¡Bienvenido a</span>'+
@@ -5434,6 +5508,7 @@ function renderInteresadoMapa(){
     '</div>'+
     '<p>Una casa propia sobre un terreno de 62.5 m², con luz, agua y desagüe ya instalados, y con título de propiedad a tu nombre.</p>'+
   '</div>';
+  }
 
   }
 
@@ -5474,7 +5549,7 @@ function renderInteresadoMapa(){
       '<div class="map-hint-banner">'+(esAsesor ? '👆 Toca la Etapa 16 para ver los lotes disponibles' : '<span>Ahora estamos vendiendo la <strong>Etapa 16</strong>. Tócala en el mapa para ver las casas disponibles.</span>')+'</div>'+
       '<div class="mapa-2col"><div class="mapa-col-gen">'+
       (esVisitante() ? renderMapaCastillaVisita() : renderMapaGeneralVisor())+
-      '<div class="mapa-etapas-otras">Elegir etapa: <button type="button" class="chip'+(String(ui.interesadoEtapaSel)==='16'?' active':'')+'" data-action="interesado-etapa" data-value="16">Etapa 16</button></div>'+
+      (esVisitante() ? '<div class="lp-etapa16"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><div><b>Etapa 16 disponible</b><span>Elige tu casa y habla con un asesor.</span></div><button type="button" data-action="interesado-etapa" data-value="16">Ver casas de la Etapa 16 →</button></div>' : '<div class="mapa-etapas-otras">Elegir etapa: <button type="button" class="chip'+(String(ui.interesadoEtapaSel)==='16'?' active':'')+'" data-action="interesado-etapa" data-value="16">Etapa 16</button></div>')+
       '</div><div class="mapa-col-etapa">'+
       (dosColC ? renderMapaEtapa5Html(String(ui.interesadoEtapaSel)) : '')+
     '</div></div></div>';
@@ -5545,7 +5620,7 @@ function renderInteresadoMapa(){
   if (esAsesor) html += renderApagadoHtml();
   if ((esAsesor && (proy === 'sullana' || proy === 'castilla')) || esVisitante()){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">🏠 Así puede quedar tu casa</h4>'+
-      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Para mostrarle al cliente su casa en potencia. Imágenes referenciales.</p>'+galeriaCasaHtml()+
+      '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">'+(esAsesor ? 'Para mostrarle al cliente su casa en potencia. ' : 'Mira cómo puede quedar tu casa. ')+'Imágenes referenciales.</p>'+galeriaCasaHtml()+
       '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a></div>';
   }
   if (!esAsesor) html += comoLlegarHtml(proy);
@@ -6226,7 +6301,7 @@ document.addEventListener('click', async function(ev){
     ui.interesadoStep = 'cargando';
     window.scrollTo(0,0);
     render();
-    setTimeout(function(){ ui.interesadoStep = 'mapa'; window.scrollTo(0,0); render(); }, 1700);
+    setTimeout(function(){ ui.interesadoStep = esVisitante() ? 'bienvenida' : 'mapa'; window.scrollTo(0,0); render(); }, 1700);
   } else if (action === 'interesado-cambiar-proyecto'){
     ui.interesadoStep = 'elegir';
     window.scrollTo(0,0);
@@ -8504,7 +8579,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-130218';
+var APP_BUILD = '20261127-130948';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
