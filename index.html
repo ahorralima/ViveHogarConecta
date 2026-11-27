@@ -477,7 +477,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   .gn-card{flex:0 0 42%;max-width:640px;margin:0;border-radius:0;box-shadow:none;justify-content:center;padding:40px 56px;gap:18px;}
   .gn-card h1{font-size:2.3rem;}
   .gn-trust div{font-size:.9rem;padding:16px 12px;}
-  .gn-b1,.gn-b2{padding:18px 20px;font-size:1.15rem;}
+  .gn-b1,.gn-b2,.gn-b3{padding:18px 20px;font-size:1.15rem;}
   .gn-ref{display:none;}
 }
 /* Pantallas grandes (Mac / monitor): logo, textos y botones crecen con el ancho de la pantalla */
@@ -490,8 +490,8 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
   .gn-trust div{font-size:clamp(.9rem,1.05vw,1.9rem);padding:clamp(16px,1.3vw,40px) clamp(12px,1vw,30px);border-radius:clamp(14px,1.1vw,30px);gap:clamp(8px,.8vw,24px);}
   .gn-trust div:first-child span b{font-size:clamp(1.3rem,1.7vw,3.2rem);}
   .gn-trust svg{width:clamp(30px,2.2vw,64px);height:clamp(30px,2.2vw,64px);}
-  .gn-b1,.gn-b2{font-size:clamp(1.15rem,1.4vw,2.6rem);padding:clamp(18px,1.6vw,52px) clamp(20px,1.6vw,52px);border-radius:clamp(14px,1.1vw,32px);}
-  .gn-b1 svg,.gn-b2 svg{width:clamp(22px,1.7vw,52px);height:clamp(22px,1.7vw,52px);}
+  .gn-b1,.gn-b2,.gn-b3{font-size:clamp(1.15rem,1.4vw,2.6rem);padding:clamp(18px,1.6vw,52px) clamp(20px,1.6vw,52px);border-radius:clamp(14px,1.1vw,32px);}
+  .gn-b1 svg,.gn-b2 svg,.gn-b3 svg{width:clamp(22px,1.7vw,52px);height:clamp(22px,1.7vw,52px);}
 }
 .gate-new{min-height:100vh;display:flex;justify-content:center;background:#e9efe6;}
 .gate-new-in{width:100%;max-width:520px;background:#fff;display:flex;flex-direction:column;min-height:100vh;}
@@ -4007,7 +4007,7 @@ function renderGate(){
       '</div>'+
       '<button type="button" class="gn-b1" data-action="gate-cliente"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Ingresar como cliente</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>'+
       '<button type="button" class="gn-b2" data-action="gate-asesor"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M11 13v2h2v-2"/></svg><span>Ingresar como asesor</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>'+
-      (betaVisitante() ? '<button type="button" class="gn-b3" data-action="gate-interesado"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Estoy interesado/a</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>' : '')+
+      (betaVisitante() ? '<button type="button" class="gn-b3" data-action="gate-interesado"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Estoy interesado/a</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>' : '')+
     '</div>'+
     '<div class="gn-ref" style="padding:16px 0 calc(18px + env(safe-area-inset-bottom,0px));"><u></u>Vive Hogar<u></u></div>'+
   '</div></div>';
@@ -8637,7 +8637,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-135002';
+var APP_BUILD = '20261127-135318';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
