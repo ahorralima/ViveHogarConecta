@@ -2468,14 +2468,12 @@ function renderMiCasa(){
         '<button type="button" class="entrega-flecha entrega-next" data-action="entrega-flecha" data-value="1" aria-label="Ver la parte de atrás">→</button>'+
       '</div>'+
       '<p style="font-size:0.78rem;color:var(--ink-faint);margin-top:4px;text-align:center;">Toca la flecha o desliza para cambiar de foto</p></div>';
-    // Las opciones de fachada y el recorrido 3D son de Sullana y Castilla; Ejidos solo muestra la foto de entrega
-    if (miProySlug() !== 'ejidos'){
+    // Las opciones de fachada y el recorrido 3D ahora salen en los tres proyectos (Ejidos activado 2026-11-27)
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">Opciones para tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">Mira cómo puede quedar tu vivienda. Imágenes y recorrido 3D <strong>referenciales</strong>: la casa que se entrega puede variar en acabados y detalles.</p>'+
       galeriaCasaHtml()+
       '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a>'+
       '<p style="font-size:0.78rem;color:var(--ink-faint);margin-top:6px;text-align:center;">Recorre la casa por dentro, cuarto por cuarto.</p></div>';
-    }
   }
 
   if (esSullana && etapaTienePlano(etapaNum)){
@@ -5676,7 +5674,7 @@ function renderInteresadoMapa(){
   if (esAsesor && esJefe() && !asesorSoloLectura) html += renderAlertaSincroHtml() + renderReporteVentasHtml() + renderReporteCastillaHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentasManualesJefeHtml() : '');
   else if (esAsesor && !asesorSoloLectura) html += renderMisVentasHtml() + renderVentasMesHtml() + renderVentas2nfHtml() + (miProySlug() === 'castilla' ? renderVentaManualAsesorHtml() : '');
   if (esAsesor) html += renderApagadoHtml();
-  if ((esAsesor && (proy === 'sullana' || proy === 'castilla')) || esVisitante()){
+  if ((esAsesor && (proy === 'sullana' || proy === 'castilla' || proy === 'ejidos')) || esVisitante()){
     html += '<div class="panel panel-flat"><h4 style="margin-bottom:6px;">🏠 Así puede quedar tu casa</h4>'+
       '<p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:10px;">'+(esAsesor ? 'Para mostrarle al cliente su casa en potencia. ' : 'Mira cómo puede quedar tu casa. ')+'Imágenes referenciales.</p>'+galeriaCasaHtml()+
       '<a class="btn btn-primary btn-block" style="margin-top:12px;" href="casa360/">🚶 Entrar a mi casa 3D →</a></div>';
@@ -8667,7 +8665,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-141314';
+var APP_BUILD = '20261127-173514';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
