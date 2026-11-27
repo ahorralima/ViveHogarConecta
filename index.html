@@ -1345,6 +1345,7 @@ html .lote-dot-sep{background:#f6d085;}
   .mg-logo{display:block;}
   .mg-et h3{font-size:1.7rem;}
 }
+.sep-aviso{background:#fff;border:1px solid #e3e9f2;border-radius:14px;box-shadow:0 2px 10px -6px rgba(0,0,0,.25);padding:12px 14px;margin:0 0 10px;font-size:.92rem;line-height:1.5;color:#1f2933;}
 </style>
 </head>
 <body>
@@ -2630,9 +2631,9 @@ function esMiReserva(loteId){
 }
 function mmss(iso){
   var ms = new Date(iso).getTime() - Date.now();
-  if (!(ms > 0)) return '00:00';
+  if (!(ms > 0)) return '0:00:00';
   var s = Math.floor(ms/1000);
-  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  return Math.floor(s/3600)+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 }
 function etiquetaLote(m, l){ return esc(m)+'-Lt'+esc(l); }
 // Orden natural de manzanas: A2 antes que A10, I3 antes que I11
@@ -3825,7 +3826,11 @@ function renderAsesorLoteAcciones(lote){
     if (esJefe()) h += ofertaLoteHtml(lote);
   } else if (lote.e === 'EN_ATENCION' && lote.vence){
     var mia = esMiReserva(lote.id);
-    h += '<p class="sep-info">⏳ Separación en proceso · tiempo restante <span class="as-timer js-vence" data-vence=\"'+esc(lote.vence)+'\">'+mmss(lote.vence)+'</span></p>';
+    if (mia){
+      h += '<div class="sep-aviso"><b>✅ Casa separada.</b><br>Recuerda: tienes <b>5 horas</b> para subir el voucher del pago. Tiempo restante: <span class="as-timer js-vence" data-vence=\"'+esc(lote.vence)+'\">'+mmss(lote.vence)+'</span></div>';
+    } else {
+      h += '<p class="sep-info">⏳ Separación en proceso · tiempo restante <span class="as-timer js-vence" data-vence=\"'+esc(lote.vence)+'\">'+mmss(lote.vence)+'</span></p>';
+    }
     if (mia){
       var di = ui.descInfo[lote.id];
       if (!di && !ui._descCarg[lote.id]){ ui._descCarg[lote.id] = 1; cargarDescInfo(lote.id).then(function(){ renderSiLibre(); }); }
@@ -3922,9 +3927,8 @@ function asesorIniciarRelojes(){
     var vencio = false;
     els.forEach(function(el){
       var ms = new Date(el.getAttribute('data-vence')).getTime() - Date.now();
-      if (ms <= 0){ el.textContent = '00:00'; vencio = true; return; }
-      var s = Math.floor(ms/1000);
-      el.textContent = String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+      if (ms <= 0){ el.textContent = '0:00:00'; vencio = true; return; }
+      el.textContent = mmss(el.getAttribute('data-vence'));
     });
     if (vencio && !ui._venceBusy){
       ui._venceBusy = true;
@@ -6483,7 +6487,7 @@ document.addEventListener('click', async function(ev){
     ui.sepMsg = ''; ui.sepOp = ''; ui.sepNombre = ''; ui.sepDni = ''; ui.sepMonto = ''; ui.sepImg = '';
     var rv = await asesoraLlamar('ec_reservar_lote', { p_lote_id: rvId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin });
     if (rv.ok){
-      ui.sepMsg = 'Casa bloqueada por 5 horas. Cobra la separación y registra el comprobante antes de que se acabe el tiempo.';
+      ui.sepMsg = '';   // el aviso "Casa separada · tienes 5 horas para el voucher" sale arriba del formulario
       await etapa5Refrescar(); await asesorCargarPanel();
     }
     render();
@@ -6494,7 +6498,7 @@ document.addEventListener('click', async function(ev){
       if (el) ui[kv[1]] = el.value;
     });
     if (miProySlug() === 'sullana' && (!String(ui.sepNombre||'').trim() || !ui.sepImg)){
-      ui.asesoraError = !String(ui.sepNombre||'').trim() ? 'Escribe el nombre del cliente.' : 'Sube la captura del pago (Yape, Plin o voucher).';
+      ui.asesoraError = !String(ui.sepNombre||'').trim() ? 'Escribe el nombre del cliente.' : 'Falta la captura del pago (Yape, Plin o voucher). Súbela antes de que se acabe el tiempo para confirmar la separación.';
       render(); return;
     }
     var montoNum = parseFloat(String(ui.sepMonto).replace(',','.'));
@@ -8637,7 +8641,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-135801';
+var APP_BUILD = '20261127-140450';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
