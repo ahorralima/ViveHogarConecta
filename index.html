@@ -5248,7 +5248,6 @@ function renderMapaEtapa5Html(etapaN){
           '<div><span>Precio total</span><strong>'+precioHtml(lote)+'</strong></div>'+
         '</div>'+
         (lote.e==='DISPONIBLE' && lote.of ? '<div class="oferta-chip">🏷️ Oferta hasta el '+fmtFechaCorta(lote.oh)+'</div>' : '')+
-        (lote.e==='DISPONIBLE' ? '<a class="btn btn-primary btn-block" href="#cuotas-calc-anchor" style="margin-top:10px;">Simular cuotas ↓</a>' : '')+
       '</div>';
       html += '<div class="lote-detail-section">'+
         '<div class="lote-detail-section-title">✅ Información</div>'+
@@ -5280,6 +5279,7 @@ function renderMapaEtapa5Html(etapaN){
         var saldoFinanciar = Math.max(0, inicialCliente - sepMonto());
         var adelantoCalc = Math.min(saldoFinanciar, calcAdelanto());
         var cuotaMensual = Math.round(saldoFinanciar / calcMeses);
+        html += '<div style="padding:0 16px;"><a class="btn btn-primary btn-block" href="#cuotas-calc-anchor" style="margin:4px 0 10px;">Simular cuotas ↓</a></div>';
         html += '<div class="cuotas-calc" id="cuotas-calc-anchor">';
         html += '<div class="cuotas-calc-title">Simula tu cuota mensual</div>';
         html += '<div class="cuotas-calc-tabs">'+
@@ -8637,7 +8637,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-135318';
+var APP_BUILD = '20261127-135801';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
