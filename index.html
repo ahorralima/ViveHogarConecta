@@ -2590,6 +2590,8 @@ function betaVisitante(){
 function esVisitante(){ return betaVisitante() && appGate === 'interesado' && !modoAsesor() && !ui.miCasaKey; }
 var VHS_WA_VISITA = { castilla: '51933570995', sullana: '51934042610', ejidos: '51965302079' };
 function waVisita(proy, texto){ return 'https://wa.me/'+(VHS_WA_VISITA[proy] || VHS_WHATSAPP)+'?text='+encodeURIComponent(texto); }
+// Flujo "sin DNI / voucher después" (Sullana y Ejidos): se separa con nombre y apellido; el voucher se sube dentro de las 5 horas
+function sepSinDni(){ var sl = modoAsesor() ? planoProy() : miProySlug(); return sl === 'sullana' || sl === 'ejidos'; }
 function esJefe(){ return !!(ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.rol === 'jefe'); }
 function sepMonto(){
   return SEPARACION_LOTE;   // la separación es S/ 500 en todos los proyectos
@@ -3838,19 +3840,19 @@ function renderAsesorLoteAcciones(lote){
       h += '<div class="asesora-form">'+filaAcordado+
         '<label>Nombre y apellidos del cliente</label>'+
         '<input class="text-input" type="text" id="sep-nombre" data-ui="sepNombre" autocomplete="off" placeholder="Como figura en su DNI" value="'+esc(ui.sepNombre)+'" />'+
-        (miProySlug() === 'sullana' ? '<p class="sep-info" style="margin:6px 0 0;">Solo necesitas el nombre y la captura del pago. El DNI y demás datos los completas después.</p>' : ('<label style="margin-top:8px;">DNI del cliente'+(miProySlug() === 'sullana' ? ' (opcional)' : '')+'</label>'+
+        (sepSinDni() ? '<p class="sep-info" style="margin:6px 0 0;">Solo necesitas el nombre y apellido del cliente. El voucher y el DNI los completas después: tienes <strong>5 horas</strong> para subir el voucher.</p>' : ('<label style="margin-top:8px;">DNI del cliente'+(sepSinDni() ? ' (opcional)' : '')+'</label>'+
         '<input class="text-input" type="text" id="sep-dni" data-ui="sepDni" inputmode="numeric" autocomplete="off" placeholder="12345678" value="'+esc(ui.sepDni)+'" />'+
-        (miProySlug() === 'sullana' ? '<p class="sep-info" style="margin:4px 0 0;">Si el cliente aún no te da su DNI, déjalo vacío: la separación queda <strong>por aprobar</strong> del jefe de ventas y el pago pasa a ser opcional. Después podrás completar todo desde esta misma casa.</p>' : '')+
+        (sepSinDni() ? '<p class="sep-info" style="margin:4px 0 0;">Si el cliente aún no te da su DNI, déjalo vacío: la separación queda <strong>por aprobar</strong> del jefe de ventas y el pago pasa a ser opcional. Después podrás completar todo desde esta misma casa.</p>' : '')+
         '<label style="margin-top:8px;">N.º de operación (opcional si subes la captura)</label>'+
         '<input class="text-input" type="text" id="sep-op" data-ui="sepOp" autocomplete="off" placeholder="Ej. 00123456" value="'+esc(ui.sepOp)+'" />'))+
-        '<label style="margin-top:8px;">Captura del pago (Yape, Plin o voucher)</label>'+
+        '<label style="margin-top:8px;">Captura del pago (Yape, Plin o voucher)'+(sepSinDni() ? ' · opcional ahora' : '')+'</label>'+
         (ui.sepImg
           ? '<div style="margin:4px 0;"><img src="'+ui.sepImg+'" alt="Comprobante" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border);" /></div>'+
             '<button type="button" class="btn btn-secondary btn-block" data-action="sep-img-quitar">Quitar imagen</button>'
           : '<input class="text-input" type="file" id="sep-img" accept="image/*" />'+(ui.sepImgBusy ? '<p class="sep-info">Preparando imagen…</p>' : '')+(ui.sepImgErr ? '<p class="as-err">No se pudo leer esa imagen. Prueba con otra captura.</p>' : ''))+
-        (miProySlug() === 'sullana' ? '' : ('<label style="margin-top:8px;">Monto pagado (S/) · mínimo '+fmtMoney(sepMonto())+'</label>'+
+        (sepSinDni() ? '' : ('<label style="margin-top:8px;">Monto pagado (S/) · mínimo '+fmtMoney(sepMonto())+'</label>'+
         '<input class="text-input" type="number" id="sep-monto" data-ui="sepMonto" inputmode="decimal" value="'+esc(ui.sepMonto !== '' ? ui.sepMonto : sepMonto())+'" />'))+
-        '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="sep-confirmar" data-value="'+lote.id+'"'+busy+'>'+(ui.asesoraBusy?'Guardando…':(miProySlug() === 'sullana' ? '✅ Confirmar y separar' : '✅ Confirmar pago y separar'))+'</button>'+
+        '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="sep-confirmar" data-value="'+lote.id+'"'+busy+'>'+(ui.asesoraBusy?'Guardando…':(sepSinDni() ? '✅ Confirmar y separar' : '✅ Confirmar pago y separar'))+'</button>'+
         '<button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" data-action="reserva-cancelar" data-value="'+lote.id+'"'+busy+'>Cancelar separación</button>'+
       '</div>';
     } else {
@@ -6151,6 +6153,16 @@ document.addEventListener('click', async function(ev){
     render();
   } else if (action === 'pago2-img-quitar'){
     ui.pago2Img = ''; ui.pago2ImgErr = false; render();
+  } else if (action === 'voucher-subir'){
+    var vLote = t.getAttribute('data-value');
+    if (!ui.sepImg){ ui.asesoraError = 'Elige la captura del voucher.'; render(); return; }
+    var rV = await asesoraLlamar('ec_separacion_editar', { p_lote_id: vLote, p_asesora_id: asesoraIdActual, p_pin: asesoraPin,
+      p_nombre: '', p_dni: '', p_operacion: '', p_monto: sepMonto(), p_imagen: ui.sepImg });
+    if (rV.ok){
+      ui.sepImg = ''; ui.sepMsg = '¡Voucher subido! El jefe de ventas lo revisará.';
+      ui.misVentas = null; await cargarMisVentas(); await etapa5Refrescar();
+    }
+    render();
   } else if (action === 'pago2-enviar'){
     var p2Id = t.getAttribute('data-value');
     ['pago2-op:pago2Op','pago2-monto:pago2Monto'].forEach(function(p){
@@ -6497,17 +6509,18 @@ document.addEventListener('click', async function(ev){
       var kv = p.split(':'), el = document.getElementById(kv[0]);
       if (el) ui[kv[1]] = el.value;
     });
-    if (miProySlug() === 'sullana' && (!String(ui.sepNombre||'').trim() || !ui.sepImg)){
-      ui.asesoraError = !String(ui.sepNombre||'').trim() ? 'Escribe el nombre del cliente.' : 'Falta la captura del pago (Yape, Plin o voucher). Súbela antes de que se acabe el tiempo para confirmar la separación.';
+    if (sepSinDni() && String(ui.sepNombre||'').trim().split(/\s+/).filter(Boolean).length < 2){
+      ui.asesoraError = 'Escribe el nombre y apellido del cliente.';
       render(); return;
     }
     var montoNum = parseFloat(String(ui.sepMonto).replace(',','.'));
+    var sepConImg = !!ui.sepImg;
     var rSep = await asesoraLlamar('ec_reserva_confirmar', { p_lote_id: sepId, p_asesora_id: asesoraIdActual, p_pin: asesoraPin,
       p_nombre: ui.sepNombre, p_dni: ui.sepDni, p_operacion: ui.sepOp, p_monto: isNaN(montoNum) ? null : montoNum, p_imagen: ui.sepImg || null });
     if (rSep.ok){
       ui.sepNombre = ''; ui.sepDni = ''; ui.sepOp = ''; ui.sepMonto = ''; ui.sepImg = '';
       ui.sepMsg = rSep.por_aprobar
-        ? '¡Listo! La casa quedó SEPARADA y está ⏳ por aprobar del jefe de ventas. Cuando el cliente te pase su DNI y el pago, ábrela y toca "Editar datos".'
+        ? '¡Casa separada! ' + (sepConImg ? 'El jefe de ventas la aprobará.' : 'Tienes 5 horas para subir el voucher: hazlo desde "Mis ventas". Si no lo subes, la casa se libera sola.') + ' Cuando el cliente te pase su DNI, ábrela y toca "Editar datos".'
         : '¡Pago registrado! La casa quedó SEPARADA.' + (rSep.aviso === 'nombre_distinto' ? ' Ojo: ese DNI ya estaba registrado con otro nombre; puede que no pueda entrar con este.' : '');
       ui.misVentas = null;
       await etapa5Refrescar(); await asesorCargarPanel();
@@ -7535,21 +7548,24 @@ function renderMisVentasHtml(){
   var mesTxt = '';
   try { mesTxt = new Date(mv ? mv.mes : Date.now()).toLocaleDateString('es-PE', { month: 'long', year: 'numeric', timeZone: 'America/Lima' }); } catch(e){}
   var h = '<div class="panel panel-flat" id="mis-ventas"><h4>🧾 Mis ventas de '+esc(mesTxt)+'</h4>'+
+    '<p class="sep-info" style="margin:0 0 8px;">📎 <strong>Si separas sin voucher</strong>, tienes <strong>5 horas</strong> para subirlo desde aquí. Si no lo subes, la casa se libera sola.</p>'+
     '<p class="sep-info" style="margin:0 0 8px;">⚠️ <strong>Recuerda:</strong> la separación de '+fmtMoney(sepMonto())+' queda sujeta a que el cliente complete otros <strong>'+fmtMoney(500)+'</strong> (mínimo <strong>'+fmtMoney(1000)+'</strong> en total) <strong>antes de que termine el mes</strong>. Si no subes la segunda boleta a tiempo, la casa se libera para el mes siguiente.</p>';
   if (ui.misVentasErr && !mv) return h+'<p class="as-err">No se pudo cargar. Revisa tu conexión (o falta activar la actualización v7x en Supabase).</p></div>';
   if (!mv) return h+'<p style="font-size:0.85rem;color:var(--ink-faint);">Cargando…</p></div>';
   if (!mv.items.length) return h+'</div>';
   var activas = mv.items.filter(function(v){ return v.estado !== 'liberada'; });
-  var faltan = activas.filter(function(v){ return v.exige_pago2 && !v.pago2_en; }).length;
+  var faltan = activas.filter(function(v){ return v.exige_pago2 && !v.pago2_en && !v.voucher_vence; }).length;
   h += '<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 8px;"><strong>'+activas.length+'</strong> venta'+(activas.length===1?'':'s')+(faltan ? ' · <strong style="color:var(--danger,#b3261e);">'+faltan+' con la 2.ª boleta pendiente</strong>' : '')+'. Toca una venta para ver el detalle.</p>';
   if (ui.mvAbierta && ui.asesoraError) h += '<p class="as-err">'+esc(ui.asesoraError)+'</p>';
   if (ui.mvAbierta && ui.sepMsg) h += '<p class="sep-info">'+esc(ui.sepMsg)+'</p>';
   mv.items.forEach(function(v){
     var abierta = String(ui.mvAbierta) === String(v.id);
-    var pend = v.estado !== 'liberada' && v.exige_pago2 && !v.pago2_en;
-    var chip = v.estado === 'liberada' ? 'Liberada' : (v.pago2_en ? 'Pago completo ✅' : (pend ? '⏳ Falta 2.ª boleta' : 'Separada'));
+    var pendV = v.estado !== 'liberada' && !!v.voucher_vence;
+    var pend = !pendV && v.estado !== 'liberada' && v.exige_pago2 && !v.pago2_en;
+    var chip = v.estado === 'liberada' ? 'Liberada' : (pendV ? '⏳ Falta el voucher' : (v.pago2_en ? 'Pago completo ✅' : (pend ? '⏳ Falta 2.ª boleta' : 'Separada')));
     h += '<div class="as-hist"><div style="cursor:pointer;" role="button" tabindex="0" data-action="mv-toggle" data-value="'+v.id+'">'+
       '<div class="as-hist-top"><span><strong>'+etiquetaLote(v.m, v.l)+'</strong> · Etapa '+esc(v.etapa)+' <em>'+chip+'</em></span><span>'+esc(fmtFechaCorta(v.cuando))+' '+(abierta ? '▲' : '▼')+'</span></div>'+
+      (pendV ? '<div class="sep-aviso" style="margin:6px 0 0;">📎 Sube el <b>voucher</b> del pago. Tiempo restante: <span class="as-timer js-vence" data-vence=\"'+esc(v.voucher_vence)+'\">'+mmss(v.voucher_vence)+'</span> · si no lo subes, la casa se libera sola.</div>' : '')+
       (pend ? '<div style="font-size:0.8rem;">Sube la 2.ª boleta hasta el <b>'+esc(ultimoDiaMes(v.vence_pago2))+'</b> o la casa se libera.</div>' : '')+
       '</div>';
     if (abierta){
@@ -7559,6 +7575,16 @@ function renderMisVentasHtml(){
         (v.pago2_en ? '<div>2.ª boleta: <b>'+fmtMoney(v.pago2_monto)+'</b>'+(v.pago2_op ? ' · Op. '+esc(v.pago2_op) : '')+'</div>' : '')+
         (v.precio_final ? '<div>Precio final <b>'+fmtMoney(v.precio_final)+'</b></div>' : '')+
         (Number(v.descuento) > 0 ? '<div>Descuento acordado: <b>'+fmtMoney(v.descuento)+'</b></div>' : '');
+      if (pendV){
+        h += '<div class="asesora-form" style="margin-top:8px;">'+
+          '<label>Captura del voucher (Yape, Plin o voucher)</label>'+
+          (ui.sepImg
+            ? '<div style="margin:4px 0;"><img src="'+ui.sepImg+'" alt="Voucher" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border);" /></div>'+
+              '<button type="button" class="btn btn-secondary btn-block" data-action="sep-img-quitar">Quitar imagen</button>'
+            : '<input class="text-input" type="file" id="sep-img" accept="image/*" />'+(ui.sepImgBusy ? '<p class="sep-info">Preparando imagen…</p>' : '')+(ui.sepImgErr ? '<p class="as-err">No se pudo leer esa imagen. Prueba con otra captura.</p>' : ''))+
+          '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px;" data-action="voucher-subir" data-value="'+v.lote_id+'"'+((ui.asesoraBusy || !ui.sepImg)?' disabled':'')+'>'+(ui.asesoraBusy?'Guardando…':'✅ Subir voucher')+'</button>'+
+        '</div>';
+      }
       if (pend){
         h += '<div class="asesora-form" style="margin-top:8px;">'+
           '<label>N.º de operación de la 2.ª boleta (opcional si subes la captura)</label>'+
@@ -8641,7 +8667,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-140450';
+var APP_BUILD = '20261127-141314';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
