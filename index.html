@@ -1281,6 +1281,9 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .qm-gen img{width:100%;height:auto;display:block;}
 .qm-gen-hot{position:absolute;border:0;padding:0;background:rgba(255,255,255,0);cursor:pointer;}
 .qm-gen-hot:active{background:rgba(255,255,255,.25);}
+
+.wa-fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:60;width:54px;height:54px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.28);}
+.wa-fab-alto{bottom:calc(82px + env(safe-area-inset-bottom,0px));}
 </style>
 </head>
 <body>
@@ -2523,7 +2526,7 @@ function betaVisitante(){
   } catch(e){ return false; }
 }
 function esVisitante(){ return betaVisitante() && appGate === 'interesado' && !modoAsesor() && !ui.miCasaKey; }
-var VHS_WA_VISITA = { castilla: '51966704021', sullana: '51934042610', ejidos: '51965302079' };
+var VHS_WA_VISITA = { castilla: '51933570995', sullana: '51934042610', ejidos: '51965302079' };
 function waVisita(proy, texto){ return 'https://wa.me/'+(VHS_WA_VISITA[proy] || VHS_WHATSAPP)+'?text='+encodeURIComponent(texto); }
 function esJefe(){ return !!(ui.asesorPanel && ui.asesorPanel.yo && ui.asesorPanel.yo.rol === 'jefe'); }
 function sepMonto(){
@@ -5547,6 +5550,7 @@ function renderInteresadoMapa(){
   }
   if (!esAsesor) html += comoLlegarHtml(proy);
   html += '</div>';
+  if (esVisitante()) html += '<a class="wa-fab'+(ui.interesadoLoteSel ? ' wa-fab-alto' : '')+'" href="'+asesorHref+'" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp a '+esc(nombreProy)+'"><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.200-.5-2.300-1.400-.8-.8-1.400-1.700-1.600-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.600-.9-2.200-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.400s1.100 2.800 1.200 3c.1.2 2.100 3.200 5.100 4.500.7.3 1.300.5 1.700.6.7.2 1.400.2 1.900.1.600-.1 1.700-.7 2-1.400.2-.7.2-1.300.2-1.400-.1-.1-.3-.2-.6-.3z"/><path d="M12 2a10 10 0 0 0-8.600 15L2 22l5.200-1.400A10 10 0 1 0 12 2zm0 18.200c-1.500 0-2.900-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200z"/></svg></a>';
   if (!esAsesor && ui.interesadoLoteSel) html += '<a class="asesor-bar" href="'+asesorHref+'" target="_blank" rel="noopener">💬 Hablar con un asesor</a>';
   return html;
 }
@@ -8500,7 +8504,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-124343';
+var APP_BUILD = '20261127-125858';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
