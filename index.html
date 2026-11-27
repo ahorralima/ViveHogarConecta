@@ -1327,6 +1327,24 @@ html[data-plano="sullana"] .lote-dot-neutral,html[data-plano="ejidos"] .lote-dot
 /* Naranja de separada: más suave en todos los planos */
 html .lote-hotspot.lote-warn,html .mapa-real .lote-hotspot.lote-warn{background:#f6d085;}
 html .lote-dot-sep{background:#f6d085;}
+
+/* Mapa general de Castilla (visitante): mapa grande + panel de la Etapa 16 */
+.mg{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px;}
+.mg-map .mapa-gen{border-radius:16px;}
+.mg-panel{background:#fff;border:1px solid #e3e9f2;border-radius:18px;box-shadow:0 6px 20px -10px rgba(20,48,90,.25);padding:14px 16px;}
+.mg-logo{display:none;width:150px;height:auto;mix-blend-mode:multiply;margin:0 0 8px;}
+.mg-et{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.mg-et h3{margin:0;font-size:1.35rem;color:#14305a;}
+.mg-tag{background:#e6f4ea;color:#1e7a3a;font-weight:700;font-size:.78rem;border-radius:999px;padding:4px 10px;}
+.mg-panel p{margin:8px 0 0;color:#5b6b82;font-size:.95rem;line-height:1.4;}
+.mg-dato b{color:#2e7d32;}
+.mg-btn{margin-top:12px;width:100%;padding:15px;font-size:1.05rem;}
+@media (min-width:900px){
+  .mg{grid-template-columns:minmax(0,7fr) minmax(260px,3fr);align-items:start;gap:18px;}
+  .mg-panel{padding:20px;position:sticky;top:16px;}
+  .mg-logo{display:block;}
+  .mg-et h3{font-size:1.7rem;}
+}
 </style>
 </head>
 <body>
@@ -5564,14 +5582,25 @@ function renderInteresadoMapa(){
 
   } else if (proy === 'castilla'){
     var dosColC = !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));
+    if (esVisitante()){
+      html += '<div class="mg" id="mapa-proyecto-panel"><div class="mg-map">'+renderMapaGeneralVisor()+'</div>'+
+        '<aside class="mg-panel"><img class="mg-logo" src="portada/logo_c.png?v=2" alt="Vive Hogar" />'+
+          '<div class="mg-et"><h3>Etapa 16</h3><span class="mg-tag">A la venta</span></div>'+
+          '<p>Conoce las viviendas disponibles en esta etapa.</p>'+
+          '<p class="mg-dato">Casas de <b>25 m²</b> sobre terreno de <b>62.5 m²</b>, con título de propiedad.</p>'+
+          '<button type="button" class="qm-btn qm-e mg-btn" data-action="interesado-etapa" data-value="16">Ver viviendas disponibles <span>→</span></button>'+
+        '</aside></div>'+
+        '<div id="qm-lotes">'+(dosColC ? '<div class="panel panel-flat mapa-wide"><div class="mapa-col-etapa">'+renderMapaEtapa5Html(String(ui.interesadoEtapaSel))+'</div></div>' : '')+'</div>';
+    } else {
     html += '<div class="panel panel-flat'+(dosColC ? ' mapa-wide' : ' mapa-wide mapa-solo')+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
       '<div class="map-hint-banner">'+(esAsesor ? '👆 Toca la Etapa 16 para ver los lotes disponibles' : '<span>Ahora estamos vendiendo la <strong>Etapa 16</strong>. Tócala en el mapa para ver las casas disponibles.</span>')+'</div>'+
       '<div class="mapa-2col"><div class="mapa-col-gen">'+
-      (esVisitante() ? renderMapaCastillaVisita() : renderMapaGeneralVisor())+
+      renderMapaGeneralVisor()+
       (esVisitante() ? '<div class="lp-etapa16"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><div><b>Etapa 16 disponible</b><span>Elige tu casa y habla con un asesor.</span></div><button type="button" data-action="interesado-etapa" data-value="16">Ver casas de la Etapa 16 →</button></div>' : '<div class="mapa-etapas-otras">Elegir etapa: <button type="button" class="chip'+(String(ui.interesadoEtapaSel)==='16'?' active':'')+'" data-action="interesado-etapa" data-value="16">Etapa 16</button></div>')+
       '</div><div class="mapa-col-etapa">'+
       (dosColC ? renderMapaEtapa5Html(String(ui.interesadoEtapaSel)) : '')+
     '</div></div></div>';
+    }
   } else if (proy === 'lambayeque'){
     var dosColL = !!(ui.interesadoEtapaSel && etapaTienePlano(ui.interesadoEtapaSel));
     html += '<div class="panel panel-flat'+(dosColL ? ' mapa-wide' : ' mapa-wide mapa-solo')+'" id="mapa-proyecto-panel"><h4>Mapa del proyecto</h4>'+
@@ -6351,6 +6380,7 @@ document.addEventListener('click', async function(ev){
     ui.interesadoManzanaSel = null;
     ui.interesadoLoteSel = null;
     render();
+    if (esVisitante() && etapaVal && ui.interesadoProyecto === 'castilla') setTimeout(function(){ var d = document.getElementById('qm-lotes'); if (d) d.scrollIntoView({block:'start', behavior:'smooth'}); }, 120);
   } else if (action === 'interesado-manzana'){
     var mzVal = t.getAttribute('data-value');
     ui.interesadoManzanaSel = (ui.interesadoManzanaSel === mzVal) ? null : mzVal;
@@ -7822,7 +7852,10 @@ function genSeleccionSvg(){
     (lb ? '<text x="'+(lb[0]*w/100).toFixed(1)+'" y="'+(lb[1]*h/100).toFixed(1)+'" style="font-size:'+Math.round(w*(cfg.vendido?0.021:0.0154))+'px;stroke-width:'+Math.round(w*(cfg.vendido?0.0055:0.0037))+'px;">ETAPA '+esc(n)+'</text>' : '')+'</svg>';
 }
 // Zona de arriba de Castilla (etapas 1 a 8 y 10, según el plano de ingeniería): colores suaves como Sullana, sin clic
-var COLOR_PLOMO = '#98a6b4', COLOR_ARENA = '#e3d8bf';  // plomo = vendida, arena = próxima
+var COLOR_PLOMO = '#98a6b4', COLOR_ARENA = '#e3d8bf';
+function colVend(){ return esVisitante() ? '#A9CDE8' : COLOR_PLOMO; }
+function colProx(){ return esVisitante() ? '#F5DFC5' : COLOR_ARENA; }
+function colDisp(){ return esVisitante() ? '#35A853' : '#5fd068'; }  // plomo = vendida, arena = próxima
 var ABAJO_VENDIDAS = ['11','12','13','14','15'];
 // Geometría del terreno sobre la foto satélite (píxeles del plano de 1000 de ancho). La avenida principal separa lo vendido (arriba) de lo que viene (abajo)
 function genPts(ps){ return ps.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' '); }
@@ -7833,7 +7866,7 @@ function genVendidoSvg(){
   var w = cfg.dim[0], h = cfg.dim[1], out = '';
   Object.keys(CASTILLA_ARRIBA).forEach(function(n){
     var ps = CASTILLA_ARRIBA[n], lb = CASTILLA_ARRIBA_LABELS[n];
-    out += '<polygon points="'+genPts(ps)+'" fill="'+COLOR_PLOMO+'" fill-opacity="0.8" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+    out += '<polygon points="'+genPts(ps)+'" fill="'+colVend()+'" fill-opacity="'+(esVisitante() ? '0.95' : '0.8')+'" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
       '<text class="gen-et-vend" x="'+lb[0]+'" y="'+lb[1]+'" style="font-size:'+Math.round(w*0.02)+'px;">ETAPA '+n+'</text>';
   });
   return '<svg class="mapa-gen-sel" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+out+'</svg>';
@@ -7854,7 +7887,7 @@ function genProximasSvg(){
   var w = cfg.dim[0], h = cfg.dim[1], out = '';
   Object.keys(CASTILLA_ABAJO).forEach(function(k){
     var ps = genPts(CASTILLA_ABAJO[k]), vend = ABAJO_VENDIDAS.indexOf(k) >= 0;
-    out += '<polygon points="'+ps+'" fill="'+(vend ? COLOR_PLOMO : COLOR_ARENA)+'" fill-opacity="'+(vend ? '0.8' : '0.72')+'" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+    out += '<polygon points="'+ps+'" fill="'+(vend ? colVend() : colProx())+'" fill-opacity="'+(esVisitante() ? '0.95' : (vend ? '0.8' : '0.72'))+'" stroke="#1d2f45" stroke-width="1.3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
       (vend ? '' : '<polygon points="'+ps+'" fill="url(#gen-hatch)" stroke="none"/>');
   });
   ABAJO_VENDIDAS.forEach(function(k){
@@ -7873,7 +7906,7 @@ function genDisponibleSvg(){
     var pp = cfg.etapas[n].map(function(p){ return (p[0]*w/100).toFixed(1)+','+(p[1]*h/100).toFixed(1); }).join(' '), lb = cfg.labels[n];
     var lx = lb[0]*w/100, ly = lb[1]*h/100;
     o += '<polygon class="gen-disp-halo" points="'+pp+'" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
-      '<polygon points="'+pp+'" fill="#5fd068" fill-opacity="0.88" stroke="#0a3d20" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      '<polygon points="'+pp+'" fill="'+colDisp()+'" fill-opacity="'+(esVisitante() ? '0.95' : '0.88')+'" stroke="#0a3d20" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
       '<text class="gen-et-disp" x="'+lx.toFixed(1)+'" y="'+(ly-w*0.008).toFixed(1)+'" style="font-size:'+Math.round(w*0.021)+'px;stroke-width:'+Math.round(w*0.005)+'px;">ETAPA '+n+'</text>'+
       '<text class="gen-et-disp gen-et-venta" x="'+lx.toFixed(1)+'" y="'+(ly+w*0.014).toFixed(1)+'" style="font-size:'+Math.round(w*0.0125)+'px;stroke-width:'+Math.round(w*0.0038)+'px;">A LA VENTA</text>';
   });
@@ -7912,7 +7945,7 @@ function renderMapaGeneralVisor(){
           zonas+
         '</div>'+
       '</div>'+
-      '<div class="mapa-gen-leyenda"><span><i style="background:#1f5f8c;"></i>Etapa seleccionada</span>'+(cfg.vendido ? '<span><i style="background:#5fd068;"></i>A la venta</span><span><i style="background:#98a6b4;"></i>Etapas vendidas</span><span><i style="background:#e3d8bf;"></i>Próximas etapas</span>' : '<span><i style="background:#b4c4d2;"></i>Otras etapas</span>')+'</div>'+
+      '<div class="mapa-gen-leyenda">'+(esVisitante() && cfg.vendido ? '<span><i style="background:#A9CDE8;"></i>Etapas vendidas</span><span><i style="background:#35A853;"></i>Etapas a la venta</span><span><i style="background:#F5DFC5;"></i>Próximas etapas</span>' : '<span><i style="background:#1f5f8c;"></i>Etapa seleccionada</span>'+(cfg.vendido ? '<span><i style="background:#5fd068;"></i>A la venta</span><span><i style="background:#98a6b4;"></i>Etapas vendidas</span><span><i style="background:#e3d8bf;"></i>Próximas etapas</span>' : '<span><i style="background:#b4c4d2;"></i>Otras etapas</span>'))+'</div>'+
       '<div class="mapa-zoom-controls">'+
         '<button type="button" class="mapa-zoom-btn" data-action="gen-zoom" data-value="in" title="Acercar">+</button>'+
         '<button type="button" class="mapa-zoom-btn" data-action="gen-zoom" data-value="out" title="Alejar">−</button>'+
@@ -8600,7 +8633,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-133309';
+var APP_BUILD = '20261127-133851';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
