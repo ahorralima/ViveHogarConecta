@@ -1292,7 +1292,7 @@ select:focus,.text-input:focus,textarea:focus{border-color:var(--teal);}
 .lp-c{color:#1976d2;}.lp-s{color:#7b2d8e;}.lp-e{color:#2e7d32;}
 .lp-desc{color:#5b6b82;font-size:1rem;line-height:1.4;margin:4px auto 0;max-width:520px;}
 .lp-foto{border-radius:20px;overflow:hidden;box-shadow:0 8px 24px -10px rgba(20,48,90,.3);margin-bottom:14px;}
-.lp-foto img{width:100%;display:block;aspect-ratio:966/386;object-fit:cover;}
+.lp-foto img{width:100%;display:block;aspect-ratio:998/356;object-fit:cover;}
 .lp-stats{display:grid;grid-template-columns:repeat(3,1fr);background:#eef5ee;border-radius:18px;padding:12px 6px;margin-bottom:14px;}
 .lp-stats div{display:flex;align-items:center;gap:8px;justify-content:center;color:#2e7d32;padding:0 6px;border-left:1px solid #d5e4d5;}
 .lp-stats div:first-child{border-left:0;}
@@ -4794,7 +4794,7 @@ function renderProyectoLanding(){
     '<h1>Vive Hogar <span class="lp-'+inf.cls+'">'+esc(nom)+'</span></h1>'+
     '<div class="qm-loc" style="justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#d32f2f"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>'+esc(inf.loc)+'</div>'+
     '<p class="lp-desc">'+esc(inf.txt)+'</p></div>';
-  html += '<div class="lp-foto"><img src="casas/hero-calle.jpg?v=1" alt="Casas Vive Hogar" /></div>';
+  html += '<div class="lp-foto"><img src="casas/hero-calle2.jpg?v=1" alt="Casas Vive Hogar" /></div>';
   html += '<div class="lp-stats">'+
     '<div><svg '+ic+'><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span><b>25 m²</b>de vivienda</span></div>'+
     '<div><svg '+ic+'><path d="M4 8l16-2v12L4 17z"/></svg><span><b>62.5 m²</b>de terreno</span></div>'+
@@ -5472,6 +5472,10 @@ function renderLoteSheetEtapa5(){
 }
 
 // "Cómo llegar": mapa + Google Maps + Street View (sin Apple Maps). Solo sale si el proyecto tiene coordenadas cargadas.
+// Vista fija de Street View por proyecto (foto elegida a mano; si no hay, se usa la más cercana al punto)
+var SV_FIJO = {
+  castilla: 'https://www.google.com/maps/@-5.1594245,-80.5036077,145a,75y,335.99h,81.87t/data=!3m7!1e1!3m5!1soezgONdWQfI1e7OzxI1bUQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D8.130289894136638%26panoid%3DoezgONdWQfI1e7OzxI1bUQ%26yaw%3D335.986295044498!7i16384!8i8192'
+};
 function comoLlegarHtml(slug){
   var pr = proyById(proyIdDeSlug(slug));
   if (!pr || pr.lat == null) return '';
@@ -5482,7 +5486,7 @@ function comoLlegarHtml(slug){
     '<div class="streetview-wrap"><iframe src="https://maps.google.com/maps?q='+pr.lat+','+pr.lng+'&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'+
     (slug === 'sullana' ? renderEntornoChips() : '')+
     '<a class="btn btn-secondary btn-block" style="margin-top:10px;" href="https://www.google.com/maps?q='+pr.lat+','+pr.lng+'" target="_blank" rel="noopener">Ver ubicación en Google Maps</a>'+
-    '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="https://www.google.com/maps/@'+pr.lat+','+pr.lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0" target="_blank" rel="noopener">Explorar con Street View</a>'+
+    '<a class="btn btn-secondary btn-block" style="margin-top:8px;" href="'+(SV_FIJO[slug] || 'https://www.google.com/maps/@'+pr.lat+','+pr.lng+',3a,75y,90h,90t/data=!3m4!1e1!3m2!1s0!2e0')+'" target="_blank" rel="noopener">Explorar con Street View</a>'+
   '</div>';
 }
 function renderInteresadoMapa(){
@@ -8584,7 +8588,7 @@ async function init(){
 
 // ---- Actualizacion automatica: si el sitio tiene una version mas nueva, la app se recarga sola ----
 // APP_BUILD cambia en cada publicacion (lo sella el script sellar.sh antes de subir). Si el sitio tiene otro sello, recarga.
-var APP_BUILD = '20261127-131646';
+var APP_BUILD = '20261127-132206';
 function revisarVersionNueva(){
   try {
     if (document.hidden) return;
